@@ -5,10 +5,7 @@ import React, { useState, useEffect } from "react";
 
 const Bookmarks = () => {
 
-    const category = useLocation().search;
-
-
-    
+    const category = useLocation().search;  
 
 
 

@@ -10,6 +10,9 @@ import { debounced } from "../utils/debounce";
 
 const Write = () => {
   const location = useLocation();
+
+  console.log(location);
+
   const navigate = useNavigate();
   const draftParamId = new URLSearchParams(location.search).get("draftId");
 
@@ -19,10 +22,11 @@ const Write = () => {
   const [file, setFile] = useState(null);
   const [cat, setCat] = useState(location?.state?.category || "");
   const [draftId, setDraftId] = useState(draftParamId);
+  const [postId, setPostId] = useState(location?.state?.pid || "");
 
   useEffect(() => {
     const saveDraftAutomatically = async () => {
-      if (title && desc && cont && cat) {
+      if (title && desc && cont && cat && !postId) {
         try {
           const endpoint = draftId
             ? `http://localhost:9000/api/v1/draftposts/${draftId}` // Use the existing draftId for updates
@@ -75,18 +79,33 @@ const Write = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:9000/api/v1/draftposts"
-        );
+        const endpoint = postId
+          ? `http://localhost:9000/api/v1/posts/${postId}`
+          : "http://localhost:9000/api/v1/draftposts";
+        const response = await axios({
+          method: "get",
+          url: endpoint,
+          withCredentials: true,
+        });
+
+        const postData = response.data.post || [];
+        console.log("The Object is: ", postData);
+
         const draftData = response.data.posts || [];
         console.log(draftData);
 
-        if (draftData) {
+        if (postData) {
+          setTitle(postData?.title || "");
+          setDesc(postData?.description || "");
+          setCont(postData?.content || "");
+          setCat(postData?.category || "");
+          setFile(postData?.image ? { name: postData.image } : null);
+        } else {
           setTitle(draftData[0]?.title || "");
-          setDesc(draftData[0]?.description || "");
+          setDesc(draftData[0]?.description);
           setCont(draftData[0]?.content || "");
           setCat(draftData[0]?.category || "");
-          setFile(draftData[0]?.image || null);
+          setFile(draftData[0]?.image ? { name: draftData[0].image } : null);
         }
       } catch (err) {
         console.log(err);
@@ -99,91 +118,104 @@ const Write = () => {
   }, [draftId]);
 
   const handleDeleteDraftPost = async () => {
-    try {
-      // Delete the draftId from localStorage
-      localStorage.removeItem("draftId");
+    if (!postId) {
+      try {
+        // Delete the draftId from localStorage
+        localStorage.removeItem("draftId");
 
-      // Set the state to null or an appropriate value
-      setDraftId(null);
+        // Set the state to null or an appropriate value
+        setDraftId(null);
 
-      await axios.delete(`http://localhost:9000/api/v1/draftposts`, {
-        withCredentials: true,
-      });
-      setTitle("");
-      setDesc("");
-      setCont("");
-      navigate("/");
-      toast.info("Draft deleted successfully", {
-        position: "bottom-right",
-        autoClose: 2500,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-      });
-    } catch (err) {
-      console.log(err);
+        await axios.delete(`http://localhost:9000/api/v1/draftposts`, {
+          withCredentials: true,
+        });
+        setTitle("");
+        setDesc("");
+        setCont("");
+        navigate("/");
+        toast.info("Draft deleted successfully", {
+          position: "bottom-right",
+          autoClose: 2500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+      } catch (err) {
+        console.log(err);
+      }
     }
   };
 
   const handlePublish = async () => {
-    if (!title || !desc || !cont || !cat || !file) {
+    if (!title || !desc || !cont || !cat) {
       toast.error("Please fill all the fields");
       return;
     }
 
     try {
-      toast.info("Uploading image...", {
-        position: "bottom-right",
-        autoClose: 2500,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-      });
+      let fileUrl = "";
+      const formData = new FormData() || location.state.image;
 
-      const formData = new FormData();
-      formData.append("file", file);
+      if (file) {
+        console.log(file);
+        toast.info("Uploading image...", {
+          position: "bottom-right",
+          autoClose: 2500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
 
-      const res = await axios.post(
-        "http://localhost:9000/api/v1/upload",
-        formData
-      );
+        formData.set("file", file);
+        console.log(formData.get("file"));
 
-      const imgUrl = res.data;
+        if (location.state.image && formData) {
+          const res = await axios.post(
+            "http://localhost:9000/api/v1/upload",
+            formData
+          );
+          const filename = res.data;
 
-      if (location.state && location.state.id) {
-        await axios.put(
-          `http://localhost:9000/api/v1/posts/${location.state.id}`,
-          {
-            title,
-            description: desc,
-            content: cont,
-            category: cat,
-            image: file ? imgUrl : "",
-          },
-          {
-            withCredentials: true,
-          }
-        );
-      } else {
-        await axios.post(
-          "http://localhost:9000/api/v1/posts",
-          {
-            title,
-            description: desc,
-            content: cont,
-            image: file.name ? imgUrl : "",
-            date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-            category: cat,
-          },
-          { withCredentials: true }
-        );
+          fileUrl = filename;
+
+          console.log(fileUrl);
+        } else if (!location.state.image && formData) {
+          const res = await axios.post(
+            "http://localhost:9000/api/v1/upload",
+            formData
+          );
+          const filename = res.data;
+
+          fileUrl = filename;
+
+          console.log(fileUrl);
+        }
       }
+
+      const method = location.state.pid ? "put" : "post";
+      const url = location.state.pid
+        ? `http://localhost:9000/api/v1/posts/${location.state.pid}`
+        : "http://localhost:9000/api/v1/posts";
+
+      await axios({
+        method: method,
+        url: url,
+        data: {
+          title,
+          description: desc,
+          content: cont,
+          image: file ? fileUrl : location.state.image, // Use the uploaded image URL or an empty string if no file was uploaded
+          date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+          category: cat,
+        },
+        withCredentials: true,
+      });
 
       toast.success("Post published successfully", {
         position: "bottom-right",
@@ -195,8 +227,6 @@ const Write = () => {
         progress: undefined,
         theme: "dark",
       });
-      navigate("/");
-      window.location.reload();
     } catch (err) {
       console.log(err);
       toast.error("Error uploading image or publishing post");
@@ -275,15 +305,17 @@ const Write = () => {
           <input
             style={{ display: "none" }}
             type="file"
-            name=""
+            name="file"
             id="file"
             onChange={(e) => setFile(e.target.files[0])}
           />
           <label className="input-file" htmlFor="file">
             Upload Image
           </label>
-          <button onClick={handleDeleteDraftPost}>Delete Draft</button>
-          <h5>{file ? `Uploaded: ${file.name}` : ""}</h5>
+          {!postId && (
+            <button onClick={handleDeleteDraftPost}>Delete Draft</button>
+          )}
+          <h5>{file ? `Uploaded: ${file.name}` : "No file selected"}</h5>
           {file ? (
             <div className="actions">
               <button onClick={handlePublishAndDeleteDraft}>Publish</button>

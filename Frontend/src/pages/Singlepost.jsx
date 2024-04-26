@@ -34,7 +34,6 @@ const Singlepost = () => {
 
   const navigate = useNavigate();
 
-
   const currentUserUsername = currentUser?.user?.username;
 
   useEffect(() => {
@@ -125,7 +124,6 @@ const Singlepost = () => {
           `http://localhost:9000/api/v1/bookmarks/${currentUser?.user?.id}`
         );
         setBookmarks(res.data.bookmarks);
-        
 
         if (res.data.bookmarks) {
           setBookmarks(res.data.bookmarks);
@@ -173,12 +171,16 @@ const Singlepost = () => {
   return (
     <Wrapper>
       <Post>
-        <img className="postImg" src={`http://localhost:9000/uploads/${post.image}`} alt="" />
+        <img
+          className="postImg"
+          src={`http://localhost:9000/uploads/${post.image}`}
+          alt=""
+        />
         <div className="user">
           {userImage && (
             <img
               className="userImg"
-              src={`../upload/${userImage}`}
+              src={`http://localhost:9000/uploads/${post.userImage}`}
               alt={userImage}
             />
           )}

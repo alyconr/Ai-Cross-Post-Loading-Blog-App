@@ -88,7 +88,7 @@ const Write = () => {
           withCredentials: true,
         });
 
-        const postData = response.data.post || [];
+        const postData = response.data.post;
         console.log("The Object is: ", postData);
 
         const draftData = response.data.posts || [];
@@ -185,17 +185,19 @@ const Write = () => {
           fileUrl = filename;
 
           console.log(fileUrl);
+          
         } else if (!location.state.image && formData) {
-          const res = await axios.post(
-            "http://localhost:9000/api/v1/upload",
-            formData
-          );
-          const filename = res.data;
+          
+          const res = await axios.post("http://localhost:9000/api/v1/upload",
+            formData)
+           const filename = res.data;
 
           fileUrl = filename;
 
           console.log(fileUrl);
         }
+
+       
       }
 
       const method = location.state.pid ? "put" : "post";

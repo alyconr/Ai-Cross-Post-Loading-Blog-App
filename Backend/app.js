@@ -10,10 +10,12 @@ app.use(express.json());
 app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
 app.use(cookieParser());
 
+app.use("/uploads", express.static("uploads"));
+
 // multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "../Frontend/public/upload");
+    cb(null, "uploads/");
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + file.originalname);
@@ -24,16 +26,22 @@ const upload = multer({
   storage: storage,
 });
 
-app.post("/api/v1/upload", upload.single("file"), (req, res) => {
-  const file = req.file;
+app.all("/api/v1/upload", upload.single("file"), (req, res) => {
+  if (req.method === "POST" || req.method === "PUT" || req.method === "GET") {
+    const file = req.file;
 
-  if (!file) {
-    // If no file is provided, you can handle it accordingly
-    res.status(400).json({ error: "No file uploaded" });
-    return;
+    if (!file) {
+      // If no file is provided, respond with an error
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const filename = file.filename;
+
+    return res.status(200).json(filename);
+  } else {
+    // If the request method is not supported, respond with an error
+    return res.status(405).json({ error: "Method Not Allowed" });
   }
-
-  res.status(200).json(file.filename);
 });
 
 const authRouter = require("./routes/auth");
@@ -48,7 +56,6 @@ const draftPostsRouter = require("./routes/draft.post");
 const followersRouter = require("./routes/followers");
 const followingsRouter = require("./routes/followings");
 const bookmarksRouter = require("./routes/bookmarks");
-
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/posts", postsRouter);

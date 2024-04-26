@@ -27,13 +27,13 @@ const Singlepost = () => {
   const [show, setShow] = useState(false);
   const [showBookmark, setShowBookmark] = useState(false);
   const [bookmarks, setBookmarks] = useState([]);
+  const postId = location.pathname.split("/")[2];
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
   const navigate = useNavigate();
 
-  const postId = location.pathname.split("/")[2];
 
   const currentUserUsername = currentUser?.user?.username;
 
@@ -173,7 +173,7 @@ const Singlepost = () => {
   return (
     <Wrapper>
       <Post>
-        <img className="postImg" src={`../upload/${post.image}`} alt="" />
+        <img className="postImg" src={`http://localhost:9000/uploads/${post.image}`} alt="" />
         <div className="user">
           {userImage && (
             <img

@@ -16,7 +16,8 @@ const Home = () => {
     shouldFetchAllPosts
       ? "http://localhost:9000/api/v1/posts"
       : `http://localhost:9000/api/v1/posts${category}`
-  );
+    );
+ 
   useEffect(() => {}, []);
 
   return (
@@ -31,7 +32,7 @@ const Home = () => {
           {Array.isArray(posts) && posts.length > 0 ? (
             posts.map((post) => (
               <Post key={post.id}>
-                <img src={`../upload/${post.image}`} alt={post.title} />
+                {post.image && <img src={ `http://localhost:9000/uploads/${post.image}` } alt={ post.title } /> }
                 <div className="Content">
                   <PostLink to={`/singlepost/${post.id}`}>
                     <h1>{post.title}</h1>

@@ -40,7 +40,7 @@ const MenuLeft = ({ category }) => {
       {Array.isArray(posts) &&
         posts.map((post) => (
           <div className="post" key={post.id}>
-            <img className="postImg" src={`../upload/${post.image}`} alt="post" />
+            <img className="postImg" src={`http://localhost:9000/uploads/${post.image}`} alt="post" />
             <div className="postInfo">
               <h2 className="postTitle">{post.title}</h2>
               <p>{getText(post.description)}</p>

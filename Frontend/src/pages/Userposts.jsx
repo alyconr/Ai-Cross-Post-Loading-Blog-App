@@ -25,7 +25,7 @@ const Userposts = () => {
           {Array.isArray(posts) && posts.length > 0 ? (
             posts.map((post) => (
               <Post key={post.id}>
-                <img src={`/upload/${post.image}`} alt={post.title} />
+                <img src={`http://localhost:9000/uploads/${post.image}`} alt={post.title} />
                 <div className="Content">
                   <PostLink to={`/singlepost/${post.id}`}>
                     <h1>{post.title}</h1>

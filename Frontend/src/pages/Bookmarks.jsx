@@ -90,6 +90,24 @@ const Container = styled.div`
     );
     border-radius: 5px;
   }
+
+  @media (max-width: 768px) {
+    h1 {
+      width: 90%;
+    }
+  }
+
+  @media (max-width: 432px) {
+    h1 {
+      width: 90%;
+    }
+  }
+
+  @media (max-width: 320px) {
+    h1 {
+      width: 90%;
+    }
+  }
 `;
 const BookmarksContainer = styled.div`
   display: flex;
@@ -98,6 +116,10 @@ const BookmarksContainer = styled.div`
   background-color: #f8f8f8;
   border-radius: 5px;
   gap: 20px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 const MenuSide = styled.div`
   display: flex;
@@ -130,6 +152,29 @@ const MenuSide = styled.div`
     );
     border-radius: 5px;
   }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    flex-direction: row;
+    gap: 5px;
+    justify-content: center;
+
+    .link {
+      font-size: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .link {
+      font-size: 0.8rem;
+    }
+  }
+
+  @media (max-width: 320px) {
+    .link {
+      font-size: 0.7rem;
+    }
+  }
 `;
 
 const Post = styled.div`
@@ -139,6 +184,18 @@ const Post = styled.div`
   border-radius: 5px;
   padding: 10px;
   gap: 20px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+
+  @media (max-width: 480px) {
+    width: 100%;
+  }
+
+  @media (max-width: 320px) {
+    width: 100%;
+  }
 `;
 
 const Posts = styled.div`

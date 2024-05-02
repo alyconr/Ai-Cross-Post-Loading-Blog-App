@@ -38,6 +38,7 @@ const Profile = () => {
   const [follow, setFollow] = useState(false);
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
+  const [bookmarks, setBookmarks] = useState([]);
   const [showModalFollower, setShowModalFollower] = useState(false);
   const [showModalFollowing, setShowModalFollowing] = useState(false);
   const { currentUser } = useContext(AuthContext);
@@ -102,7 +103,7 @@ const Profile = () => {
         formData.append("image", imgUrl); // Append the image URL to the formData
       }
 
-      const res = await axios.put(
+      await axios.put(
         `http://localhost:9000/api/v1/user/${currentUser?.user.username}`,
         {
           fullname: name,
@@ -203,6 +204,18 @@ const Profile = () => {
 
         setFollowing(res.data);
         console.log(res.data);
+
+        const values = res.data;
+
+        const filter = values.filter(
+          (value) => value.id === currentUser?.user.id
+        );
+
+        if (filter.length > 0) {
+          if (filter[0].id === currentUser?.user.id) {
+            setBookmarks(true);
+          }
+        }
       } catch (error) {
         console.error(error);
       }
@@ -210,6 +223,22 @@ const Profile = () => {
 
     fetchFollowings();
   }, [user.id]);
+
+  useEffect(() => {
+    const fetchBookmarks = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:9000/api/v1/bookmarks/${currentUser?.user.id}`
+        );
+
+        setBookmarks(res.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchBookmarks();
+  }, [currentUser?.user.id]);
 
   const handleUnFollow = async () => {
     try {
@@ -250,44 +279,53 @@ const Profile = () => {
 
             <hr />
 
-            <div className="d-flex flex-column">
-              <PostLink
-                className="d-flex flex-row justify-content-between "
-                to={`/profile/${user.username}/posts`}
-              >
-                <div>
-                  <MdOutlinePostAdd size={30} color="#6A072D" /> {posts?.length}{" "}
-                  Posts <FaMagnifyingGlass />
-                </div>
-                <div className="d-flex flex-row align-items-center gap-3 me-3 ">
-                  <BsBookmarkHeartFill size={30} color="#6A072D" />
-                  Bookmarks
-                  <FaMagnifyingGlass />
-                </div>
-              </PostLink>
-              <PostLink className="d-flex flex-column">
-                <div>
-                  <MdOutlineGroups2 size={30} color="#6A072D" />{" "}
-                  <>{followers?.length > 0 ? followers?.length : 0} Followers</>
-                  <Button
-                    onClick={() => setShowModalFollower(true)}
-                    className="btn-followers border-0 bg-transparent"
-                  >
-                    <FaMagnifyingGlass size={25} color="#333" />
-                  </Button>
-                  <SlUserFollowing size={25} color="#6A072D" />{" "}
-                  <>
-                    {following?.length > 0 ? following?.length : 0} Followings
-                  </>
-                  <Button
-                    onClick={() => setShowModalFollowing(true)}
-                    className="btn-followers border-0 bg-transparent"
-                  >
-                    <FaMagnifyingGlass size={25} color="#333" />
-                  </Button>
-                </div>
-              </PostLink>
-            </div>
+            <UserInfo>
+              <div>
+                <MdOutlinePostAdd size={30} color="#6A072D" />{" "}
+                <p className="m-0 d-inline ps-2  fw-bold fs-5">
+                  {posts?.length} Posts{" "}
+                </p>
+                <Link to={`/profile/${user.username}/posts`}>
+                  <FaMagnifyingGlass color="#2E2E3B" />
+                </Link>
+              </div>
+              <div>
+                <BsBookmarkHeartFill size={30} color="#6A072D" />
+                <p className="m-0 d-inline ps-2  fw-bold fs-5">
+                  {bookmarks?.length > 0 ? bookmarks?.length : 0} Bookmarks{" "}
+                </p>
+                <Link to={`/profile/${user.username}/bookmarks`}>
+                  <FaMagnifyingGlass color="#2E2E3B" />
+                </Link>
+              </div>
+            </UserInfo>
+
+            <UserInfo>
+              <div>
+                <MdOutlineGroups2 size={30} color="#6A072D" />{" "}
+                <p className="m-0 d-inline ps-2  fw-bold fs-5">
+                  {followers?.length > 0 ? followers?.length : 0} Followers
+                </p>
+                <Button
+                  onClick={() => setShowModalFollower(true)}
+                  className="btn-followers border-0 bg-transparent"
+                >
+                  <FaMagnifyingGlass size={18} color="#333" />
+                </Button>
+              </div>
+              <div>
+                <SlUserFollowing size={25} color="#6A072D" />{" "}
+                <p className="m-0 d-inline ps-2  fw-bold fs-5">
+                  {following?.length > 0 ? following?.length : 0} Followings
+                </p>
+                <Button
+                  onClick={() => setShowModalFollowing(true)}
+                  className="btn-followers border-0 bg-transparent "
+                >
+                  <FaMagnifyingGlass size={18} color="#333" />
+                </Button>
+              </div>
+            </UserInfo>
 
             <hr />
 
@@ -725,25 +763,6 @@ const EditProfile = styled.div`
   }
 `;
 
-const PostLink = styled(Link)`
-  text-decoration: none;
-  color: #333;
-  cursor: pointer;
-  font-size: 1.5rem;
-
-  @media (max-width: 768px) {
-    font-size: 1rem;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 0.8rem;
-  }
-
-  @media (max-width: 370px) {
-    font-size: 0.6rem;
-  }
-`;
-
 const Image = styled.div`
   .userImg-follower {
     width: 40px;
@@ -751,5 +770,16 @@ const Image = styled.div`
     display: block;
     margin: 0 auto;
     border-radius: 50%;
+  }
+`;
+
+const UserInfo = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+
+  @media (max-width: 432px) {
+    flex-direction: column;
   }
 `;

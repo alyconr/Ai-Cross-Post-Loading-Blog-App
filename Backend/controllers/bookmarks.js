@@ -67,7 +67,7 @@ const getAllBookmarks = async (req, res) => {
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
         .json({ error: "Database query error" });
     } else {
-      res.status(StatusCodes.OK).json(results);
+      res.status(StatusCodes.OK).json({ bookmarks: results });
     }
   });
 };

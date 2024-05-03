@@ -13,7 +13,7 @@ const Bookmarks = () => {
   const { currentUser } = useContext(AuthContext);
 
   const currentUserId = currentUser?.user?.id;
-  console.log(currentUserId);
+
 
   const [bookmarks, setBookmarks] = useState([]);
 
@@ -23,7 +23,7 @@ const Bookmarks = () => {
         const res = await axios.get(
           `http://localhost:9000/api/v1/bookmarks/${currentUserId} `
         );
-        setBookmarks(res.data);
+        setBookmarks(res.data.bookmarks);
         console.log(res.data);
       } catch (err) {
         console.log(err);

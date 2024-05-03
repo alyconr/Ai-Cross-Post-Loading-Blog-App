@@ -124,22 +124,20 @@ const Singlepost = () => {
           `http://localhost:9000/api/v1/bookmarks/${currentUser?.user?.id}`
         );
         setBookmarks(res.data.bookmarks);
+        console.log(res.data.bookmarks);
 
-        if (res.data.bookmarks) {
-          setBookmarks(res.data.bookmarks);
-          console.log(res.data.bookmarks);
+        // Check if any bookmark has the same postId
+        const isBookmarked = res.data.bookmarks.some(
+          (bookmark) => bookmark.id === parseInt(postId)
+        );
 
-          const bookmarksExist = Object.keys(res.data.bookmarks).length > 0;
-          setShowBookmark(bookmarksExist);
-        } else {
-          setShowBookmark(false);
-        }
+        setShowBookmark(isBookmarked);
       } catch (err) {
         console.log(err);
       }
     };
     getBookmarks();
-  }, [currentUser?.user?.id]);
+  }, [postId]);
 
   const deleteBookmark = async () => {
     try {

@@ -11,20 +11,15 @@ import { FaTelegram } from "react-icons/fa6";
 const Share = ({ post }) => {
   const { currentUser } = useContext(AuthContext);
 
-  const location = useLocation();
-  console.log(location);
-  const postId = useLocation().pathname.split("/")[2];
-  console.log(postId);
+
   const url = window.location.href;
-  console.log(url);
 
   const [smShow, setSmShow] = useState(false);
 
- const images = 'http://localhost:9000/uploads/${post.image}'
+  const images = "http://localhost:9000/uploads/${post.image}";
 
   return (
     <>
-    
       {currentUser && (
         <button
           onClick={() => setSmShow(true)}
@@ -60,9 +55,9 @@ const Share = ({ post }) => {
           <a
             href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(
               url
-            )}&text=${encodeURIComponent(post.title)}&source=${encodeURIComponent(
-              images
-            )}`}
+            )}&text=${encodeURIComponent(
+              post.title
+            )}&source=${encodeURIComponent(images)}`}
             target="_blank"
             rel="noopener noreferrer"
           >

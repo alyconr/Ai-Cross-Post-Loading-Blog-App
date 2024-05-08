@@ -30,11 +30,15 @@ const Userposts = () => {
                   alt={post.title}
                 />
                 <div className="Content">
-                  <PostLink to={`/singlepost/${post.id}`}>
+                  <PostLink to={`/singlepost/${post.id}/title=${encodeURIComponent(
+                      post.title.replace(/ /g, "-")
+                    )}`}>
                     <h1>{post.title}</h1>
                   </PostLink>
                   <h3>{post.description}</h3>
-                  <Link to={`/singlepost/${post.id}`}>
+                  <Link to={`/singlepost/${post.id}/title=${encodeURIComponent(
+                      post.title.replace(/ /g, "-")
+                    )}`}>
                     {" "}
                     <Button>Read More</Button>
                   </Link>

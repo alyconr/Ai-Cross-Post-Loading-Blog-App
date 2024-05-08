@@ -30,6 +30,7 @@ const Layout = () => {
   const location = useLocation();
   const isHome = location.pathname === "/";
   const category = useLocation().search;
+  
 
   return (
     <>
@@ -45,6 +46,8 @@ const Layout = () => {
 
 const PrivateRoute = ({ element }) => {
   const { currentUser } = useContext(AuthContext);
+  
+
 
   return currentUser ? element : <Navigate to="/login" />;
 };
@@ -63,7 +66,7 @@ const Router = createBrowserRouter([
         element: <PrivateRoute element={<Write />} />,
       },
       {
-        path: "/singlepost/:id",
+        path: "/singlepost/:id/:title",
         element: <Singlepost />,
       },
       {

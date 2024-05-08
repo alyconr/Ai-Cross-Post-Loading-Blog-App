@@ -17,7 +17,8 @@ import Comments from "../components/comments";
 import { FaCommentDots } from "react-icons/fa";
 import { Offcanvas } from "react-bootstrap";
 import { MdBookmarkAdd } from "react-icons/md";
-import Bookmarks from "./Bookmarks";
+
+import Share from "../components/share";
 const Singlepost = () => {
   const [post, setPost] = useState({});
   const [userImage, setUserImage] = useState("");
@@ -237,6 +238,9 @@ const Singlepost = () => {
               <MdBookmarkAdd className="bookmark" size={35} color="#0D0D0E" />
             </button>
           ) : null}
+
+      
+          <Share post={post} />
         </div>
         <h1>{post.title}</h1>
         <h3>{post.description}</h3>
@@ -272,8 +276,11 @@ const Singlepost = () => {
               {" "}
               <MdBookmarkAdd className="bookmark" size={35} color="#0D0D0E" />
             </button>
-          ) : null}
+          ) : null }
+       
+        
         </FooterAction>
+
         <Offcanvas show={show} onHide={handleClose} className="w-50 p-1 ">
           <Offcanvas.Header closeButton>
             <Offcanvas.Title className="bg-dark text-light p-3 rounded ">
@@ -308,7 +315,8 @@ const Singlepost = () => {
                 </h3>
               )}
 
-              <Comments post={post} setPost={setPost} />
+              <Comments post={ post } setPost={ setPost } />
+              test
             </ContainerComments>
           </Offcanvas.Body>
         </Offcanvas>
@@ -421,6 +429,13 @@ const Post = styled.div`
     margin-left: 5px;
     cursor: pointer;
     color: #01df74;
+  }
+
+  .share {
+    margin-left: 5px;
+    cursor: pointer;
+    color: #884dff;
+    
   }
 `;
 

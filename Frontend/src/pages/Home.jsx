@@ -6,7 +6,6 @@ import React, { useEffect } from "react";
 const Home = () => {
   const category = useLocation().search;
 
-
   const shouldFetchAllPosts = !category;
   const {
     data: posts,
@@ -16,12 +15,13 @@ const Home = () => {
     shouldFetchAllPosts
       ? "http://localhost:9000/api/v1/posts"
       : `http://localhost:9000/api/v1/posts${category}`
-    );
- 
+  );
+
   useEffect(() => {}, []);
 
   return (
     <Wrapper>
+      
       {error && <div>{error}</div>}
       {loading ? (
         <Loader>
@@ -32,13 +32,26 @@ const Home = () => {
           {Array.isArray(posts) && posts.length > 0 ? (
             posts.map((post) => (
               <Post key={post.id}>
-                {post.image && <img src={ `http://localhost:9000/uploads/${post.image}` } alt={ post.title } /> }
+                {post.image && (
+                  <img
+                    src={`http://localhost:9000/uploads/${post.image}`}
+                    alt={post.title}
+                  />
+                )}
                 <div className="Content">
-                  <PostLink to={`/singlepost/${post.id}`}>
+                  <PostLink
+                    to={`/singlepost/${post.id}/title=${encodeURIComponent(
+                      post.title.replace(/ /g, "-")
+                    )}`}
+                  >
                     <h1>{post.title}</h1>
                   </PostLink>
                   <h3>{post.description}</h3>
-                  <Link to={`/singlepost/${post.id}`}>
+                  <Link
+                    to={`/singlepost/${post.id}/title=${encodeURIComponent(
+                      post.title.replace(/ /g, "-")
+                    )}`}
+                  >
                     <Button>Read More</Button>
                   </Link>
                 </div>

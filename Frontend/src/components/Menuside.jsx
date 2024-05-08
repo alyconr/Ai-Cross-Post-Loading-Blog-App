@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { BsPostcardHeartFill } from "react-icons/bs";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";	
+import { Link } from "react-router-dom";
 const MenuLeft = ({ category }) => {
   const [posts, setPosts] = useState([]);
 
@@ -12,7 +12,9 @@ const MenuLeft = ({ category }) => {
         const res = await axios(
           `http://localhost:9000/api/v1/posts/?category=${category}`
         );
-        setPosts(res.data.posts);
+        const reverse = res.data.posts.reverse();
+
+        setPosts(reverse);
       } catch (error) {
         console.error(error);
       }
@@ -40,12 +42,21 @@ const MenuLeft = ({ category }) => {
       {Array.isArray(posts) &&
         posts.map((post) => (
           <div className="post" key={post.id}>
-            <img className="postImg" src={`http://localhost:9000/uploads/${post.image}`} alt="post" />
+            <img
+              className="postImg"
+              src={`http://localhost:9000/uploads/${post.image}`}
+              alt="post"
+            />
             <div className="postInfo">
               <h2 className="postTitle">{post.title}</h2>
               <p>{getText(post.description)}</p>
-              <Link to={`/singlepost/${post.id}`}><button>Read More</button></Link> 
-              
+              <Link
+                to={`/singlepost/${post.id}/title=${encodeURIComponent(
+                  post.title.replace(/ /g, "-")
+                )}`}
+              >
+                <button>Read More</button>
+              </Link>
             </div>
           </div>
         ))}

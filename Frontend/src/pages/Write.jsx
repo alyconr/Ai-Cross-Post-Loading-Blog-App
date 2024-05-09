@@ -157,9 +157,8 @@ const Write = () => {
 
     try {
       let fileUrl = "";
-      const formData = new FormData() || location.state.image;
-
-      if (file) {
+      console.log(file)
+      if (!file) {
         console.log(file);
         toast.info("Uploading image...", {
           position: "bottom-right",
@@ -172,32 +171,21 @@ const Write = () => {
           theme: "dark",
         });
 
+        const formData = new FormData();
         formData.set("file", file);
         console.log(formData.get("file"));
 
-        if (location.state.image && formData) {
-          const res = await axios.post(
-            "http://localhost:9000/api/v1/upload",
-            formData
-          );
-          const filename = res.data;
+        const res = await axios.post(
+          "http://localhost:9000/api/v1/upload",
+          formData
+        );
+        const filename = res.data;
 
-          fileUrl = filename;
+        fileUrl = filename;
 
-          console.log(fileUrl);
-          
-        } else if (!location.state.image && formData) {
-          
-          const res = await axios.post("http://localhost:9000/api/v1/upload",
-            formData)
-           const filename = res.data;
-
-          fileUrl = filename;
-
-          console.log(fileUrl);
-        }
-
-       
+        console.log(fileUrl);
+      } else  {
+        fileUrl = file.name
       }
 
       const method = location.state.pid ? "put" : "post";
@@ -212,7 +200,7 @@ const Write = () => {
           title,
           description: desc,
           content: cont,
-          image: file ? fileUrl : location.state.image, // Use the uploaded image URL or an empty string if no file was uploaded
+          image: fileUrl,
           date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
           category: cat,
         },
@@ -229,6 +217,7 @@ const Write = () => {
         progress: undefined,
         theme: "dark",
       });
+      navigate("/");      
     } catch (err) {
       console.log(err);
       toast.error("Error uploading image or publishing post");

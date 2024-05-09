@@ -198,7 +198,7 @@ const Singlepost = () => {
                   <FcEditImage size={30} />
                 </button>
               </Link>
-              <Link to={`/singlepost/${postId}`}>
+              <Link to={`/singlepost/${postId}/title=${encodeURIComponent(post.title.replace(/ /g, "-"))}`}>
                 <button title="Delete" className="message">
                   <BsFillTrashFill
                     onClick={handleDelete}

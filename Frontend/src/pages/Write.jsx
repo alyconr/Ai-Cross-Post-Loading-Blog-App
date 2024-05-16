@@ -7,6 +7,8 @@ import axios from "axios";
 import moment from "moment";
 import { toast } from "react-toastify";
 import { debounced } from "../utils/debounce";
+import handleCrossPostToDevTo from "../utils/devToApi";
+import TagsInput from "../components/tags";
 
 const Write = () => {
   const location = useLocation();
@@ -23,6 +25,12 @@ const Write = () => {
   const [cat, setCat] = useState(location?.state?.category || "");
   const [draftId, setDraftId] = useState(draftParamId);
   const [postId, setPostId] = useState(location?.state?.pid || "");
+  const [crossPostLoading, setCrossPostLoading] = useState(false);
+
+  const handleCrossPost = async () => {
+    setCrossPostLoading(true);
+    await handleCrossPostToDevTo(title, cont, desc, cat, setCrossPostLoading);
+  };
 
   useEffect(() => {
     const saveDraftAutomatically = async () => {
@@ -157,7 +165,7 @@ const Write = () => {
 
     try {
       let fileUrl = "";
-      console.log(file)
+      console.log(file);
       if (!file) {
         console.log(file);
         toast.info("Uploading image...", {
@@ -184,8 +192,8 @@ const Write = () => {
         fileUrl = filename;
 
         console.log(fileUrl);
-      } else  {
-        fileUrl = file.name
+      } else {
+        fileUrl = file.name;
       }
 
       const method = location.state.pid ? "put" : "post";
@@ -217,7 +225,7 @@ const Write = () => {
         progress: undefined,
         theme: "dark",
       });
-      navigate("/");      
+      navigate("/");
     } catch (err) {
       console.log(err);
       toast.error("Error uploading image or publishing post");
@@ -233,12 +241,15 @@ const Write = () => {
     <Wrapper>
       <div className="Editor">
         <input
+          className="h1"
           type="text"
           placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
+        <TagsInput />
         <textarea
+          className="h3"
           type="text"
           placeholder="Short Description"
           value={desc}
@@ -308,7 +319,10 @@ const Write = () => {
           )}
           <h5>{file ? `Uploaded: ${file.name}` : "No file selected"}</h5>
           {file ? (
-            <div className="actions">
+            <div className="actions d-flex justify-content-between gap-3">
+              <button onClick={handleCrossPost} disabled={crossPostLoading}>
+                {crossPostLoading ? "Cross-Posting..." : "Cross-Post to Dev.to"}
+              </button>
               <button onClick={handlePublishAndDeleteDraft}>Publish</button>
             </div>
           ) : (
@@ -417,20 +431,14 @@ const Wrapper = styled.div`
     .Box-editor {
       height: 600px;
       max-width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 5px;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
-      overflow: hidden;
-      resize: vertical;
     }
 
     input {
       padding: 0.5rem;
       background-color: transparent;
-      border: none;
-      border-bottom: 1px solid #ccc;
+      border: none;      
       margin-top: 1rem;
       outline: none;
     }
@@ -439,7 +447,7 @@ const Wrapper = styled.div`
       padding: 0.5rem;
       background-color: transparent;
       border: none;
-      border-bottom: 1px solid #ccc;
+      
       resize: none;
       outline: none;
     }

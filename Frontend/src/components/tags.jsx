@@ -60,19 +60,8 @@ const Tag = styled.div`
   margin: 0.25rem;
   color: white;
   font-weight: bold;
-  background-image: linear-gradient(
-  45deg,
-  hsl(49deg 73% 58%) 0%,
-  hsl(35deg 80% 60%) 11%,
-  hsl(22deg 77% 61%) 22%,
-  hsl(7deg 64% 61%) 33%,
-  hsl(350deg 48% 56%) 44%,
-  hsl(335deg 39% 47%) 56%,
-  hsl(314deg 33% 38%) 67%,
-  hsl(278deg 30% 33%) 78%,
-  hsl(239deg 31% 28%) 89%,
-  hsl(209deg 90% 15%) 100%
-);
+  background: #9a7626;
+  background: linear-gradient(180deg, #9a7626, #8a334c);
   border-radius: 0.25rem;
   cursor: pointer;
 `;

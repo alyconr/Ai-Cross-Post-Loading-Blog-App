@@ -25,7 +25,7 @@ const getAllPosts = async (req, res) => {
 
 const getSinglePost = async (req, res) => {
   const sql =
-    "SELECT posts.id AS pid, users.id AS uid, `fullname`, `username`,  `title`, `description`,  posts.image, users.image AS userImage, `content`, `date`, `category` FROM users JOIN posts ON users.id = posts.uid WHERE posts.id = ?";
+    "SELECT posts.id AS pid, users.id AS uid, `fullname`, `username`,  `title`, `description`,  posts.image, users.image AS userImage, `content`, `date`, `category`, `tags` FROM users JOIN posts ON users.id = posts.uid WHERE posts.id = ?";
 
   const values = [req.params.id];
 
@@ -95,7 +95,7 @@ const createPost = async (req, res) => {
   }
 
   const sql =
-    "INSERT INTO posts(`title`, `description`, `Content`,	 `image`, `date`,`uid`, `Category` ) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    "INSERT INTO posts(`title`, `description`, `Content`,	 `image`, `date`,`uid`, `Category`, `Tags` ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
   const values = [
     req.body.title,
@@ -105,6 +105,7 @@ const createPost = async (req, res) => {
     req.body.date,
     decoded.id,
     req.body.category,
+    req.body.tags,
   ];
 
   pool.query(sql, values, (queryError, results) => {
@@ -139,7 +140,7 @@ const updatePost = async (req, res) => {
   }
 
   const sql =
-    "UPDATE posts SET `title` = ?, `description` = ?, `Content` = ?, `image` = ?,  `Category` = ? WHERE `id` = ? AND `uid` = ?";
+    "UPDATE posts SET `title` = ?, `description` = ?, `Content` = ?, `image` = ?,  `Category` = ?, `Tags` = ? WHERE `id` = ? AND `uid` = ?";
 
   const values = [
     req.body.title,
@@ -147,6 +148,7 @@ const updatePost = async (req, res) => {
     req.body.content,
     req.body.image,
     req.body.category,
+    req.body.tags,
     req.params.id,
     decoded.id,
   ];

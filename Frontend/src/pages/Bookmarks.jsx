@@ -14,7 +14,6 @@ const Bookmarks = () => {
 
   const currentUserId = currentUser?.user?.id;
 
-
   const [bookmarks, setBookmarks] = useState([]);
 
   useEffect(() => {

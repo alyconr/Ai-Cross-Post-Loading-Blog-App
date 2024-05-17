@@ -1,32 +1,32 @@
 import { useState } from "react";
 import styled from "styled-components";
 
-const TagsInput = (props) => {
-  const [tags, setTags] = useState([]);
-
+const TagsInput = ({ tags, setTags }) => {
   const removeTags = (indexToRemove) => {
     setTags(tags.filter((_, index) => index !== indexToRemove));
   };
 
   const addTags = (event) => {
     if (event.target.value !== "" && event.key === "Enter") {
-      setTags([...tags, event.target.value]);
-      if (props.selectedTags) {
-        props.selectedTags([...tags, event.target.value]);
-      }
+      const newTags = [...tags, event.target.value];
+      setTags(newTags);
+
       event.target.value = "";
+
+      console.log(newTags); // Log the updated tags
     }
   };
 
   return (
     <Container>
       <TagsContainer>
-        {tags.map((tag, index) => (
-          <Tag key={index}>
-            <TagTitle>{tag}</TagTitle>
-            <TagCloseIcon onClick={() => removeTags(index)}>x</TagCloseIcon>
-          </Tag>
-        ))}
+        {Array.isArray(tags) &&
+          tags.map((tag, index) => (
+            <Tag key={index}>
+              <TagTitle>{tag}</TagTitle>
+              <TagCloseIcon onClick={() => removeTags(index)}>x</TagCloseIcon>
+            </Tag>
+          ))}
         <Input
           type="text"
           onKeyUp={(event) => addTags(event)}
@@ -59,19 +59,20 @@ const Tag = styled.div`
   padding: 0.5rem;
   margin: 0.25rem;
   color: white;
+  font-weight: bold;
   background-image: linear-gradient(
-    45deg,
-    hsl(26deg 89% 55%) 0%,
-    hsl(39deg 90% 43%) 11%,
-    hsl(51deg 89% 35%) 22%,
-    hsl(68deg 63% 36%) 33%,
-    hsl(93deg 44% 41%) 44%,
-    hsl(132deg 38% 42%) 56%,
-    hsl(159deg 70% 33%) 67%,
-    hsl(172deg 100% 27%) 78%,
-    hsl(181deg 100% 26%) 89%,
-    hsl(187deg 82% 29%) 100%
-  );
+  45deg,
+  hsl(49deg 73% 58%) 0%,
+  hsl(35deg 80% 60%) 11%,
+  hsl(22deg 77% 61%) 22%,
+  hsl(7deg 64% 61%) 33%,
+  hsl(350deg 48% 56%) 44%,
+  hsl(335deg 39% 47%) 56%,
+  hsl(314deg 33% 38%) 67%,
+  hsl(278deg 30% 33%) 78%,
+  hsl(239deg 31% 28%) 89%,
+  hsl(209deg 90% 15%) 100%
+);
   border-radius: 0.25rem;
   cursor: pointer;
 `;

@@ -13,19 +13,22 @@ import TagsInput from "../components/tags";
 const Write = () => {
   const location = useLocation();
 
-  console.log(location);
-
   const navigate = useNavigate();
   const draftParamId = new URLSearchParams(location.search).get("draftId");
 
-  const [title, setTitle] = useState(location?.state?.title || "");
+  const [title, setTitle] = useState("");
   const [desc, setDesc] = useState(location?.state?.description || "");
   const [cont, setCont] = useState(location?.state?.content || "");
   const [file, setFile] = useState(null);
   const [cat, setCat] = useState(location?.state?.category || "");
+  const [tags, setTags] = useState(
+    Array.isArray(location?.state?.tags) ? location.state.tags : []
+  );
   const [draftId, setDraftId] = useState(draftParamId);
   const [postId, setPostId] = useState(location?.state?.pid || "");
   const [crossPostLoading, setCrossPostLoading] = useState(false);
+
+  console.log();
 
   const handleCrossPost = async () => {
     setCrossPostLoading(true);
@@ -34,7 +37,7 @@ const Write = () => {
 
   useEffect(() => {
     const saveDraftAutomatically = async () => {
-      if (title && desc && cont && cat && !postId) {
+      if (title && desc && cont && cat && tags && !postId) {
         try {
           const endpoint = draftId
             ? `http://localhost:9000/api/v1/draftposts/${draftId}` // Use the existing draftId for updates
@@ -50,6 +53,7 @@ const Write = () => {
               image: file ? file.name : "",
               date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
               category: cat,
+              tags,
             },
             withCredentials: true,
           });
@@ -82,7 +86,7 @@ const Write = () => {
     return () => {
       debounced.cancel();
     };
-  }, [title, desc, cont, cat]);
+  }, [title, desc, cont, cat, tags]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -107,12 +111,14 @@ const Write = () => {
           setDesc(postData?.description || "");
           setCont(postData?.content || "");
           setCat(postData?.category || "");
+          setTags(Array.isArray(postData?.tags) ? postData.tags : []);
           setFile(postData?.image ? { name: postData.image } : null);
         } else {
           setTitle(draftData[0]?.title || "");
           setDesc(draftData[0]?.description);
           setCont(draftData[0]?.content || "");
           setCat(draftData[0]?.category || "");
+          setTags(Array.isArray(draftData[0]?.tags) ? draftData[0].tags : []);
           setFile(draftData[0]?.image ? { name: draftData[0].image } : null);
         }
       } catch (err) {
@@ -247,7 +253,7 @@ const Write = () => {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
-        <TagsInput />
+        <TagsInput tags={tags} setTags={setTags} />
         <textarea
           className="h3"
           type="text"
@@ -438,7 +444,7 @@ const Wrapper = styled.div`
     input {
       padding: 0.5rem;
       background-color: transparent;
-      border: none;      
+      border: none;
       margin-top: 1rem;
       outline: none;
     }
@@ -447,7 +453,7 @@ const Wrapper = styled.div`
       padding: 0.5rem;
       background-color: transparent;
       border: none;
-      
+
       resize: none;
       outline: none;
     }

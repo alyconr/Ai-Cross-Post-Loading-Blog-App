@@ -58,10 +58,31 @@ const Tag = styled.div`
   align-items: center;
   padding: 0.5rem;
   margin: 0.25rem;
-  color: white;
+  color: #fff;
   font-weight: bold;
-  background: #9a7626;
-  background: linear-gradient(180deg, #9a7626, #8a334c);
+  background: hsla(53, 84%, 74%, 1);
+  background: linear-gradient(
+    90deg,
+    hsla(53, 84%, 74%, 1) 0%,
+    hsla(336, 87%, 61%, 1) 50%,
+    hsla(262, 81%, 71%, 1) 100%
+  );
+
+  background: -moz-linear-gradient(
+    90deg,
+    hsla(53, 84%, 74%, 1) 0%,
+    hsla(336, 87%, 61%, 1) 50%,
+    hsla(262, 81%, 71%, 1) 100%
+  );
+
+  background: -webkit-linear-gradient(
+    90deg,
+    hsla(53, 84%, 74%, 1) 0%,
+    hsla(336, 87%, 61%, 1) 50%,
+    hsla(262, 81%, 71%, 1) 100%
+  );
+
+  filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#F4E784", endColorstr="#F24389", GradientType=1 );
   border-radius: 0.25rem;
   cursor: pointer;
 `;

@@ -130,7 +130,7 @@ const Post = styled.div`
 
   img {
     width: 40%;
-    height: 300px;
+    height: auto;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   }

@@ -12,7 +12,17 @@ import { Button, Modal } from "react-bootstrap";
 import users from "../assets/users.png";
 import user from "../assets/user100.png";
 import { PiFileMagnifyingGlass } from "react-icons/pi";
-
+import { FaLaptopCode } from "react-icons/fa";
+import { GrCloudComputer } from "react-icons/gr";
+import { GoInfinity } from "react-icons/go";
+import { MdSecurity } from "react-icons/md";
+import { FaLinux } from "react-icons/fa";
+import { FaNetworkWired } from "react-icons/fa6";
+import { GiArtificialIntelligence } from "react-icons/gi";
+import { LuBrainCircuit } from "react-icons/lu";
+import { BsDatabaseGear } from "react-icons/bs";
+import { GoHubot } from "react-icons/go";
+import { CiCircleMore } from "react-icons/ci";
 const Navbar = () => {
   const { currentUser, logout } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -88,35 +98,77 @@ const Navbar = () => {
                 as={Link}
                 to="/?category=Web-Development"
               >
-                Web Development
+                <FaLaptopCode /> Web Development
               </Dropdown.Item>
               <Dropdown.Item
                 className="  menu-item text-decoration-none "
                 as={Link}
                 to="/?category=Cloud-Computing"
               >
-                Cloud Computing
+                <GrCloudComputer /> Cloud Computing
               </Dropdown.Item>
               <Dropdown.Item
                 as={Link}
                 className="  menu-item text-decoration-none "
                 to="/?category=DevOps"
               >
-                DevOps
+                <GoInfinity /> DevOps
               </Dropdown.Item>
               <Dropdown.Item
                 as={Link}
                 className="  menu-item text-decoration-none "
                 to="/?category=Security"
               >
-                Security
+                <MdSecurity /> Security
               </Dropdown.Item>
               <Dropdown.Item
                 as={Link}
                 className="  menu-item text-decoration-none "
                 to="/?category=Linux"
               >
-                Linux
+                <FaLinux /> Linux
+              </Dropdown.Item>
+              <Dropdown.Item
+                as={Link}
+                className="  menu-item text-decoration-none "
+                to="/?category=Networking"
+              >
+                <FaNetworkWired /> Networking
+              </Dropdown.Item>
+              <Dropdown.Item
+                as={Link}
+                className="  menu-item text-decoration-none "
+                to="/?category=Artificial-Intelligence"
+              >
+                <GiArtificialIntelligence /> Artificial Intelligence
+              </Dropdown.Item>
+              <Dropdown.Item
+                as={Link}
+                className="  menu-item text-decoration-none "
+                to="/?category=Machine-Learning"
+              >
+                <LuBrainCircuit /> Machine Learning
+              </Dropdown.Item>
+              <Dropdown.Item
+                as={Link}
+                className="  menu-item text-decoration-none "
+                to="/?category=Data-Science"
+              >
+                <BsDatabaseGear /> Data Science
+              </Dropdown.Item>
+              <Dropdown.Item
+                as={Link}
+                className="  menu-item text-decoration-none "
+                to="/?category=Internet-Of-Things"
+              >
+                <GoHubot /> Internet Of Things
+              </Dropdown.Item>
+              <Dropdown.Item
+                as={Link}
+                className="  menu-item text-decoration-none "
+                to="/?category=Others"
+              >
+                <CiCircleMore /> Others
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
@@ -230,35 +282,77 @@ const Navbar = () => {
                   className="menu-item text-decoration-none"
                   to="/?category=Web-Development"
                 >
-                  Web Development
+                  <FaLaptopCode /> Web Development
                 </Dropdown.Item>
                 <Dropdown.Item
                   as={Link}
                   className="menu-item text-decoration-none"
                   to="/?category=Cloud-Computing"
                 >
-                  Cloud Computing
+                  <GrCloudComputer /> Cloud Computing
                 </Dropdown.Item>
                 <Dropdown.Item
                   as={Link}
                   className="menu-item text-decoration-none"
                   to="/?category=DevOps"
                 >
-                  DevOps
+                  <GoInfinity /> DevOps
                 </Dropdown.Item>
                 <Dropdown.Item
                   as={Link}
                   className="menu-item text-decoration-none"
                   to="/?category=Security"
                 >
-                  Security
+                  <MdSecurity /> Security
                 </Dropdown.Item>
                 <Dropdown.Item
                   as={Link}
                   className="menu-item text-decoration-none"
                   to="/?category=Linux"
                 >
-                  Linux
+                  <FaLinux /> Linux
+                </Dropdown.Item>
+                <Dropdown.Item
+                  as={Link}
+                  className="  menu-item text-decoration-none "
+                  to="/?category=Networking"
+                >
+                  <FaNetworkWired /> Networking
+                </Dropdown.Item>
+                <Dropdown.Item
+                  as={Link}
+                  className="  menu-item text-decoration-none "
+                  to="/?category=Artificial-Intelligence"
+                >
+                  <GiArtificialIntelligence /> Artificial Intelligence
+                </Dropdown.Item>
+                <Dropdown.Item
+                  as={Link}
+                  className="  menu-item text-decoration-none "
+                  to="/?category=Machine-Learning"
+                >
+                  <LuBrainCircuit /> Machine Learning
+                </Dropdown.Item>
+                <Dropdown.Item
+                  as={Link}
+                  className="  menu-item text-decoration-none "
+                  to="/?category=Data-Science"
+                >
+                  <BsDatabaseGear /> Data Science
+                </Dropdown.Item>
+                <Dropdown.Item
+                  as={Link}
+                  className="  menu-item text-decoration-none "
+                  to="/?category=Internet-Of-Things"
+                >
+                  <GoHubot /> Internet Of Things
+                </Dropdown.Item>
+                <Dropdown.Item
+                  as={Link}
+                  className="  menu-item text-decoration-none "
+                  to="/?category=Others"
+                >
+                  <CiCircleMore /> Others
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
@@ -440,10 +534,6 @@ const MobileMenuIcon = styled.div`
   @media (max-width: 820px) {
     display: block; /* Show the mobile menu icon on small screens */
   }
-
-  @media (max-width: 820px) {
-    display: block; /* Show the mobile menu icon on small screens */
-  }
 `;
 
 const MobileMenu = styled.div`
@@ -464,6 +554,7 @@ const MobileMenu = styled.div`
   @media (max-width: 820px) {
     display: flex;
     flex-direction: column;
+    align-items: center;
     position: absolute;
     top: 70px;
     left: 0;
@@ -521,15 +612,6 @@ const MenuItem = styled(Link)`
         color: #12c4c1;
       }
     }
-
-    @media (max-width: 820px) {
-      &:hover {
-        transform: scale(1.1);
-        transition: all 0.3s ease;
-        text-decoration: underline;
-        cursor: pointer;
-      }
-    }
   }
 `;
 
@@ -578,15 +660,6 @@ const Write = styled(Link)`
     width: 25px;
     height: 25px;
   }
-`;
-
-const Profile = styled(Link)`
-  cursor: pointer;
-  text-decoration: none;
-  color: white;
-  border-radius: 50px;
-  transition: all 0.3s ease;
-  width: 10%;
 `;
 
 const ImageProfile = styled.div`

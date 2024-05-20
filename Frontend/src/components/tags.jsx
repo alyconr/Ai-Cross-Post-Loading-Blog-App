@@ -56,35 +56,32 @@ const TagsContainer = styled.div`
 const Tag = styled.div`
   display: flex;
   align-items: center;
+  border-radius: 5px;
   padding: 0.5rem;
   margin: 0.25rem;
   color: #fff;
   font-weight: bold;
-  background: hsla(53, 84%, 74%, 1);
+  background: hsla(58, 77%, 50%, 1);
+
   background: linear-gradient(
     90deg,
-    hsla(53, 84%, 74%, 1) 0%,
-    hsla(336, 87%, 61%, 1) 50%,
-    hsla(262, 81%, 71%, 1) 100%
+    hsla(58, 77%, 50%, 1) 0%,
+    hsla(281, 95%, 52%, 1) 100%
   );
 
   background: -moz-linear-gradient(
     90deg,
-    hsla(53, 84%, 74%, 1) 0%,
-    hsla(336, 87%, 61%, 1) 50%,
-    hsla(262, 81%, 71%, 1) 100%
+    hsla(58, 77%, 50%, 1) 0%,
+    hsla(281, 95%, 52%, 1) 100%
   );
 
   background: -webkit-linear-gradient(
     90deg,
-    hsla(53, 84%, 74%, 1) 0%,
-    hsla(336, 87%, 61%, 1) 50%,
-    hsla(262, 81%, 71%, 1) 100%
+    hsla(58, 77%, 50%, 1) 0%,
+    hsla(281, 95%, 52%, 1) 100%
   );
 
-  filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#F4E784", endColorstr="#F24389", GradientType=1 );
-  border-radius: 0.25rem;
-  cursor: pointer;
+  filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#E2DB1F", endColorstr="#AE10F9", GradientType=1 );
 `;
 
 const TagTitle = styled.span`

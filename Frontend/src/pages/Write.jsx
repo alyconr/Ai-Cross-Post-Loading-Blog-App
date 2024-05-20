@@ -393,6 +393,65 @@ const Write = () => {
             />
             <label htmlFor="Linux"> Linux </label>
           </Category>
+          <Category>
+            <input
+              type="radio"
+              name="cat"
+              checked={cat === "Networking"}
+              value="Networking"
+              id="Networking"
+              onChange={(e) => setCat(e.target.value)}
+            />
+            <label htmlFor="Networking"> Networking </label>
+          </Category>
+
+          <Category>
+            <input
+              type="radio"
+              name="cat"
+              checked={cat === "Artificial-Intelligence"}
+              value="Artificial-Intelligence"
+              id="Artificial-Intelligence"
+              onChange={(e) => setCat(e.target.value)}
+            />
+            <label htmlFor="Artificial-Intelligence">
+              {" "}
+              Artificial-Intelligence{" "}
+            </label>
+          </Category>
+          <Category>
+            <input
+              type="radio"
+              name="cat"
+              checked={cat === "Machine-Learning"}
+              value="Machine-Learning"
+              id="Machine-Learning"
+              onChange={(e) => setCat(e.target.value)}
+            />
+            <label htmlFor="Machine-Learning"> Machine-Learning </label>
+          </Category>
+          <Category>
+            <input
+              type="radio"
+              name="cat"
+              checked={cat === "Data-Science"}
+              value="Data-Science"
+              id="Data-Science"
+              onChange={(e) => setCat(e.target.value)}
+            />
+            <label htmlFor="Data-Science"> Data-Science </label>
+          </Category>
+          <Category>
+            <input
+              type="radio"
+              name="cat"
+              checked={cat === "Others"}
+              value="Others"
+              id="Others"
+              onChange={(e) => setCat(e.target.value)}
+            />
+            <label htmlFor="Others"> Others </label>
+          </Category>
         </div>
       </div>
     </Wrapper>
@@ -470,11 +529,10 @@ const Wrapper = styled.div`
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 1rem;
       border: 1px solid #ccc;
       border-radius: 5px;
       padding: 1rem;
-      flex: 1;
+      gap: 1rem;
       background-image: linear-gradient(
         to right bottom,
         #1085ae,

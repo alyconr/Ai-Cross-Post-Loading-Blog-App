@@ -12,6 +12,7 @@ const authorizedUser = (req, res, next) => {
   }
 
   let decoded;
+
   try {
     decoded = jwt.verify(token, process.env.JWT_SECRET);
   } catch (error) {
@@ -30,4 +31,31 @@ const authorizedUser = (req, res, next) => {
   next();
 };
 
-module.exports = authorizedUser;
+const authorized = (req, res, next) => {
+  const token = req.cookies.token;
+  if (!token) {
+    return res
+      .status(StatusCodes.UNAUTHORIZED)
+      .json({ error: "Unauthorized no token" });
+  }
+
+  let decoded;
+
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Unauthorized" });
+  }
+
+  const { userId: urlUserId } = req.params;
+
+  if (parseInt(urlUserId) !== decoded.id) {
+    return res
+      .status(StatusCodes.UNAUTHORIZED)
+      .json({ error: "Unauthorized " });
+  }
+
+  next();
+};
+
+module.exports = { authorizedUser, authorized }; //authorizedUser ; // authorizedUser;

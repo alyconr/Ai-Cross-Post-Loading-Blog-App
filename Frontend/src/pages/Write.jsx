@@ -9,6 +9,8 @@ import { toast } from "react-toastify";
 import { debounced } from "../utils/debounce";
 import handleCrossPostToDevTo from "../utils/devToApi";
 import TagsInput from "../components/tags";
+import save from "../assets/save.png";
+import update from "../assets/update.png";
 
 const Write = () => {
   const location = useLocation();
@@ -27,6 +29,8 @@ const Write = () => {
   const [draftId, setDraftId] = useState(draftParamId);
   const [postId, setPostId] = useState(location?.state?.pid || "");
   const [crossPostLoading, setCrossPostLoading] = useState(false);
+  const [isCrossPostDevTo, setIsCrossPostDevTo] = useState(false);
+  const [devToApiKey, setDevToApiKey] = useState("");
 
   console.log();
 
@@ -321,15 +325,53 @@ const Write = () => {
             Upload Image
           </label>
           {!postId && (
-            <button onClick={handleDeleteDraftPost}>Delete Draft</button>
+            <button className="btn" onClick={handleDeleteDraftPost}>
+              Delete Draft
+            </button>
           )}
           <h5>{file ? `Uploaded: ${file.name}` : "No file selected"}</h5>
+          <hr />
+          <p>Please toggle the checkbox if you want to publish to Dev.to</p>
+          <CrossPosts>
+            <input
+              type="checkbox"
+              id="switch"
+              className="toggle"
+              checked={isCrossPostDevTo}
+              onChange={() => setIsCrossPostDevTo(!isCrossPostDevTo)}
+            />
+            <label for="switch" className="switch"></label>
+
+            {isCrossPostDevTo && (
+              <div>
+                <input
+                  type="text"
+                  placeholder="Enter Dev.to API key"
+                  value={devToApiKey}
+                  onChange={(e) => setDevToApiKey(e.target.value)}
+                />
+                <button className="message" title="Save">
+                  <img src={save} alt="save" />
+                </button>
+                <button className="message" title="Update">
+                  <img src={update} alt="update" />
+                </button>
+              </div>
+            )}
+          </CrossPosts>
+
           {file ? (
             <div className="actions d-flex justify-content-between gap-3">
-              <button onClick={handleCrossPost} disabled={crossPostLoading}>
+              <button
+                className="btn"
+                onClick={handleCrossPost}
+                disabled={crossPostLoading}
+              >
                 {crossPostLoading ? "Cross-Posting..." : "Cross-Post to Dev.to"}
               </button>
-              <button onClick={handlePublishAndDeleteDraft}>Publish</button>
+              <button className="btn" onClick={handlePublishAndDeleteDraft}>
+                Publish
+              </button>
             </div>
           ) : (
             <p> Please before Publish your post select an image</p>
@@ -465,7 +507,7 @@ const Wrapper = styled.div`
   gap: 2rem;
   margin: 1rem;
 
-  button {
+  .btn {
     width: 50%;
     padding: 0.5rem 1rem;
     border: none;
@@ -494,7 +536,7 @@ const Wrapper = styled.div`
     }
 
     .Box-editor {
-      height: 600px;
+      height: auto;
       max-width: 100%;
       display: flex;
       flex-direction: column;
@@ -555,13 +597,48 @@ const Wrapper = styled.div`
         transition: all 0.3s ease-in-out;
         text-align: center;
       }
+
+      .toggle {
+        position: absolute;
+        width: 0;
+        height: 0;
+        & + .switch {
+          position: relative;
+          display: block;
+          background: lightgray;
+          width: 4cap;
+          height: 20px;
+          cursor: pointer;
+          border-radius: 30px;
+          transition: 0.5s;
+        }
+        &:checked + .switch {
+          background: #0cdf73;
+        }
+        & + .switch:before {
+          content: "";
+          position: absolute;
+          width: 20px;
+          height: 20px;
+          top: 50%;
+          transform: translateY(-50%);
+          background: #0c0e0d;
+          border-radius: 50%;
+          left: 0%;
+          transition: 0.5s;
+        }
+        &:checked + .switch:before {
+          left: 100%;
+          transform: translate(calc(-100% - 2px), -50%);
+        }
+      }
     }
 
     .actions {
       display: flex;
       justify-content: space-between;
 
-      button {
+      .btn {
         padding: 0.5rem 1rem;
         border: none;
         border-radius: 5px;
@@ -587,5 +664,53 @@ const Category = styled.div`
 
   label {
     cursor: pointer;
+  }
+`;
+
+const CrossPosts = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: -1rem;
+
+  input {
+    width: auto;
+    height: 30px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+  }
+  img {
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+  }
+
+  .message {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    width: auto;
+    height: auto;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    margin-left: 5px;
+  }
+  .message[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 0.5rem;
   }
 `;

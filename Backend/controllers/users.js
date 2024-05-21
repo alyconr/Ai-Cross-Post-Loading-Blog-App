@@ -102,7 +102,6 @@ const updateUser = async (req, res) => {
   });
 };
 
-
 const deleteUser = async (req, res) => {
   const token = req.cookies.token;
 
@@ -132,15 +131,78 @@ const deleteUser = async (req, res) => {
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
         .json({ error: "Database query error" });
     } else {
-      res.status(StatusCodes.OK).json({ message: "User and account deleted successfully" });
+      res
+        .status(StatusCodes.OK)
+        .json({ message: "User and account deleted successfully" });
     }
-  })
-}
+  });
+};
+
+const updateDevToken = async (req, res) => {
+  const { userId } = req.params;
+  const { devToToken } = req.body;
+
+  if (!devToToken) {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ error: "DevTo token is required" });
+  }
+
+  const sql = "UPDATE users SET `devToToken` = ? WHERE `id` = ?";
+
+  const values = [devToToken, userId];
+
+  pool.query(sql, values, (queryError, results) => {
+    if (queryError) {
+      console.error("Database query error:", queryError);
+      res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: "Database query error" });
+    }
+
+    if (results.affectedRows === 0) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ error: "User not found" });
+    }
+
+    res
+      .status(StatusCodes.OK)
+      .json({ message: "DevTo token updated successfully" });
+  });
+};
+
+const getDevToken = async (req, res) => {
+  const { userId } = req.params;
+
+  const sql = "SELECT `devToToken` FROM users WHERE `id` = ?";
+
+  const values = [userId];
+
+  pool.query(sql, values, (queryError, results) => {
+    if (queryError) {
+      console.error("Database query error:", queryError);
+      res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: "Database query error" });
+    }
+
+    if (results.length === 0) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ error: "User not found" });
+    }
+
+    res.status(StatusCodes.OK).json({ devToToken: results[0].devToToken });
+  });
+};
 
 module.exports = {
   getCurrentUser,
   updateUser,
   getUserPosts,
   getAllUsers,
-  deleteUser
+  deleteUser,
+  updateDevToken,
+  getDevToken,
 };

@@ -14,7 +14,7 @@ function Hero() {
     <Carousel activeIndex={index} onSelect={handleSelect}>
       <Carousel.Item>
         <img
-          style={{ height: "500px", width: "100%" }}
+          style={{ height: "600px", width: "100%" }}
           src="https://images.pexels.com/photos/1181325/pexels-photo-1181325.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
           alt="First slide"
         />
@@ -25,7 +25,7 @@ function Hero() {
       </Carousel.Item>
       <Carousel.Item>
         <img
-          style={{ height: "500px", width: "100%" }}
+          style={{ height: "600px", width: "100%" }}
           src="https://images.pexels.com/photos/1261427/pexels-photo-1261427.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
           alt="First slide"
         />
@@ -36,7 +36,7 @@ function Hero() {
       </Carousel.Item>
       <Carousel.Item>
         <img
-          style={{ height: "500px", width: "100%" }}
+          style={{ height: "600px", width: "100%" }}
           src="https://images.pexels.com/photos/16018144/pexels-photo-16018144/free-photo-of-pessoa-programando-hacker.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2g"
           alt="First slide"
         />

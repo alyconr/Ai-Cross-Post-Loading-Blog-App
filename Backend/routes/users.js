@@ -23,7 +23,7 @@ router.route("/").get(getAllUsers);
 
 router
   .route("/devToken/:userId")
-  .get(getDevToken)
+  .get(authorized, getDevToken)
   .put(authorized, updateDevToken);
 
 module.exports = router;

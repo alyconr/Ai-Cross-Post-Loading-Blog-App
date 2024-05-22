@@ -212,7 +212,9 @@ const Settings = () => {
       <div className="Actions">
         <button onClick={handleSave}>Save</button>
         <button onClick={handleCancel}>cancel</button>
-        <button onClick={handleDeleteAccount} className="danger">Delete Account</button>
+        <button onClick={handleDeleteAccount} className="danger">
+          Delete Account
+        </button>
       </div>
     </EditProfile>
   );
@@ -227,14 +229,15 @@ const EditProfile = styled.div`
   border: 1px solid #ebe3d5;
   margin: 2rem auto;
   border-radius: 10px;
-  -webkit-box-shadow: 2px 1px 43px 23px rgba(0,0,0,0.75);
--moz-box-shadow: 2px 1px 43px 23px rgba(0,0,0,0.75);
-box-shadow: 2px 1px 43px 23px rgba(0,0,0,0.75);
+  -webkit-box-shadow: 2px 1px 43px 23px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 2px 1px 43px 23px rgba(0, 0, 0, 0.75);
+  box-shadow: 2px 1px 43px 23px rgba(0, 0, 0, 0.75);
 
   input {
     padding: 0 2.5rem;
-    border: 1px solid #ebe3d5;
+    border: 2px solid #ebe3d5;
     border-radius: 50px;
+    height: 2.5rem;
   }
 
   textarea {
@@ -276,7 +279,8 @@ box-shadow: 2px 1px 43px 23px rgba(0,0,0,0.75);
   }
 
   label {
-    color: #858d92;
+    color: black;
+    font-size: 1.5rem;
   }
 
   form {
@@ -300,12 +304,27 @@ box-shadow: 2px 1px 43px 23px rgba(0,0,0,0.75);
     font-size: 1rem;
     border-radius: 10px;
     color: #fff;
+    background: hsla(148, 100%, 47%, 1);
+
     background: linear-gradient(
       90deg,
-      rgba(0, 6, 36, 1) 0%,
-      rgba(9, 21, 121, 1) 35%,
-      rgba(0, 212, 255, 1) 100%
+      hsla(148, 100%, 47%, 1) 0%,
+      hsla(211, 90%, 47%, 1) 100%
     );
+
+    background: -moz-linear-gradient(
+      90deg,
+      hsla(148, 100%, 47%, 1) 0%,
+      hsla(211, 90%, 47%, 1) 100%
+    );
+
+    background: -webkit-linear-gradient(
+      90deg,
+      hsla(148, 100%, 47%, 1) 0%,
+      hsla(211, 90%, 47%, 1) 100%
+    );
+
+    filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#00EE6E", endColorstr="#0C75E6", GradientType=1 );
     border: none;
     cursor: pointer;
     margin: 0.5rem 0;

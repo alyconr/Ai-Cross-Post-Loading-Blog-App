@@ -1,8 +1,9 @@
 import styled from "styled-components";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useLocation, useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/authContext";
 import axios from "axios";
 import moment from "moment";
 import { toast } from "react-toastify";
@@ -14,7 +15,7 @@ import update from "../assets/update.png";
 
 const Write = () => {
   const location = useLocation();
-
+  const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const draftParamId = new URLSearchParams(location.search).get("draftId");
 
@@ -38,6 +39,27 @@ const Write = () => {
     setCrossPostLoading(true);
     await handleCrossPostToDevTo(title, cont, desc, cat, setCrossPostLoading);
   };
+
+  const handleUpdateDevToToken = async () => {
+
+    
+    try {
+
+      const response = await axios.put(`http://localhost:9000/api/v1/user/devToken/${currentUser?.user.id}`, {
+        devToToken: devToApiKey,
+      }, {
+        withCredentials: true,
+        credentials: "include"
+      });
+
+      console.log(response.data);  
+
+
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   useEffect(() => {
     const saveDraftAutomatically = async () => {
@@ -353,7 +375,7 @@ const Write = () => {
                 <button className="message" title="Save">
                   <img src={save} alt="save" />
                 </button>
-                <button className="message" title="Update">
+                <button className="message" title="Update" onClick={handleUpdateDevToToken}>
                   <img src={update} alt="update" />
                 </button>
               </div>
@@ -669,7 +691,9 @@ const Category = styled.div`
 
 const CrossPosts = styled.div`
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: flex-start;
+
   gap: 0.5rem;
   margin-top: -1rem;
 

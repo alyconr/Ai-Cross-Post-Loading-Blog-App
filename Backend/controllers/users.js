@@ -168,7 +168,7 @@ const updateDevToken = async (req, res) => {
 
     res
       .status(StatusCodes.OK)
-      .json({ message: "DevTo token updated successfully" });
+      .json({ message: "DevTo token updated successfully", devToToken });
   });
 };
 

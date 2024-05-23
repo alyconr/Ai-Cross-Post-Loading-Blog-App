@@ -4,10 +4,11 @@ const axios = require("axios");
 
 const postDevtoApi = async (req, res) => {
   try {
-    const devToApiKey = "dds9t4CwnH7W9dz5hM29YDfM"; // Get your Dev.to API key
+     // Get your Dev.to API key
     const devToEndpoint = "https://dev.to/api/articles";
 
-    const { title, body_markdown, published, tags } = req.body;
+    const { title, body_markdown, published, tags, devToken } = req.body;
+    const devToApiKey = devToken;
 
     console.log("Received article data:", {
       title,

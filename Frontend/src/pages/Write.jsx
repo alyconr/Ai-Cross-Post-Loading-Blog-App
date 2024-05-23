@@ -38,7 +38,7 @@ const Write = () => {
 
   const handleCrossPost = async () => {
     setCrossPostLoading(true);
-    await handleCrossPostToDevTo(title, cont, desc, cat, setCrossPostLoading);
+    await handleCrossPostToDevTo(title, cont, desc, cat, tags, devToken, setCrossPostLoading);
   };
 
   const handleUpdateDevToToken = async () => {

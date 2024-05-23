@@ -32,6 +32,7 @@ const Write = () => {
   const [crossPostLoading, setCrossPostLoading] = useState(false);
   const [isCrossPostDevTo, setIsCrossPostDevTo] = useState(false);
   const [devToApiKey, setDevToApiKey] = useState("");
+  const [devToken, setDevToken] = useState("");
 
   console.log();
 
@@ -41,25 +42,46 @@ const Write = () => {
   };
 
   const handleUpdateDevToToken = async () => {
-
-    
     try {
+      const response = await axios.put(
+        `http://localhost:9000/api/v1/user/devToken/${currentUser?.user.id}`,
+        {
+          devToToken: devToApiKey,
+        },
+        {
+          withCredentials: true,
+          credentials: "include",
+        }
+      );
 
-      const response = await axios.put(`http://localhost:9000/api/v1/user/devToken/${currentUser?.user.id}`, {
-        devToToken: devToApiKey,
-      }, {
-        withCredentials: true,
-        credentials: "include"
-      });
-
-      console.log(response.data);  
-
-
-
+      console.log(response.data);
+      setIsCrossPostDevTo(false);
+      setDevToken(response.data.devToToken);
     } catch (error) {
       console.log(error);
     }
-  }
+  };
+
+  useEffect(() => {
+    const getDevToToken = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:9000/api/v1/user/devToken/${currentUser?.user.id}`,
+          {
+            withCredentials: true,
+            credentials: "include",
+          }
+        );
+
+        console.log(response.data);
+        setIsCrossPostDevTo(false);
+        setDevToken(response.data.devToToken);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getDevToToken();
+  }, []);
 
   useEffect(() => {
     const saveDraftAutomatically = async () => {
@@ -353,30 +375,49 @@ const Write = () => {
           )}
           <h5>{file ? `Uploaded: ${file.name}` : "No file selected"}</h5>
           <hr />
-          <p>Please toggle the checkbox if you want to publish to Dev.to</p>
+          {!devToken && (
+            <p>Please toggle the checkbox if you want to publish to Dev.to</p>
+          )}
           <CrossPosts>
-            <input
-              type="checkbox"
-              id="switch"
-              className="toggle"
-              checked={isCrossPostDevTo}
-              onChange={() => setIsCrossPostDevTo(!isCrossPostDevTo)}
-            />
-            <label for="switch" className="switch"></label>
+            <div className="d-flex flex-row align-items-center gap-2">
+              <input
+                type="checkbox"
+                id="switch"
+                className="toggle"
+                checked={isCrossPostDevTo}
+                onChange={() => setIsCrossPostDevTo(!isCrossPostDevTo)}
+              />
+              <label htmlFor="switch" className="switch"></label>
+              {isCrossPostDevTo && (
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Enter Dev.to API key"
+                    value={devToApiKey}
+                    onChange={(e) => setDevToApiKey(e.target.value)}
+                  />
+                  <button
+                    className="message"
+                    title="Save"
+                    onClick={handleUpdateDevToToken}
+                  >
+                    <img src={save} alt="save" />
+                  </button>
+                </div>
+              )}
+            </div>
 
-            {isCrossPostDevTo && (
+            {devToken && (
               <div>
-                <input
-                  type="text"
-                  placeholder="Enter Dev.to API key"
-                  value={devToApiKey}
-                  onChange={(e) => setDevToApiKey(e.target.value)}
-                />
-                <button className="message" title="Save">
-                  <img src={save} alt="save" />
-                </button>
-                <button className="message" title="Update" onClick={handleUpdateDevToToken}>
-                  <img src={update} alt="update" />
+                <p className="fs-5 fw-bold">
+                  DevTo Token is Saved Successfully
+                </p>
+                <button
+                  className="btn"
+                  onClick={handleCrossPost}
+                  disabled={crossPostLoading}
+                >
+                  {crossPostLoading ? "Cross-Posting..." : "Publish to Dev.to"}
                 </button>
               </div>
             )}
@@ -384,13 +425,6 @@ const Write = () => {
 
           {file ? (
             <div className="actions d-flex justify-content-between gap-3">
-              <button
-                className="btn"
-                onClick={handleCrossPost}
-                disabled={crossPostLoading}
-              >
-                {crossPostLoading ? "Cross-Posting..." : "Cross-Post to Dev.to"}
-              </button>
               <button className="btn" onClick={handlePublishAndDeleteDraft}>
                 Publish
               </button>

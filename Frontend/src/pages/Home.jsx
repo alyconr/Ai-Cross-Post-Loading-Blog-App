@@ -20,8 +20,7 @@ const Home = () => {
   useEffect(() => {}, []);
 
   return (
-    <Wrapper>
-      
+    <Wrapper id="Home">
       {error && <div>{error}</div>}
       {loading ? (
         <Loader>

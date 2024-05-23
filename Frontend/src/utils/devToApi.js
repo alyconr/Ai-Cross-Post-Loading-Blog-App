@@ -6,6 +6,8 @@ const handleCrossPostToDevTo = async (
   content,
   description,
   category,
+  tags,
+  devToken,
   setLoading
 ) => {
   setLoading(true);
@@ -18,7 +20,8 @@ const handleCrossPostToDevTo = async (
     title: title,
     body_markdown: markdownContent,
     published: false,
-    tags: [category],
+    tags: [category, tags.toString()],
+    devToken
   };
 
   try {

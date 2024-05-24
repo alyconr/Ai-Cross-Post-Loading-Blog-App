@@ -44,7 +44,7 @@ const MenuLeft = ({ category }) => {
           <div className="post" key={post.id}>
             <img
               className="postImg"
-              src={`http://localhost:9000/uploads/${post.image}`}
+              src={post.image}
               alt="post"
             />
             <div className="postInfo">

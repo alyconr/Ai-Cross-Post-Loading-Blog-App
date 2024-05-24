@@ -172,7 +172,7 @@ const Singlepost = () => {
       <Post>
         <img
           className="postImg"
-          src={`http://localhost:9000/uploads/${post.image}`}
+          src={post.image}
           alt=""
         />
         <div className="user">

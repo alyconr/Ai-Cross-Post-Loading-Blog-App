@@ -23,8 +23,8 @@ function Hero() {
               Loading, The Technology Blog
             </h3>
             <p>Where you can express your ideas </p>
-            <div class="arrow bounce">
-              <a class="fa fa-arrow-down fa-2x" href="#Home"></a>
+            <div className="arrow bounce">
+              <a className="fa fa-arrow-down fa-2x" href="#Home"></a>
             </div>
           </Carousel.Caption>
         </Carousel.Item>
@@ -36,8 +36,8 @@ function Hero() {
           <Carousel.Caption className="top-50">
             <h3 className="fw-bolder fs-1 text-white  ">Technology Stacks</h3>
             <p>Web development, Cloud, Devops, Networking, Security and more</p>
-            <div class="arrow bounce">
-              <a class="fa fa-arrow-down fa-2x" href="#Home"></a>
+            <div className="arrow bounce">
+              <a className="fa fa-arrow-down fa-2x" href="#Home"></a>
             </div>
           </Carousel.Caption>
         </Carousel.Item>
@@ -49,8 +49,8 @@ function Hero() {
           <Carousel.Caption className="top-50">
             <h3 className="fw-bolder fs-1 text-white  ">Social Networking</h3>
             <p>Share your Knowledge and learn on a daily basis.</p>
-            <div class="arrow bounce">
-              <a class="fa fa-arrow-down fa-2x" href="#Home"></a>
+            <div className="arrow bounce">
+              <a className="fa fa-arrow-down fa-2x" href="#Home"></a>
             </div>
           </Carousel.Caption>
         </Carousel.Item>

@@ -16,7 +16,7 @@ const Home = () => {
       ? "http://localhost:9000/api/v1/posts"
       : `http://localhost:9000/api/v1/posts${category}`
   );
-
+ 
   useEffect(() => {}, []);
 
   return (

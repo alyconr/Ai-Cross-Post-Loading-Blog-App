@@ -11,7 +11,6 @@ import { debounced } from "../utils/debounce";
 import handleCrossPostToDevTo from "../utils/devToApi";
 import TagsInput from "../components/tags";
 import save from "../assets/save.png";
-import update from "../assets/update.png";
 
 const Write = () => {
   const location = useLocation();
@@ -22,7 +21,7 @@ const Write = () => {
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState(location?.state?.description || "");
   const [cont, setCont] = useState(location?.state?.content || "");
-  const [file, setFile] = useState(null);
+  const [file, setFile] = useState("");
   const [cat, setCat] = useState(location?.state?.category || "");
   const [tags, setTags] = useState(
     Array.isArray(location?.state?.tags) ? location.state.tags : []
@@ -34,11 +33,19 @@ const Write = () => {
   const [devToApiKey, setDevToApiKey] = useState("");
   const [devToken, setDevToken] = useState("");
 
-  console.log();
+  console.log(file);
 
   const handleCrossPost = async () => {
     setCrossPostLoading(true);
-    await handleCrossPostToDevTo(title, cont, desc, cat, tags, devToken, setCrossPostLoading);
+    await handleCrossPostToDevTo(
+      title,
+      cont,
+      desc,
+      cat,
+      tags,
+      devToken,
+      setCrossPostLoading
+    );
   };
 
   const handleUpdateDevToToken = async () => {
@@ -85,11 +92,12 @@ const Write = () => {
 
   useEffect(() => {
     const saveDraftAutomatically = async () => {
-      if (title && desc && cont && cat && tags && !postId) {
+      if (title && desc && cont && file && cat && tags && !postId) {
         try {
           const endpoint = draftId
             ? `http://localhost:9000/api/v1/draftposts/${draftId}` // Use the existing draftId for updates
             : "http://localhost:9000/api/v1/draftposts"; // Create a new draft only if no draftId is present
+          const imageUrl = file.name;
 
           const response = await axios({
             method: draftId ? "put" : "post",
@@ -98,7 +106,7 @@ const Write = () => {
               title,
               description: desc,
               content: cont,
-              image: file ? file.name : "",
+              image: imageUrl,
               date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
               category: cat,
               tags,
@@ -134,7 +142,7 @@ const Write = () => {
     return () => {
       debounced.cancel();
     };
-  }, [title, desc, cont, cat, tags]);
+  }, [title, desc, cont, file, cat, tags]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -163,7 +171,7 @@ const Write = () => {
           setFile(postData?.image ? { name: postData.image } : null);
         } else {
           setTitle(draftData[0]?.title || "");
-          setDesc(draftData[0]?.description);
+          setDesc(draftData[0]?.description || "");
           setCont(draftData[0]?.content || "");
           setCat(draftData[0]?.category || "");
           setTags(Array.isArray(draftData[0]?.tags) ? draftData[0].tags : []);
@@ -194,7 +202,9 @@ const Write = () => {
         setTitle("");
         setDesc("");
         setCont("");
-        navigate("/");
+        setDesc(" ");
+        setFile("");
+        //navigate("/");
         toast.info("Draft deleted successfully", {
           position: "bottom-right",
           autoClose: 2500,
@@ -219,9 +229,8 @@ const Write = () => {
 
     try {
       let fileUrl = "";
-      console.log(file);
-      if (!file) {
-        console.log(file);
+
+      if (file) {
         toast.info("Uploading image...", {
           position: "bottom-right",
           autoClose: 2500,
@@ -234,6 +243,7 @@ const Write = () => {
         });
 
         const formData = new FormData();
+        console.log(formData);
         formData.set("file", file);
         console.log(formData.get("file"));
 
@@ -243,21 +253,24 @@ const Write = () => {
         );
         const filename = res.data;
 
-        fileUrl = filename;
-
+        fileUrl = `http://localhost:9000/uploads/${filename}`;
         console.log(fileUrl);
       } else {
-        fileUrl = file.name;
+        toast.error("Please select a file to upload");
+        return;
       }
 
-      const method = location.state.pid ? "put" : "post";
-      const url = location.state.pid
+      const method1 = location.state?.pid && "put";
+      const url = location.state?.pid
         ? `http://localhost:9000/api/v1/posts/${location.state.pid}`
-        : "http://localhost:9000/api/v1/posts";
+        : null;
+
+      const method2 = draftId && "post";
+      const url2 = draftId ? `http://localhost:9000/api/v1/posts` : null;
 
       await axios({
-        method: method,
-        url: url,
+        method: method1 || method2,
+        url: url || url2,
         data: {
           title,
           description: desc,
@@ -265,6 +278,7 @@ const Write = () => {
           image: fileUrl,
           date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
           category: cat,
+          tags,
         },
         withCredentials: true,
       });
@@ -279,16 +293,14 @@ const Write = () => {
         progress: undefined,
         theme: "dark",
       });
-      navigate("/");
     } catch (err) {
-      console.log(err);
+      console.error(err);
       toast.error("Error uploading image or publishing post");
     }
   };
 
   const handlePublishAndDeleteDraft = async () => {
     await handlePublish();
-    await handleDeleteDraftPost();
   };
 
   return (

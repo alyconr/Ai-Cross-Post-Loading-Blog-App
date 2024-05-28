@@ -63,6 +63,8 @@ const Navbar = () => {
         localStorage.setItem("draftId", newDraftId);
       } else {
         localStorage.removeItem("draftId");
+
+          
       }
     } catch (err) {
       console.log(err);

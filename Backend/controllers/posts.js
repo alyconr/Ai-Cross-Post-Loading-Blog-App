@@ -93,6 +93,7 @@ const createPost = async (req, res) => {
     // check if token is valid
     return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Unauthorized" });
   }
+  const tagsString = JSON.stringify(req.body.tags);
 
   const sql =
     "INSERT INTO posts(`title`, `description`, `Content`,	 `image`, `date`,`uid`, `Category`, `Tags` ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -105,7 +106,7 @@ const createPost = async (req, res) => {
     req.body.date,
     decoded.id,
     req.body.category,
-    req.body.tags,
+    tagsString,
   ];
 
   pool.query(sql, values, (queryError, results) => {
@@ -138,7 +139,7 @@ const updatePost = async (req, res) => {
     // check if token is valid
     return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Unauthorized" });
   }
-
+  const tagsString = JSON.stringify(req.body.tags);
   const sql =
     "UPDATE posts SET `title` = ?, `description` = ?, `Content` = ?, `image` = ?,  `Category` = ?, `Tags` = ? WHERE `id` = ? AND `uid` = ?";
 
@@ -148,7 +149,7 @@ const updatePost = async (req, res) => {
     req.body.content,
     req.body.image,
     req.body.category,
-    req.body.tags,
+    tagsString,
     req.params.id,
     decoded.id,
   ];

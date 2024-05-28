@@ -26,8 +26,8 @@ const upload = multer({
   storage: storage,
 });
 
-app.all("/api/v1/upload", upload.single("file"), (req, res) => {
-  if (req.method === "POST" || req.method === "PUT" || req.method === "GET") {
+app.post("/api/v1/upload", upload.single("file"), (req, res) => {
+ 
     const file = req.file;
 
     if (!file) {
@@ -38,10 +38,7 @@ app.all("/api/v1/upload", upload.single("file"), (req, res) => {
     const filename = file.filename;
 
     return res.status(200).json(filename);
-  } else {
-    // If the request method is not supported, respond with an error
-    return res.status(405).json({ error: "Method Not Allowed" });
-  }
+ 
 });
 
 const authRouter = require("./routes/auth");

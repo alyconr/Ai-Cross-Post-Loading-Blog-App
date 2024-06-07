@@ -36,7 +36,7 @@ const getSinglePost = async (req, res) => {
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
         .json({ error: "Database query error" });
     } else {
-      const post = {
+      const post = { 
         ...results[0],
         tags: JSON.parse(results[0].tags),
       };

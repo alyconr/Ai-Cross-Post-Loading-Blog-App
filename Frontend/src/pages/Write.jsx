@@ -25,7 +25,7 @@ const Write = () => {
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState(location?.state?.description || "");
   const [cont, setCont] = useState(location?.state?.content || "");
-  const [file, setFile] = useState({});
+  const [file, setFile] = useState("");
   const [cat, setCat] = useState(location?.state?.category || "");
   const [tags, setTags] = useState(
     Array.isArray(location?.state?.tags) ? location.state.tags : []
@@ -36,10 +36,10 @@ const Write = () => {
   const [isCrossPostDevTo, setIsCrossPostDevTo] = useState(false);
   const [devToApiKey, setDevToApiKey] = useState("");
   const [devToken, setDevToken] = useState("");
-  
+  const [image, setImage] = useState("");
 
   console.log(file);
-  console.log(tags);
+  console.log(image);
 
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files[0];
@@ -47,18 +47,31 @@ const Write = () => {
       const { base64String, metadata } = await fileToBase64WithMetadata(
         selectedFile
       );
-      setFile({ base64String, metadata });
-      localStorage.setItem(
-        "uploadedFile",
-        JSON.stringify({ base64String, metadata })
-      );
+      if (postId) {
+        setImage({ base64String, metadata });
+        localStorage.setItem(
+          "uploadedImage",
+          JSON.stringify({ base64String, metadata })
+        );
+      } else {
+        setFile({ base64String, metadata });
+        localStorage.setItem(
+          "uploadedFile",
+          JSON.stringify({ base64String, metadata })
+        );
+      }
     }
   };
 
   useEffect(() => {
     const savedFile = localStorage.getItem("uploadedFile");
-    if (savedFile) {
+    if (savedFile && draftId) {
       setFile(JSON.parse(savedFile));
+    } else {
+      const savedImage = localStorage.getItem("uploadedImage");
+      if (savedImage) {
+        setImage(JSON.parse(savedImage));
+      }
     }
   }, []);
 
@@ -169,7 +182,7 @@ const Write = () => {
     return () => {
       debounced.cancel();
     };
-  }, [title, desc, cont, file, cat, tags]);
+  }, [title, desc, cont, file?.metadata, cat, tags]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -196,14 +209,14 @@ const Write = () => {
           setCont(postData?.content || "");
           setCat(postData?.category || "");
           setTags(Array.isArray(postData?.tags) ? postData.tags : []);
-          setFile(postData?.image ? { name: postData.image } : null);
+          setImage(JSON.parse(postData?.metadata) || "");
         } else {
           setTitle(draftData[0]?.title || "");
           setDesc(draftData[0]?.description || "");
           setCont(draftData[0]?.content || "");
           setCat(draftData[0]?.category || "");
           setTags(Array.isArray(draftData[0]?.tags) ? draftData[0].tags : []);
-          setFile(draftData[0]?.image ? { name: draftData[0].image } : null);
+          //setFile(localStorage.getItem("uploadedFile"));
         }
       } catch (err) {
         console.log(err);
@@ -221,9 +234,8 @@ const Write = () => {
         // Delete the draftId from localStorage
         localStorage.removeItem("draftId");
         localStorage.removeItem("uploadedFile");
+        localStorage.removeItem("uploadedImage");
         // Set the state to null or an appropriate value
-        
-       
 
         await axios.delete(`http://localhost:9000/api/v1/draftposts`, {
           withCredentials: true,
@@ -231,7 +243,7 @@ const Write = () => {
         setTitle("");
         setDesc("");
         setCont("");
-        setDesc(" "); 
+        setDesc(" ");
         setFile("");
         setDraftId("");
         navigate("/");
@@ -252,8 +264,11 @@ const Write = () => {
     }
   };
 
+  const handleCancel = () => {
+    navigate("/");
+  };
+
   const handlePublish = async () => {
-    
     if (!title || !desc || !cont || !cat) {
       toast.error("Please fill all the fields");
       return;
@@ -262,7 +277,7 @@ const Write = () => {
     try {
       let fileUrl = "";
 
-      if (file?.base64String) {
+      if (file) {
         toast.info("Uploading image...", {
           position: "bottom-right",
           autoClose: 2500,
@@ -294,7 +309,36 @@ const Write = () => {
         fileUrl = `http://localhost:9000/uploads/${filename}`;
         console.log(fileUrl);
       } else {
-        fileUrl = file.name;
+        toast.info("Uploading image...", {
+          position: "bottom-right",
+          autoClose: 2500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+
+        const imageObject = base64ToFile(
+          image.base64String,
+          image.metadata.name,
+          image.metadata.type
+        );
+
+        const formData = new FormData(); //
+
+        formData.set("file", imageObject); // Append the image URL to the formData
+        console.log(formData.get("file"));
+
+        const res = await axios.post(
+          "http://localhost:9000/api/v1/upload",
+          formData
+        );
+        const filename = res.data;
+
+        fileUrl = `http://localhost:9000/uploads/${filename}`;
+        console.log(fileUrl);
       }
 
       if (location.state?.pid) {
@@ -309,6 +353,7 @@ const Write = () => {
             date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
             category: cat,
             tags,
+            metadata: image || file,
           },
           withCredentials: true,
         });
@@ -324,6 +369,7 @@ const Write = () => {
             date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
             category: cat,
             tags,
+            metadata: image || file,
           },
           withCredentials: true,
         });
@@ -428,12 +474,16 @@ const Write = () => {
           <label className="input-file" htmlFor="file">
             Upload Image
           </label>
-          {!postId && (
+          {!postId ? (
             <button className="btn" onClick={handleDeleteDraftPost}>
               Delete Draft
             </button>
+          ) : (
+            <button className="btn" onClick={handleCancel}>
+              Cancel Edit
+            </button>
           )}
-          <h5>{(file?.metadata || file) ? `Uploaded: ${file?.metadata?.name || file.name } `: "No file selected"}</h5>
+          <h5>{image?.metadata?.name}</h5>
           <hr />
           {!devToken && (
             <p>Please toggle the checkbox if you want to publish to Dev.to</p>
@@ -483,7 +533,7 @@ const Write = () => {
             )}
           </CrossPosts>
 
-          {file?.metadata || file ? (
+          {file?.metadata || image?.metadata?.name ? (
             <div className="actions d-flex justify-content-between gap-3">
               <button className="btn" onClick={handlePublishAndDeleteDraft}>
                 Publish

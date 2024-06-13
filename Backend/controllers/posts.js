@@ -25,7 +25,7 @@ const getAllPosts = async (req, res) => {
 
 const getSinglePost = async (req, res) => {
   const sql =
-    "SELECT posts.id AS pid, users.id AS uid, `fullname`, `username`,  `title`, `description`,  posts.image, users.image AS userImage, `content`, `date`, `category`, `tags` FROM users JOIN posts ON users.id = posts.uid WHERE posts.id = ?";
+    "SELECT posts.id AS pid, users.id AS uid, `fullname`, `username`,  `title`, `description`,  posts.image, users.image AS userImage, `content`, `date`, `category`, `tags`, `metadata` FROM users JOIN posts ON users.id = posts.uid WHERE posts.id = ?";
 
   const values = [req.params.id];
 
@@ -36,7 +36,7 @@ const getSinglePost = async (req, res) => {
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
         .json({ error: "Database query error" });
     } else {
-      const post = { 
+      const post = {
         ...results[0],
         tags: JSON.parse(results[0].tags),
       };
@@ -99,9 +99,10 @@ const createPost = async (req, res) => {
     return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Unauthorized" });
   }
   const tagsString = JSON.stringify(req.body.tags);
+  const metadataString = JSON.stringify(req.body.metadata);
 
   const sql =
-    "INSERT INTO posts(`title`, `description`, `Content`,	 `image`, `date`,`uid`, `Category`, `Tags` ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    "INSERT INTO posts(`title`, `description`, `Content`,	 `image`, `date`,`uid`, `Category`, `Tags`, `Metadata` ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
   const values = [
     req.body.title,
@@ -112,6 +113,7 @@ const createPost = async (req, res) => {
     decoded.id,
     req.body.category,
     tagsString,
+    metadataString,
   ];
 
   pool.query(sql, values, (queryError, results) => {
@@ -145,8 +147,9 @@ const updatePost = async (req, res) => {
     return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Unauthorized" });
   }
   const tagsString = JSON.stringify(req.body.tags);
+  const metadataString = JSON.stringify(req.body.metadata);
   const sql =
-    "UPDATE posts SET `title` = ?, `description` = ?, `Content` = ?, `image` = ?,  `Category` = ?, `Tags` = ? WHERE `id` = ? AND `uid` = ?";
+    "UPDATE posts SET `title` = ?, `description` = ?, `Content` = ?, `image` = ?,  `Category` = ?, `Tags` = ?, `Metadata` = ? WHERE `id` = ? AND `uid` = ?";
 
   const values = [
     req.body.title,
@@ -155,6 +158,7 @@ const updatePost = async (req, res) => {
     req.body.image,
     req.body.category,
     tagsString,
+    metadataString,
     req.params.id,
     decoded.id,
   ];

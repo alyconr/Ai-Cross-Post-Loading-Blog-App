@@ -8,8 +8,8 @@ const bodyParser = require("body-parser");
 
 app.use(express.json());
 
-app.use(bodyParser.json({ limit: "50mb" }));
-app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
+app.use(bodyParser.json({ limit: "50mb" })); 
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true })); 
 
 app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
 app.use(cookieParser());

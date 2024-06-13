@@ -8,17 +8,19 @@ import axios from "axios";
 import moment from "moment";
 import { toast } from "react-toastify";
 import { debounced } from "../utils/debounce";
-import handleCrossPostToDevTo from "../utils/devToApi";
+
 import TagsInput from "../components/tags";
-import save from "../assets/save.png";
+
 import {
   fileToBase64WithMetadata,
   base64ToFile,
 } from "../utils/uploadImagesUtils";
 
+import CustomModal from "../components/Modal";
+
 const Write = () => {
   const location = useLocation();
-  const { currentUser } = useContext(AuthContext);
+ 
   const navigate = useNavigate();
   const draftParamId = new URLSearchParams(location.search).get("draftId");
 
@@ -32,14 +34,14 @@ const Write = () => {
   );
   const [draftId, setDraftId] = useState(draftParamId);
   const [postId, setPostId] = useState(location?.state?.pid || "");
-  const [crossPostLoading, setCrossPostLoading] = useState(false);
-  const [isCrossPostDevTo, setIsCrossPostDevTo] = useState(false);
-  const [devToApiKey, setDevToApiKey] = useState("");
-  const [devToken, setDevToken] = useState("");
+
   const [image, setImage] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
   console.log(file);
   console.log(image);
+
+  const handleShowModal = () => setShowModal(true);
 
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files[0];
@@ -73,61 +75,6 @@ const Write = () => {
         setImage(JSON.parse(savedImage));
       }
     }
-  }, []);
-
-  const handleCrossPost = async () => {
-    setCrossPostLoading(true);
-    await handleCrossPostToDevTo(
-      title,
-      cont,
-      desc,
-      cat,
-      tags,
-      devToken,
-      setCrossPostLoading
-    );
-  };
-
-  const handleUpdateDevToToken = async () => {
-    try {
-      const response = await axios.put(
-        `http://localhost:9000/api/v1/user/devToken/${currentUser?.user.id}`,
-        {
-          devToToken: devToApiKey,
-        },
-        {
-          withCredentials: true,
-          credentials: "include",
-        }
-      );
-
-      console.log(response.data);
-      setIsCrossPostDevTo(false);
-      setDevToken(response.data.devToToken);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    const getDevToToken = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:9000/api/v1/user/devToken/${currentUser?.user.id}`,
-          {
-            withCredentials: true,
-            credentials: "include",
-          }
-        );
-
-        console.log(response.data);
-        setIsCrossPostDevTo(false);
-        setDevToken(response.data.devToToken);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getDevToToken();
   }, []);
 
   useEffect(() => {
@@ -483,59 +430,15 @@ const Write = () => {
               Cancel Edit
             </button>
           )}
-          <h5>{image?.metadata?.name}</h5>
+          <h5>
+            {image || file
+              ? image?.metadata?.name || file?.metadata?.name
+              : "No uploaded image"}
+          </h5>
           <hr />
-          {!devToken && (
-            <p>Please toggle the checkbox if you want to publish to Dev.to</p>
-          )}
-          <CrossPosts>
-            <div className="d-flex flex-row align-items-center gap-2">
-              <input
-                type="checkbox"
-                id="switch"
-                className="toggle"
-                checked={isCrossPostDevTo}
-                onChange={() => setIsCrossPostDevTo(!isCrossPostDevTo)}
-              />
-              <label htmlFor="switch" className="switch"></label>
-              {isCrossPostDevTo && (
-                <div>
-                  <input
-                    type="text"
-                    placeholder="Enter Dev.to API key"
-                    value={devToApiKey}
-                    onChange={(e) => setDevToApiKey(e.target.value)}
-                  />
-                  <button
-                    className="message"
-                    title="Save"
-                    onClick={handleUpdateDevToToken}
-                  >
-                    <img src={save} alt="save" />
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {devToken && (
-              <div>
-                <p className="fs-5 fw-bold">
-                  DevTo Token is Saved Successfully
-                </p>
-                <button
-                  className="btn"
-                  onClick={handleCrossPost}
-                  disabled={crossPostLoading}
-                >
-                  {crossPostLoading ? "Cross-Posting..." : "Publish to Dev.to"}
-                </button>
-              </div>
-            )}
-          </CrossPosts>
-
           {file?.metadata || image?.metadata?.name ? (
             <div className="actions d-flex justify-content-between gap-3">
-              <button className="btn" onClick={handlePublishAndDeleteDraft}>
+              <button className="btn" onClick={handleShowModal}>
                 Publish
               </button>
             </div>
@@ -662,6 +565,16 @@ const Write = () => {
           </Category>
         </div>
       </div>
+      <CustomModal
+        showModal={showModal}
+        handleShowModal={handleShowModal}
+        setShowModal={setShowModal}
+        title={title}
+        cont={cont}
+        desc={desc}
+        cat={cat}
+        tags={tags}
+      />
     </Wrapper>
   );
 };
@@ -830,55 +743,5 @@ const Category = styled.div`
 
   label {
     cursor: pointer;
-  }
-`;
-
-const CrossPosts = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-
-  gap: 0.5rem;
-  margin-top: -1rem;
-
-  input {
-    width: auto;
-    height: 30px;
-    cursor: pointer;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    padding: 0.5rem;
-    color: #000;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-  }
-  img {
-    width: 25px;
-    height: 25px;
-    cursor: pointer;
-  }
-
-  .message {
-    border: none;
-    background-color: transparent;
-    cursor: pointer;
-    width: auto;
-    height: auto;
-    position: relative;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-    margin-left: 5px;
-  }
-  .message[title]:hover::after {
-    content: attr(title);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    white-space: nowrap;
-    background-color: rgba(0, 0, 0, 0.8);
-    color: #fff;
-    padding: 0.5rem;
   }
 `;

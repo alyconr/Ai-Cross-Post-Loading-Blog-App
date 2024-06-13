@@ -4,8 +4,12 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const multer = require("multer");
 const app = express();
+const bodyParser = require("body-parser");
 
 app.use(express.json());
+
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
 app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
 app.use(cookieParser());
@@ -17,7 +21,7 @@ const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads/");
   },
-  filename: function (req, file, cb) { 
+  filename: function (req, file, cb) {
     cb(null, Date.now() + file.originalname);
   },
 });
@@ -27,18 +31,16 @@ const upload = multer({
 });
 
 app.post("/api/v1/upload", upload.single("file"), (req, res) => {
- 
-    const file = req.file;
+  const file = req.file;
 
-    if (!file) {
-      // If no file is provided, respond with an error
-      return res.status(400).json({ error: "No file uploaded" });
-    }
+  if (!file) {
+    // If no file is provided, respond with an error
+    return res.status(400).json({ error: "No file uploaded" });
+  }
 
-    const filename = file.filename;
+  const filename = file.filename;
 
-    return res.status(200).json(filename);
- 
+  return res.status(200).json(filename);
 });
 
 const authRouter = require("./routes/auth");

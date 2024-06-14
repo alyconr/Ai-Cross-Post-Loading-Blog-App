@@ -14,8 +14,9 @@ const CustomModal = ({
   showModal,
   title,
   cont,
+  image,
   desc,
-  cat,
+  category,
   tags,
 }) => {
   const [crossPostLoading, setCrossPostLoading] = useState(false);
@@ -31,7 +32,8 @@ const CustomModal = ({
       title,
       cont,
       desc,
-      cat,
+      image,
+      category,
       tags,
       devToken,
       setCrossPostLoading
@@ -94,7 +96,12 @@ const CustomModal = ({
   const handlePublishAll = async () => {
     await handlePublishAndDeleteDraft();
     await handleClose();
-    await handleCrossPost();
+
+    if (isCrossPostDevTo) {
+      await handleCrossPost();
+    } else if (publishDevTo) {
+      await handleCrossPost();
+    }
   };
 
   return (
@@ -111,8 +118,8 @@ const CustomModal = ({
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
+        <p>Do you want to publish to Dev.to?</p>
         <CrossPosts>
-          <p>Do you want to publish to Dev.to?</p>
           <div className="onoffswitch">
             <input
               type="checkbox"
@@ -127,61 +134,64 @@ const CustomModal = ({
               <span className="onoffswitch-switch"></span>
             </label>
           </div>
-        </CrossPosts>
-        {publishDevTo && (
-          <>
-            {!devToken && (
-              <p className="mt-3">
-                Please toggle the checkbox to set your Dev.to API key
-              </p>
-            )}
-            <CrossPosts>
-              <div className="d-flex flex-row align-items-center gap-2">
-                <input
-                  type="checkbox"
-                  role="switch"
-                  id="flexSwitchCheckDisabled"
-                  className="toggle form-check-input bg-success "
-                  checked={isCrossPostDevTo}
-                  onChange={() => setIsCrossPostDevTo(!isCrossPostDevTo)}
-                />
-                <label
-                  htmlFor="switch"
-                  className="switch form-check-label"
-                ></label>
 
-                {isCrossPostDevTo && (
-                  <div>
-                    <input
-                      type="text"
-                      placeholder={devToken ? devToken : "Enter Dev.to API Key"}
-                      value={devToApiKey}
-                      onChange={(e) => setDevToApiKey(e.target.value)}
-                    />
-                    <button
-                      className="message"
-                      title="Save"
-                      onClick={handleUpdateDevToToken}
-                    >
-                      <img src={save} alt="save" />
-                    </button>
-                  </div>
-                )}
-              </div>
+          {publishDevTo && (
+            <>
+              {!devToken && (
+                <p className="mt-3">
+                  Please toggle the checkbox to set your Dev.to API key
+                </p>
+              )}
+
+              <input
+                type="checkbox"
+                role="switch"
+                title={
+                  devToken ? "Update Dev.to API Key" : "Save Dev.to API Key"
+                }
+                id="flexSwitchCheckDisabled"
+                className="form-check-input message bg-success "
+                checked={isCrossPostDevTo}
+                onChange={() => setIsCrossPostDevTo(!isCrossPostDevTo)}
+              />
+              <label
+                htmlFor="switch"
+                className="switch form-check-label"
+              ></label>
+
+              {isCrossPostDevTo && (
+                <div>
+                  <input
+                    type="text"
+                    placeholder={devToken ? devToken : "Enter Dev.to API Key"}
+                    value={devToApiKey}
+                    onChange={(e) => setDevToApiKey(e.target.value)}
+                  />
+                  <button
+                    className="message"
+                    title="Save"
+                    onClick={handleUpdateDevToToken}
+                  >
+                    <img src={save} alt="save" />
+                  </button>
+                </div>
+              )}
 
               {devToken && (
                 <div>
-                  <p className="fs-5">
-                    DevTo Token is already Saved Successfully
-                  </p>
+                  <p className="mt-3">DevTo Token is already saved </p>
                 </div>
               )}
-            </CrossPosts>
-          </>
-        )}
+            </>
+          )}
+        </CrossPosts>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="primary" onClick={handlePublishAll}>
+        <Button
+          className="btn btn-primary btn-publish w-25 m-auto"
+          variant="primary"
+          onClick={handlePublishAll}
+        >
           Publish
         </Button>
       </Modal.Footer>
@@ -193,7 +203,8 @@ export default CustomModal;
 
 const CrossPosts = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
   justify-content: flex-start;
   gap: 0.5rem;
 

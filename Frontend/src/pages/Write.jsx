@@ -3,12 +3,10 @@ import { useEffect, useState, useContext } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useLocation, useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/authContext";
 import axios from "axios";
 import moment from "moment";
 import { toast } from "react-toastify";
 import { debounced } from "../utils/debounce";
-
 import TagsInput from "../components/tags";
 
 import {
@@ -20,7 +18,7 @@ import CustomModal from "../components/Modal";
 
 const Write = () => {
   const location = useLocation();
- 
+
   const navigate = useNavigate();
   const draftParamId = new URLSearchParams(location.search).get("draftId");
 
@@ -566,6 +564,7 @@ const Write = () => {
         </div>
       </div>
       <CustomModal
+        handlePublishAndDeleteDraft={handlePublishAndDeleteDraft}
         showModal={showModal}
         handleShowModal={handleShowModal}
         setShowModal={setShowModal}

@@ -5,10 +5,11 @@ import handleCrossPostToDevTo from "../utils/devToApi";
 import axios from "axios";
 import save from "../assets/save.png";
 import { useState, useEffect, useContext } from "react";
-
+import { toast } from "react-toastify";
 import { AuthContext } from "../context/authContext";
 
 const CustomModal = ({
+  handlePublishAndDeleteDraft,
   setShowModal,
   showModal,
   title,
@@ -21,7 +22,7 @@ const CustomModal = ({
   const [isCrossPostDevTo, setIsCrossPostDevTo] = useState(false);
   const [devToApiKey, setDevToApiKey] = useState("");
   const [devToken, setDevToken] = useState("");
-
+  const [publishDevTo, setPublishDevTo] = useState(false);
   const handleClose = () => setShowModal(false);
   const { currentUser } = useContext(AuthContext);
   const handleCrossPost = async () => {
@@ -53,6 +54,17 @@ const CustomModal = ({
       console.log(response.data);
       setIsCrossPostDevTo(false);
       setDevToken(response.data.devToToken);
+
+      toast.success("DevTo Token Updated Successfully", {
+        position: "bottom-center",
+        autoClose: 2500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
     } catch (error) {
       console.log(error);
     }
@@ -78,6 +90,13 @@ const CustomModal = ({
     };
     getDevToToken();
   }, []);
+
+  const handlePublishAll = async () => {
+    await handlePublishAndDeleteDraft();
+    await handleClose();
+    await handleCrossPost();
+  };
+
   return (
     <Modal
       size="lg"
@@ -87,62 +106,83 @@ const CustomModal = ({
       centered
     >
       <Modal.Header closeButton className="border-0">
-        <Modal.Title>Publish Your Article</Modal.Title>
+        <Modal.Title className="fs-4 fw-bolder">
+          Select The Social Media to Publish
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {!devToken && (
-          <p>Please toggle the checkbox if you want to publish to Dev.to</p>
-        )}
         <CrossPosts>
-          <div className="d-flex flex-row align-items-center gap-2">
+          <p>Do you want to publish to Dev.to?</p>
+          <div className="onoffswitch">
             <input
               type="checkbox"
-              role="switch"
-              id="flexSwitchCheckDisabled"
-              className="toggle form-check-input bg-success "
-              checked={isCrossPostDevTo}
-              onChange={() => setIsCrossPostDevTo(!isCrossPostDevTo)}
+              name="onoffswitch"
+              className="onoffswitch-checkbox"
+              id="myonoffswitch"
+              checked={publishDevTo}
+              onChange={() => setPublishDevTo(!publishDevTo)}
             />
-            <label htmlFor="switch" className="switch form-check-label"></label>
-            {isCrossPostDevTo && (
-              <div>
-                <input
-                  type="text"
-                  placeholder="Enter Dev.to API key"
-                  value={devToApiKey}
-                  onChange={(e) => setDevToApiKey(e.target.value)}
-                />
-                <button
-                  className="message"
-                  title="Save"
-                  onClick={handleUpdateDevToToken}
-                >
-                  <img src={save} alt="save" />
-                </button>
-              </div>
-            )}
+            <label className="onoffswitch-label" for="myonoffswitch">
+              <span className="onoffswitch-inner"></span>
+              <span className="onoffswitch-switch"></span>
+            </label>
           </div>
-
-          {devToken && (
-            <div>
-              <p className="fs-5 fw-bold">DevTo Token is Saved Successfully</p>
-              <button
-                className="btn-info btn text-black font-weight-bold fs-5"
-                onClick={handleCrossPost}
-                disabled={crossPostLoading}
-              >
-                {crossPostLoading ? "Cross-Posting..." : "Publish to Dev.to"}
-              </button>
-            </div>
-          )}
         </CrossPosts>
+        {publishDevTo && (
+          <>
+            {!devToken && (
+              <p className="mt-3">
+                Please toggle the checkbox to set your Dev.to API key
+              </p>
+            )}
+            <CrossPosts>
+              <div className="d-flex flex-row align-items-center gap-2">
+                <input
+                  type="checkbox"
+                  role="switch"
+                  id="flexSwitchCheckDisabled"
+                  className="toggle form-check-input bg-success "
+                  checked={isCrossPostDevTo}
+                  onChange={() => setIsCrossPostDevTo(!isCrossPostDevTo)}
+                />
+                <label
+                  htmlFor="switch"
+                  className="switch form-check-label"
+                ></label>
+
+                {isCrossPostDevTo && (
+                  <div>
+                    <input
+                      type="text"
+                      placeholder={devToken ? devToken : "Enter Dev.to API Key"}
+                      value={devToApiKey}
+                      onChange={(e) => setDevToApiKey(e.target.value)}
+                    />
+                    <button
+                      className="message"
+                      title="Save"
+                      onClick={handleUpdateDevToToken}
+                    >
+                      <img src={save} alt="save" />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {devToken && (
+                <div>
+                  <p className="fs-5">
+                    DevTo Token is already Saved Successfully
+                  </p>
+                </div>
+              )}
+            </CrossPosts>
+          </>
+        )}
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Close
-        </Button>
-        <Button variant="primary" onClick={handleClose}>
-          Save Changes
+        <Button variant="primary" onClick={handlePublishAll}>
+          Publish
         </Button>
       </Modal.Footer>
     </Modal>
@@ -155,9 +195,7 @@ const CrossPosts = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-
   gap: 0.5rem;
-  margin-top: -1rem;
 
   input {
     width: auto;
@@ -171,6 +209,99 @@ const CrossPosts = styled.div`
     cursor: pointer;
     transition: all 0.3s ease-in-out;
   }
+
+  .onoffswitch {
+    position: relative;
+    width: 90px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+
+  .onoffswitch-checkbox {
+    display: none;
+  }
+
+  .onoffswitch-label {
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid #999999;
+    border-radius: 20px;
+  }
+
+  .onoffswitch-inner {
+    display: block;
+    width: 200%;
+    margin-left: -100%;
+    -moz-transition: margin 0.3s ease-in 0s;
+    -webkit-transition: margin 0.3s ease-in 0s;
+    -o-transition: margin 0.3s ease-in 0s;
+    transition: margin 0.3s ease-in 0s;
+  }
+
+  .onoffswitch-inner:before,
+  .onoffswitch-inner:after {
+    display: block;
+    float: left;
+    width: 50%;
+    height: 30px;
+    padding: 0;
+    line-height: 30px;
+    font-size: 14px;
+    color: white;
+    font-family: Trebuchet, Arial, sans-serif;
+    font-weight: bold;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+
+  .onoffswitch-inner:before {
+    content: "YES";
+    padding-left: 10px;
+    background: linear-gradient(
+      109.6deg,
+      rgb(162, 2, 63) 11.2%,
+      rgb(231, 62, 68) 53.6%,
+      rgb(255, 129, 79) 91.1%
+    );
+    color: #ffffff;
+  }
+
+  .onoffswitch-inner:after {
+    content: "NO";
+    padding-right: 10px;
+    background-color: #eeeeee;
+    color: #999999;
+    text-align: right;
+  }
+
+  .onoffswitch-switch {
+    display: block;
+    width: 18px;
+    margin: 6px;
+    background: #ffffff;
+    border: 2px solid #999999;
+    border-radius: 20px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 56px;
+    -moz-transition: all 0.3s ease-in 0s;
+    -webkit-transition: all 0.3s ease-in 0s;
+    -o-transition: all 0.3s ease-in 0s;
+    transition: all 0.3s ease-in 0s;
+  }
+
+  .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+    margin-left: 0;
+  }
+
+  .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+    right: 0px;
+  }
+
   img {
     width: 25px;
     height: 25px;

@@ -571,7 +571,8 @@ const Write = () => {
         title={title}
         cont={cont}
         desc={desc}
-        cat={cat}
+        image={image || file}
+        category={cat}
         tags={tags}
       />
     </Wrapper>

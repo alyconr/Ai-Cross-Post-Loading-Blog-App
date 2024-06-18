@@ -172,6 +172,40 @@ const updateDevToken = async (req, res) => {
   });
 };
 
+const updateMediumToken = async (req, res) => {
+  const { userId } = req.params;
+  const { mediumToken } = req.body;
+
+  if (!mediumToken) {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ error: "Medium token is required" });
+  }
+
+  const sql = "UPDATE users SET `mediumToken` = ? WHERE `id` = ?";
+
+  const values = [mediumToken, userId];
+
+  pool.query(sql, values, (queryError, results) => {
+    if (queryError) {
+      console.error("Database query error:", queryError);
+      res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: "Database query error" });
+    }
+
+    if (results.affectedRows === 0) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ error: "User not found" });
+    }
+
+    res
+      .status(StatusCodes.OK)
+      .json({ message: "Medium token updated successfully", mediumToken });
+  });
+};
+
 const getDevToken = async (req, res) => {
   const { userId } = req.params;
 
@@ -197,6 +231,31 @@ const getDevToken = async (req, res) => {
   });
 };
 
+const getMediumToken = async (req, res) => {
+  const { userId } = req.params;
+
+  const sql = "SELECT `MediumToken` FROM users WHERE `id` = ?";
+
+  const values = [userId];
+
+  pool.query(sql, values, (queryError, results) => {
+    if (queryError) {
+      console.error("Database query error:", queryError);
+      res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: "Database query error" });
+    }
+
+    if (results.length === 0) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ error: "User not found" });
+    }
+
+    res.status(StatusCodes.OK).json({ mediumToken: results[0].mediumToken });
+  });
+};
+
 module.exports = {
   getCurrentUser,
   updateUser,
@@ -204,5 +263,7 @@ module.exports = {
   getAllUsers,
   deleteUser,
   updateDevToken,
+  updateMediumToken,
+  getMediumToken,
   getDevToken,
 };

@@ -8,8 +8,8 @@ const bodyParser = require("body-parser");
 
 app.use(express.json());
 
-app.use(bodyParser.json({ limit: "50mb" })); 
-app.use(bodyParser.urlencoded({ limit: "50mb", extended: true })); 
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
 app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
 app.use(cookieParser());
@@ -56,6 +56,7 @@ const followersRouter = require("./routes/followers");
 const followingsRouter = require("./routes/followings");
 const bookmarksRouter = require("./routes/bookmarks");
 const devToApi = require("./routes/devtoApi");
+const mediumApi = require("./routes/mediumApi");
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/posts", postsRouter);
@@ -70,6 +71,7 @@ app.use("/api/v1/followers", followersRouter);
 app.use("/api/v1/followings", followingsRouter);
 app.use("/api/v1/bookmarks", bookmarksRouter);
 app.use("/api/v1/devto-proxy", devToApi);
+app.use("/api/v1/medium-proxy", mediumApi);
 
 app.get("/", (req, res) => {
   res.send("Hello World, IT WORKS");

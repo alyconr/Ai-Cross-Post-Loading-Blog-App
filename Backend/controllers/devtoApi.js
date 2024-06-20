@@ -42,7 +42,10 @@ const postDevtoApi = async (req, res) => {
       }
     );
 
-    res.status(StatusCodes.OK).json(response.json);
+    res.status(StatusCodes.OK).json({
+      message: "Article created successfully",
+      response: response.data,
+    });
   } catch (error) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)

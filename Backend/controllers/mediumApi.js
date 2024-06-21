@@ -6,8 +6,6 @@ const postMediumApi = async (req, res) => {
   try {
     const { title, content, tags, publishStatus, mediumToken } = req.body;
     const mediumToEndpoint = "https://api.medium.com/v1/me";
-    const mediumApi =
-      "23ace2a469e56b901f66fb8235e094b024a1ed0cbb2eeb396d5f67bcc35f5a105";
 
     const { data } = await axios.get(mediumToEndpoint, {
       headers: {
@@ -25,7 +23,7 @@ const postMediumApi = async (req, res) => {
       content,
       tags,
       publishStatus,
-      mediumApi,
+      mediumToken,
     });
 
     const article = {
@@ -39,7 +37,7 @@ const postMediumApi = async (req, res) => {
     const response = await axios.post(postMediumEndpoint, article, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${mediumApi}`,
+        Authorization: `Bearer ${mediumToken}`,
       },
     });
 

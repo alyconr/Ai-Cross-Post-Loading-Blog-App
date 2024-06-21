@@ -57,6 +57,7 @@ const followingsRouter = require("./routes/followings");
 const bookmarksRouter = require("./routes/bookmarks");
 const devToApi = require("./routes/devtoApi");
 const mediumApi = require("./routes/mediumApi");
+const hashnodeApi = require("./routes/hashnodeApi");
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/posts", postsRouter);
@@ -72,6 +73,7 @@ app.use("/api/v1/followings", followingsRouter);
 app.use("/api/v1/bookmarks", bookmarksRouter);
 app.use("/api/v1/devto-proxy", devToApi);
 app.use("/api/v1/medium-proxy", mediumApi);
+app.use("/api/v1/hashnode-proxy", hashnodeApi); 
 
 app.get("/", (req, res) => {
   res.send("Hello World, IT WORKS");

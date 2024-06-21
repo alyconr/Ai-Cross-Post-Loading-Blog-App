@@ -50,4 +50,5 @@ const postMediumApi = async (req, res) => {
   }
 };
 
+
 module.exports = { postMediumApi };

@@ -8,11 +8,8 @@ const handleCrossPostToDevTo = async (
   image,
   category,
   tags,
-  devToken,
-  setLoading
+  devToken
 ) => {
-  setLoading(true);
-
   console.log(image);
   const devToProxyEndPoint = "http://localhost:9000/api/v1/devto-proxy";
 
@@ -39,8 +36,6 @@ const handleCrossPostToDevTo = async (
   } catch (error) {
     console.error("Error posting article to Dev.to:", error);
     toast.error("Error posting article to Dev.to");
-  } finally {
-    setLoading(false);
   }
 };
 

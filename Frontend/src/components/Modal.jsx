@@ -1,12 +1,9 @@
 import styled from "styled-components";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import { useState } from "react";
+import ModalBodyDevTo from "./ModalBodyDevto";
 import handleCrossPostToDevTo from "../utils/devToApi";
-import axios from "axios";
-import save from "../assets/save.png";
-import { useState, useEffect, useContext } from "react";
-import { toast } from "react-toastify";
-import { AuthContext } from "../context/authContext";
 
 const CustomModal = ({
   handlePublishAndDeleteDraft,
@@ -19,15 +16,11 @@ const CustomModal = ({
   category,
   tags,
 }) => {
-  const [crossPostLoading, setCrossPostLoading] = useState(false);
   const [isCrossPostDevTo, setIsCrossPostDevTo] = useState(false);
-  const [devToApiKey, setDevToApiKey] = useState("");
-  const [devToken, setDevToken] = useState("");
   const [publishDevTo, setPublishDevTo] = useState(false);
   const handleClose = () => setShowModal(false);
-  const { currentUser } = useContext(AuthContext);
+  const [devToken, setDevToken] = useState("");
   const handleCrossPost = async () => {
-    setCrossPostLoading(true);
     await handleCrossPostToDevTo(
       title,
       cont,
@@ -35,63 +28,9 @@ const CustomModal = ({
       image,
       category,
       tags,
-      devToken,
-      setCrossPostLoading
+      devToken
     );
   };
-
-  const handleUpdateDevToToken = async () => {
-    try {
-      const response = await axios.put(
-        `http://localhost:9000/api/v1/user/devToken/${currentUser?.user.id}`,
-        {
-          devToToken: devToApiKey,
-        },
-        {
-          withCredentials: true,
-          credentials: "include",
-        }
-      );
-
-      console.log(response.data);
-      setIsCrossPostDevTo(false);
-      setDevToken(response.data.devToToken);
-
-      toast.success("DevTo Token Updated Successfully", {
-        position: "bottom-center",
-        autoClose: 2500,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    const getDevToToken = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:9000/api/v1/user/devToken/${currentUser?.user.id}`,
-          {
-            withCredentials: true,
-            credentials: "include",
-          }
-        );
-
-        console.log(response.data);
-        setIsCrossPostDevTo(false);
-        setDevToken(response.data.devToToken);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getDevToToken();
-  }, []);
 
   const handlePublishAll = async () => {
     await handlePublishAndDeleteDraft();
@@ -118,73 +57,21 @@ const CustomModal = ({
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>Do you want to publish to Dev.to?</p>
-        <CrossPosts>
-          <div className="onoffswitch">
-            <input
-              type="checkbox"
-              name="onoffswitch"
-              className="onoffswitch-checkbox"
-              id="myonoffswitch"
-              checked={publishDevTo}
-              onChange={() => setPublishDevTo(!publishDevTo)}
-            />
-            <label className="onoffswitch-label" for="myonoffswitch">
-              <span className="onoffswitch-inner"></span>
-              <span className="onoffswitch-switch"></span>
-            </label>
-          </div>
-
-          {publishDevTo && (
-            <>
-              {!devToken && (
-                <p className="mt-3">
-                  Please toggle the checkbox to set your Dev.to API key
-                </p>
-              )}
-
-              <input
-                type="checkbox"
-                role="switch"
-                title={
-                  devToken ? "Update Dev.to API Key" : "Save Dev.to API Key"
-                }
-                id="flexSwitchCheckDisabled"
-                className="form-check-input message bg-success "
-                checked={isCrossPostDevTo}
-                onChange={() => setIsCrossPostDevTo(!isCrossPostDevTo)}
-              />
-              <label
-                htmlFor="switch"
-                className="switch form-check-label"
-              ></label>
-
-              {isCrossPostDevTo && (
-                <div>
-                  <input
-                    type="text"
-                    placeholder={devToken ? devToken : "Enter Dev.to API Key"}
-                    value={devToApiKey}
-                    onChange={(e) => setDevToApiKey(e.target.value)}
-                  />
-                  <button
-                    className="message"
-                    title="Save"
-                    onClick={handleUpdateDevToToken}
-                  >
-                    <img src={save} alt="save" />
-                  </button>
-                </div>
-              )}
-
-              {devToken && (
-                <div>
-                  <p className="mt-3">DevTo Token is already saved </p>
-                </div>
-              )}
-            </>
-          )}
-        </CrossPosts>
+        <ModalBodyDevTo
+          title={title}
+          cont={cont}
+          image={image}
+          desc={desc}
+          category={category}
+          tags={tags}
+          isCrossPostDevTo={isCrossPostDevTo}
+          setIsCrossPostDevTo={setIsCrossPostDevTo}
+          handleCrossPost={handleCrossPost}
+          publishDevTo={publishDevTo}
+          setPublishDevTo={setPublishDevTo}
+          devToken={devToken}
+          setDevToken={setDevToken}
+        />
       </Modal.Body>
       <Modal.Footer>
         <Button

@@ -103,7 +103,7 @@ const ModalBodyDevTo = ({
               title={devToken ? "Update Dev.to API Key" : "Save Dev.to API Key"}
               id="flexSwitchCheckDisabled"
               className="form-check-input message bg-success "
-              checked={isCrossPostDevTo}
+              checked={devToken && !isCrossPostDevTo}
               onChange={() => setIsCrossPostDevTo(!isCrossPostDevTo)}
             />
             <label htmlFor="switch" className="switch form-check-label"></label>

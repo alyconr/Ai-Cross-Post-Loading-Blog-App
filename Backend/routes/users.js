@@ -11,8 +11,10 @@ const {
   deleteUser,
   updateDevToken,
   updateMediumToken,
+  updateHashnodeToken,
   getMediumToken,
   getDevToken,
+  getHashnodeToken,
 } = require("../controllers/users");
 
 router
@@ -32,5 +34,11 @@ router
   .route("/mediumToken/:userId")
   .get(authorized, getMediumToken)
   .put(authorized, updateMediumToken);
+
+router
+  .route("/hashnodeToken/:userId")
+  .get(authorized, getHashnodeToken)
+  .put(authorized, updateHashnodeToken);
+
 
 module.exports = router;

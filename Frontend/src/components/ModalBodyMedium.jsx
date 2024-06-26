@@ -20,7 +20,7 @@ const ModalBodyMedium = ({
   const handleUpdateMediumToken = async (e) => {
     try {
       const response = await axios.put(
-        `http://localhost:9000/api/v1/user/mediumToken/{currnetUser?.user.id}`,
+        `http://localhost:9000/api/v1/user/mediumToken/${currentUser?.user.id}`,
         {
           mediumToken: mediumToApiToken,
         },
@@ -82,7 +82,7 @@ const ModalBodyMedium = ({
             checked={publishMediumTo}
             onChange={() => setPublishMediumTo(!publishMediumTo)}
           />
-          <label className="onoffswitch1-label" for="myonoffswitch1">
+          <label className="onoffswitch1-label" htmlFor="myonoffswitch1">
             <span className="onoffswitch1-inner"></span>
             <span className="onoffswitch1-switch"></span>
           </label>
@@ -99,7 +99,9 @@ const ModalBodyMedium = ({
             <input
               type="checkbox"
               role="switch"
-              title={mediumToken ? "Update Dev.to API Key" : "Save Medium Token"}
+              title={
+                mediumToken ? "Update Dev.to API Key" : "Save Medium Token"
+              }
               id="flexSwitchCheckDisabled"
               className="form-check-input message bg-success "
               checked={mediumToken && !isCrossPostMediumTo}
@@ -127,7 +129,7 @@ const ModalBodyMedium = ({
 
             {mediumToken && (
               <div>
-                <p className="mt-3">Medium  Token is already saved </p>
+                <p className="mt-3">Medium Token is already saved </p>
               </div>
             )}
           </>
@@ -209,7 +211,7 @@ const CrossPosts = styled.div`
     content: "YES";
     padding-left: 10px;
     background: linear-gradient(to top, #00c6fb 0%, #005bea 100%);
-     color: #ffffff;
+    color: #ffffff;
   }
 
   .onoffswitch1-inner:after {

@@ -1,5 +1,4 @@
 const { StatusCodes } = require("http-status-codes");
-const axios = require("axios");
 
 const postHashnodeApi = async (req, res) => {
   try {

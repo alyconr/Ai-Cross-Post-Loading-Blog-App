@@ -6,4 +6,3 @@ const { postHashnodeApi } = require("../controllers/hashnodeApi");
 router.route("/").post(postHashnodeApi);
 
 module.exports = router;
-

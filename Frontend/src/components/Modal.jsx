@@ -25,7 +25,7 @@ const CustomModal = ({
   const [devToken, setDevToken] = useState("");
   const [mediumToken, setMediumToken] = useState("");
   const handleClose = () => setShowModal(false);
-  const handleCrossPost = async () => {
+  const handlePostDevTo = async () => {
     await handleCrossPostToDevTo(
       title,
       cont,
@@ -35,6 +35,8 @@ const CustomModal = ({
       tags,
       devToken
     );
+  };
+  const handlePostMediumTo = async () => {
     await handleCrossPostToMedium(
       title,
       cont,
@@ -50,10 +52,12 @@ const CustomModal = ({
     await handlePublishAndDeleteDraft();
     await handleClose();
 
-    if (isCrossPostDevTo) {
-      await handleCrossPost();
-    } else if (publishDevTo) {
-      await handleCrossPost();
+    if (publishDevTo === true) {
+      await handlePostDevTo();
+    }
+
+    if (publishMediumTo === true) {
+      await handlePostMediumTo();
     }
   };
 
@@ -102,4 +106,3 @@ const CustomModal = ({
 };
 
 export default CustomModal;
-

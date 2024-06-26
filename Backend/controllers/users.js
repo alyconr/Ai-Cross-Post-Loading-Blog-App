@@ -206,7 +206,6 @@ const updateMediumToken = async (req, res) => {
   });
 };
 
-
 const updateHashnodeToken = async (req, res) => {
   const { userId } = req.params;
   const { hashnodeToken } = req.body;
@@ -291,8 +290,7 @@ const getMediumToken = async (req, res) => {
   });
 };
 
-const getHashnodeToken = async (req, res) => { 
-
+const getHashnodeToken = async (req, res) => {
   const { userId } = req.params;
 
   const sql = "SELECT `HashNodeToken` FROM users WHERE `id` = ?";
@@ -313,9 +311,11 @@ const getHashnodeToken = async (req, res) => {
         .json({ error: "User not found" });
     }
 
-    res.status(StatusCodes.OK).json({ HashnodeToken: results[0].HashNodeToken });
+    res
+      .status(StatusCodes.OK)
+      .json({ HashnodeToken: results[0].HashNodeToken });
   });
-}
+};
 
 module.exports = {
   getCurrentUser,
@@ -328,5 +328,5 @@ module.exports = {
   updateHashnodeToken,
   getMediumToken,
   getDevToken,
-  getHashnodeToken
+  getHashnodeToken,
 };

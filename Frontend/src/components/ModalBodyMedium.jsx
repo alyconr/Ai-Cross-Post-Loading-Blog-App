@@ -62,6 +62,7 @@ const ModalBodyMedium = ({
         console.log(response.data);
         setIsCrossPostMediumTo(false);
         setMediumToken(response.data.mediumToken);
+        
       } catch (error) {
         console.log(error);
       }

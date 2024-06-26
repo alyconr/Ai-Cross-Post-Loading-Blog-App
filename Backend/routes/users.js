@@ -40,5 +40,4 @@ router
   .get(authorized, getHashnodeToken)
   .put(authorized, updateHashnodeToken);
 
-
 module.exports = router;

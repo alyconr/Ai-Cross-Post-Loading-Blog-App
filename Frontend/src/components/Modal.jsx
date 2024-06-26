@@ -1,4 +1,3 @@
-import styled from "styled-components";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { useState } from "react";
@@ -6,6 +5,7 @@ import ModalBodyDevTo from "./ModalBodyDevto";
 import handleCrossPostToDevTo from "../utils/devToApi";
 import handleCrossPostToMedium from "../utils/mediumToApi";
 import ModalBodyMedium from "./ModalBodyMedium";
+import ModalBodyHashnode from "./ModalBodyHashnode";
 
 const CustomModal = ({
   handlePublishAndDeleteDraft,
@@ -20,10 +20,14 @@ const CustomModal = ({
 }) => {
   const [isCrossPostDevTo, setIsCrossPostDevTo] = useState(false);
   const [isCrossPostMediumTo, setIsCrossPostMediumTo] = useState(false);
+  const [isCrossPostHashnodeTo, setIsCrossPostHashnodeTo] = useState(false);
   const [publishDevTo, setPublishDevTo] = useState(false);
   const [publishMediumTo, setPublishMediumTo] = useState(false);
+  const [publishHashnodeTo, setPublishHashnodeTo] = useState(false);
   const [devToken, setDevToken] = useState("");
   const [mediumToken, setMediumToken] = useState("");
+  const [hashnodeToken, setHashnodeToken] = useState("");
+
   const handleClose = () => setShowModal(false);
   const handlePostDevTo = async () => {
     await handleCrossPostToDevTo(
@@ -47,6 +51,8 @@ const CustomModal = ({
       mediumToken
     );
   };
+
+  const handlePostHashnodeTo = async () => {};
 
   const handlePublishAll = async () => {
     await handlePublishAndDeleteDraft();
@@ -90,6 +96,14 @@ const CustomModal = ({
           setPublishMediumTo={setPublishMediumTo}
           mediumToken={mediumToken}
           setMediumToken={setMediumToken}
+        />
+        <ModalBodyHashnode
+          isCrossPostHashnodeTo={isCrossPostHashnodeTo}
+          setIsCrossPostHashnodeTo={setIsCrossPostHashnodeTo}
+          publishHashnodeTo={publishHashnodeTo}
+          setPublishHashnodeTo={setPublishHashnodeTo}
+          hashnodeToken={hashnodeToken}
+          setHashnodeToken={setHashnodeToken}
         />
       </Modal.Body>
       <Modal.Footer>

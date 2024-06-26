@@ -313,7 +313,7 @@ const getHashnodeToken = async (req, res) => {
 
     res
       .status(StatusCodes.OK)
-      .json({ HashnodeToken: results[0].HashNodeToken });
+      .json({ hashnodeToken: results[0].HashNodeToken });
   });
 };
 

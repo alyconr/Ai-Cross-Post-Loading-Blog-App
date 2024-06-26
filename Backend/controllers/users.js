@@ -252,7 +252,7 @@ const getMediumToken = async (req, res) => {
         .json({ error: "User not found" });
     }
 
-    res.status(StatusCodes.OK).json({ mediumToken: results[0].mediumToken });
+    res.status(StatusCodes.OK).json({ mediumToken: results[0].MediumToken });
   });
 };
 

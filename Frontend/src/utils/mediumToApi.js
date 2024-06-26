@@ -8,45 +8,41 @@ const handleCrossPostToMedium = async (
   image,
   category,
   tags,
-  mediumToken,
- 
+  mediumToken
 ) => {
-  
   const mediumProxiEndPoint = "http://localhost:9000/api/v1/medium-proxy";
 
-const markdownContent = `# ${description}\n\nhttp://localhost:9000/uploads/${image?.metadata?.name}\n\n${content}`;
+  const markdownContent = `# ${description}\n\nhttp://localhost:9000/uploads/${image?.metadata?.name}\n\n${content}`;
 
-const articleData = {
-  title: title,
-  content: markdownContent,
-  tags: [category, tags.toString()],
-  publishStatus:  "public",
-  mediumToken,
+  const articleData = {
+    title: title,
+    content: markdownContent,
+    tags: [category, tags.toString()],
+    publishStatus: "public",
+    mediumToken,
+  };
+
+  try {
+    const response = await axios.post(mediumProxiEndPoint, articleData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    console.log("Article published successfully:", response.data);
+    toast.success("Article published successfully", {
+      position: "bottom-center",
+      autoClose: 2500,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  } catch (error) {
+    console.error("Error posting article to Dev.to:", error);
+    toast.error("Error posting article to Dev.to");
+  }
 };
-
-try {
-  const response = await axios.post(mediumProxiEndPoint, articleData, {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  console.log("Article published successfully:", response.data);
-  toast.success("Article published successfully", {
-    position: "bottom-center",
-    autoClose: 2500,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-  });
-} catch (error) {
-  console.error("Error posting article to Dev.to:", error);
-  toast.error("Error posting article to Dev.to");
-}
-};
-
-
 
 export default handleCrossPostToMedium;

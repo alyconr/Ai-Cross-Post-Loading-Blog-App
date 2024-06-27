@@ -4,6 +4,7 @@ import { useState } from "react";
 import ModalBodyDevTo from "./ModalBodyDevto";
 import handleCrossPostToDevTo from "../utils/devToApi";
 import handleCrossPostToMedium from "../utils/mediumToApi";
+import handleCrossPostToHashnode from "../utils/hashnodeToApi";
 import ModalBodyMedium from "./ModalBodyMedium";
 import ModalBodyHashnode from "./ModalBodyHashnode";
 
@@ -53,7 +54,18 @@ const CustomModal = ({
     );
   };
 
-  const handlePostHashnodeTo = async () => {};
+  const handlePostHashnodeTo = async () => {
+    await handleCrossPostToHashnode(
+      title,
+      cont,
+      desc,
+      image,
+      category,
+      tags,
+      hashnodeToken,
+      hashnodePublicationId
+    );
+  };
 
   const handlePublishAll = async () => {
     await handlePublishAndDeleteDraft();
@@ -66,7 +78,12 @@ const CustomModal = ({
     if (publishMediumTo === true) {
       await handlePostMediumTo();
     }
+
+    if (publishHashnodeTo === true) {
+      await handlePostHashnodeTo();
+    }
   };
+
 
   return (
     <Modal

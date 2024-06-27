@@ -27,6 +27,7 @@ const CustomModal = ({
   const [devToken, setDevToken] = useState("");
   const [mediumToken, setMediumToken] = useState("");
   const [hashnodeToken, setHashnodeToken] = useState("");
+  const [hashnodePublicationId, setHashnodePublicationId] = useState("");
 
   const handleClose = () => setShowModal(false);
   const handlePostDevTo = async () => {
@@ -103,7 +104,9 @@ const CustomModal = ({
           publishHashnodeTo={publishHashnodeTo}
           setPublishHashnodeTo={setPublishHashnodeTo}
           hashnodeToken={hashnodeToken}
-          setHashnodeToken={setHashnodeToken}
+          setHashnodeToken={ setHashnodeToken }
+          hashnodePublicationId={hashnodePublicationId}
+          setHashnodePublicationId={setHashnodePublicationId}
         />
       </Modal.Body>
       <Modal.Footer>

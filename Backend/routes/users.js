@@ -42,9 +42,4 @@ router
   .get(authorized, getHashnodeToken)
   .put(authorized, updateHashnodeToken);
 
-router 
-  .route("/hashnodePublicationId/:userId")
-  .get(authorized, getHashnodePublicationId)
-  .put(authorized, updateHashnodePublicationId);  
-
 module.exports = router;

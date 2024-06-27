@@ -12,8 +12,14 @@ const ModalBodyHashnode = ({
   setIsCrossPostHashnodeTo,
   hashnodeToken,
   setHashnodeToken,
+  hashnodePublicationId,
+  setHashnodePublicationId,
 }) => {
   const [hashnodeToApiToken, setHashnodeToApiToken] = useState("");
+
+  const [hashnodePublicationIdToApi, setHashnodePublicationIdToApi] =
+    useState("");
+
   const { currentUser } = useContext(AuthContext);
 
   const handleUpdateHashnodeToken = async () => {
@@ -22,6 +28,7 @@ const ModalBodyHashnode = ({
         `http://localhost:9000/api/v1/user/hashnodeToken/${currentUser?.user.id}`,
         {
           hashnodeToken: hashnodeToApiToken,
+          hashnodePublicationId: hashnodePublicationIdToApi,
         },
         {
           withCredentials: true,
@@ -32,8 +39,9 @@ const ModalBodyHashnode = ({
       console.log(response.data);
       setIsCrossPostHashnodeTo(false);
       setHashnodeToken(response.data.hashnodeToken);
+      setHashnodePublicationIdToApi(response.data.hashnodePublicationId);
 
-      toast.success("Hashnode Token Updated Successfully", {
+      toast.success("Hashnode Token and Publication Id Updated Successfully", {
         position: "bottom-center",
         autoClose: 2500,
         hideProgressBar: false,
@@ -57,11 +65,12 @@ const ModalBodyHashnode = ({
             withCredentials: true,
             credentials: "include",
           }
-          );
+        );
 
         console.log(response.data);
         setIsCrossPostHashnodeTo(false);
         setHashnodeToken(response.data.hashnodeToken);
+        setHashnodePublicationId(response.data.hashnodePublicationId);
       } catch (err) {
         console.log(err);
       }
@@ -72,6 +81,7 @@ const ModalBodyHashnode = ({
   return (
     <div>
       <p>Do you want to publish to Hashnode ?</p>
+
       <CrossPosts>
         <div className="onoffswitch2">
           <input
@@ -90,9 +100,9 @@ const ModalBodyHashnode = ({
 
         {publishHashnodeTo && (
           <>
-            {!hashnodeToken && (
+            {!hashnodeToken && !hashnodePublicationId && (
               <p className="mt-3">
-                Please toggle the checkbox to set your Hashnode Token
+                Please set your Hashnode Token and your Publication Id
               </p>
             )}
 
@@ -104,20 +114,40 @@ const ModalBodyHashnode = ({
               }
               id="flexSwitchCheckDisabled"
               className="form-check-input message bg-success "
-              checked={hashnodeToken && !isCrossPostHashnodeTo}
+              checked={
+                hashnodeToken && hashnodePublicationId && !isCrossPostHashnodeTo
+              }
               onChange={() => setIsCrossPostHashnodeTo(!isCrossPostHashnodeTo)}
             />
             <label htmlFor="switch" className="switch form-check-label"></label>
 
             {isCrossPostHashnodeTo && (
-              <div>
+              <div className="d-flex flex-column gap-1">
+                {hashnodeToken && (
+                  <div>
+                    <p>Hashnode Token is already saved </p>
+                  </div>
+                )}
                 <input
                   type="text"
                   placeholder={
-                    hashnodeToken ? hashnodeToken : "Enter Dev.to API Key"
+                    hashnodeToken ? hashnodeToken : "Enter Hashnode Token"
                   }
                   value={hashnodeToApiToken}
                   onChange={(e) => setHashnodeToApiToken(e.target.value)}
+                />
+
+                <input
+                  type="text"
+                  placeholder={
+                    hashnodePublicationId
+                      ? hashnodePublicationId
+                      : "Hashnode Publication Id"
+                  }
+                  value={hashnodePublicationIdToApi}
+                  onChange={(e) =>
+                    setHashnodePublicationIdToApi(e.target.value)
+                  }
                 />
                 <button
                   className="message"
@@ -126,12 +156,6 @@ const ModalBodyHashnode = ({
                 >
                   <img src={save} alt="save" />
                 </button>
-              </div>
-            )}
-
-            {hashnodeToken && (
-              <div>
-                <p className="mt-3">Hashnode Token is already saved </p>
               </div>
             )}
           </>
@@ -156,7 +180,7 @@ const CrossPosts = styled.div`
     cursor: pointer;
     border-radius: 5px;
     border: 1px solid #ccc;
-    padding: 0.5rem;
+    padding: 0.4rem;
     color: #000;
     font-weight: bold;
     cursor: pointer;
@@ -213,12 +237,30 @@ const CrossPosts = styled.div`
   .onoffswitch2-inner:before {
     content: "YES";
     padding-left: 10px;
+    background: hsla(205, 46%, 10%, 1);
+
     background: linear-gradient(
-      109.6deg,
-      rgb(162, 2, 63) 11.2%,
-      rgb(231, 62, 68) 53.6%,
-      rgb(255, 129, 79) 91.1%
+      90deg,
+      hsla(205, 46%, 10%, 1) 0%,
+      hsla(191, 91%, 5%, 1) 100%,
+      hsla(207, 41%, 27%, 1) 100%
     );
+
+    background: -moz-linear-gradient(
+      90deg,
+      hsla(205, 46%, 10%, 1) 0%,
+      hsla(191, 91%, 5%, 1) 100%,
+      hsla(207, 41%, 27%, 1) 100%
+    );
+
+    background: -webkit-linear-gradient(
+      90deg,
+      hsla(205, 46%, 10%, 1) 0%,
+      hsla(191, 91%, 5%, 1) 100%,
+      hsla(207, 41%, 27%, 1) 100%
+    );
+
+    filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#0e1c26", endColorstr="#011216", GradientType=1 );
     color: #ffffff;
   }
 

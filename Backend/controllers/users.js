@@ -240,6 +240,43 @@ const updateHashnodeToken = async (req, res) => {
   });
 };
 
+const updateHashnodePublicationId = async (req, res) => {
+  const { userId } = req.params;
+  const { hashnodePublicationId } = req.body;
+
+  if (!hashnodePublicationId) {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ error: "Hashnode publication ID is required" });
+  }
+
+  const sql = "UPDATE users SET `hashnodePublicationId` = ? WHERE `id` = ?";
+
+  const values = [hashnodePublicationId, userId];
+
+  pool.query(sql, values, (queryError, results) => {
+    if (queryError) {
+      console.error("Database query error:", queryError);
+      res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: "Database query error" });
+    }
+
+    if (results.affectedRows === 0) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ error: "User not found" });
+    }
+
+    res
+      .status(StatusCodes.OK)
+      .json({
+        message: "Hashnode publication ID updated successfully",
+        hashnodePublicationId,
+      });
+  });
+};
+
 const getDevToken = async (req, res) => {
   const { userId } = req.params;
 
@@ -317,6 +354,33 @@ const getHashnodeToken = async (req, res) => {
   });
 };
 
+const getHashnodePublicationId = async (req, res) => {
+  const { userId } = req.params;
+
+  const sql = "SELECT `HashNodePublicationId` FROM users WHERE `id` = ?";
+
+  const values = [userId];
+
+  pool.query(sql, values, (queryError, results) => {
+    if (queryError) {
+      console.error("Database query error:", queryError);
+      res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: "Database query error" });
+    }
+
+    if (results.length === 0) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ error: "User not found" });
+    }
+
+    res
+      .status(StatusCodes.OK)
+      .json({ hashnodePublicationId: results[0].HashNodePublicationId });
+  });
+};
+
 module.exports = {
   getCurrentUser,
   updateUser,
@@ -326,7 +390,9 @@ module.exports = {
   updateDevToken,
   updateMediumToken,
   updateHashnodeToken,
+  updateHashnodePublicationId,
   getMediumToken,
   getDevToken,
   getHashnodeToken,
+  getHashnodePublicationId,
 };

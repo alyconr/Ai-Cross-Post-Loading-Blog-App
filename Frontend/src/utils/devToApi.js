@@ -10,7 +10,6 @@ const handleCrossPostToDevTo = async (
   tags,
   devToken
 ) => {
-  console.log(image);
   const devToProxyEndPoint = "http://localhost:9000/api/v1/devto-proxy";
 
   const markdownContent = `# ${description}\n\n${content}`;
@@ -20,9 +19,10 @@ const handleCrossPostToDevTo = async (
     body_markdown: markdownContent,
     published: false,
     main_image: `http://localhost:9000/uploads/${image?.metadata?.name}`,
-    tags: [category, tags.toString()],
+    tags: [category, tags],
     devToken,
   };
+  console.log(articleData);
 
   try {
     const response = await axios.post(devToProxyEndPoint, articleData, {

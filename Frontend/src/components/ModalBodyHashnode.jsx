@@ -158,6 +158,13 @@ const ModalBodyHashnode = ({
                 </button>
               </div>
             )}
+            {hashnodeToken && (
+              <div>
+                <p className="mt-3">
+                  Hashnode Token and Publication Id are already saved{" "}
+                </p>
+              </div>
+            )}
           </>
         )}
       </CrossPosts>

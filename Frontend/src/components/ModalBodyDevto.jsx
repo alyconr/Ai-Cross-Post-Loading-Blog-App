@@ -139,15 +139,17 @@ const ModalBodyDevTo = ({
                   <input
                     type="checkbox"
                     role="switch"
-                    title="Draft to Dev.to"
+                    title="Draft Post"
                     id="flexSwitchCheckDisabled"
                     className="form-check-input message bg-success "
+                    checked={ draftDevto }
+                    onChange={() => setDraftDevto(!draftDevto)}
                   />
                   <label
                     htmlFor="switch"
                     className="switch form-check-label"
                   ></label>
-                  <p className="mt-3">Click if you want to Draft the Post</p>
+                  <p className="mt-3">Check if you want to Draft the Post</p>
                 </div>
               )}
             </div>

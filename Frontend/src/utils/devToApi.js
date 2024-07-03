@@ -25,13 +25,12 @@ const handleCrossPostToDevTo = async (
   console.log(articleData);
 
   try {
-    const response = await axios.post(devToProxyEndPoint, articleData, {
+    await axios.post(devToProxyEndPoint, articleData, {
       headers: {
         "Content-Type": "application/json",
       },
     });
 
-    console.log("Article posted to Dev.to:", response.data);
     toast.success("Article posted to Dev.to successfully");
   } catch (error) {
     console.error("Error posting article to Dev.to:", error);

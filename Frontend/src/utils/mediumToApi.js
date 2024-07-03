@@ -8,7 +8,8 @@ const handleCrossPostToMedium = async (
   image,
   category,
   tags,
-  mediumToken
+  mediumToken,
+  draftMedium
 ) => {
   const mediumProxiEndPoint = "http://localhost:9000/api/v1/medium-proxy";
 
@@ -18,7 +19,7 @@ const handleCrossPostToMedium = async (
     title: title,
     content: markdownContent,
     tags: [category, tags.toString()],
-    publishStatus: "public",
+    publishStatus: draftMedium ? "draft" : "public",
     mediumToken,
   };
 
@@ -29,7 +30,7 @@ const handleCrossPostToMedium = async (
       },
     });
 
-    toast.success("Article published successfully", {
+    toast.success("Article published to Medium successfully", {
       position: "bottom-center",
       autoClose: 2500,
       hideProgressBar: false,

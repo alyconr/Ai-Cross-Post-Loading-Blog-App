@@ -32,7 +32,15 @@ const handleCrossPostToDevTo = async (
       },
     });
 
-    toast.success("Article posted to Dev.to successfully");
+    toast.success("Article posted to Dev.to successfully", {
+      position: "bottom-center",
+      autoClose: 2500,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
   } catch (error) {
     console.error("Error posting article to Dev.to:", error);
     toast.error("Error posting article to Dev.to");

@@ -23,13 +23,12 @@ const handleCrossPostToMedium = async (
   };
 
   try {
-    const response = await axios.post(mediumProxiEndPoint, articleData, {
+    await axios.post(mediumProxiEndPoint, articleData, {
       headers: {
         "Content-Type": "application/json",
       },
     });
 
-    console.log("Article published successfully:", response.data);
     toast.success("Article published successfully", {
       position: "bottom-center",
       autoClose: 2500,

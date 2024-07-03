@@ -8,7 +8,8 @@ const handleCrossPostToDevTo = async (
   image,
   category,
   tags,
-  devToken
+  devToken,
+  draftDevto
 ) => {
   const devToProxyEndPoint = "http://localhost:9000/api/v1/devto-proxy";
 
@@ -17,7 +18,7 @@ const handleCrossPostToDevTo = async (
   const articleData = {
     title: title,
     body_markdown: markdownContent,
-    published: false,
+    published: draftDevto ? true : false,
     main_image: `http://localhost:9000/uploads/${image?.metadata?.name}`,
     tags: [category, tags],
     devToken,

@@ -25,6 +25,8 @@ const CustomModal = ({
   const [publishDevTo, setPublishDevTo] = useState(false);
   const [publishMediumTo, setPublishMediumTo] = useState(false);
   const [publishHashnodeTo, setPublishHashnodeTo] = useState(false);
+  const [draftDevto, setDraftDevto] = useState(false);
+  const [draftMedium, setDraftMedium] = useState(false);
   const [devToken, setDevToken] = useState("");
   const [mediumToken, setMediumToken] = useState("");
   const [hashnodeToken, setHashnodeToken] = useState("");
@@ -39,7 +41,8 @@ const CustomModal = ({
       image,
       category,
       tags,
-      devToken
+      devToken,
+      draftDevto
     );
   };
   const handlePostMediumTo = async () => {
@@ -84,7 +87,6 @@ const CustomModal = ({
     }
   };
 
-
   return (
     <Modal
       size="lg"
@@ -105,7 +107,9 @@ const CustomModal = ({
           publishDevTo={publishDevTo}
           setPublishDevTo={setPublishDevTo}
           devToken={devToken}
-          setDevToken={setDevToken}
+          setDevToken={ setDevToken }
+          draftDevto={ draftDevto }
+          setDraftDevto={ setDraftDevto }
         />
         <ModalBodyMedium
           isCrossPostMediumTo={isCrossPostMediumTo}
@@ -121,7 +125,7 @@ const CustomModal = ({
           publishHashnodeTo={publishHashnodeTo}
           setPublishHashnodeTo={setPublishHashnodeTo}
           hashnodeToken={hashnodeToken}
-          setHashnodeToken={ setHashnodeToken }
+          setHashnodeToken={setHashnodeToken}
           hashnodePublicationId={hashnodePublicationId}
           setHashnodePublicationId={setHashnodePublicationId}
         />

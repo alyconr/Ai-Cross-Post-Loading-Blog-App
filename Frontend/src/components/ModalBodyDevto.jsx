@@ -6,12 +6,14 @@ import axios from "axios";
 import save from "../assets/save.png";
 
 const ModalBodyDevTo = ({
-  publishDevTo, // Accept the state here
-  setPublishDevTo, // Accept the setter function here
+  publishDevTo,
+  setPublishDevTo,
   isCrossPostDevTo,
   setIsCrossPostDevTo,
   devToken,
   setDevToken,
+  draftDevto,
+  setDraftDevto,
 }) => {
   const [devToApiKey, setDevToApiKey] = useState("");
 
@@ -91,46 +93,64 @@ const ModalBodyDevTo = ({
 
         {publishDevTo && (
           <>
-            {!devToken && (
-              <p className="mt-3">
-                Please toggle the checkbox to set your Dev.to API key
-              </p>
-            )}
+            <div className="d-flex flex-wrap   ">
+              {!devToken && (
+                <p>Please toggle the checkbox to set your Dev.to API key</p>
+              )}
 
-            <input
-              type="checkbox"
-              role="switch"
-              title={devToken ? "Update Dev.to API Key" : "Save Dev.to API Key"}
-              id="flexSwitchCheckDisabled"
-              className="form-check-input message bg-success "
-              checked={devToken && !isCrossPostDevTo}
-              onChange={() => setIsCrossPostDevTo(!isCrossPostDevTo)}
-            />
-            <label htmlFor="switch" className="switch form-check-label"></label>
-
-            {isCrossPostDevTo && (
-              <div>
+              <div className="d-flex gap-2 me-2   align-items-center ">
                 <input
-                  type="text"
-                  placeholder={devToken ? devToken : "Enter Dev.to API Key"}
-                  value={devToApiKey}
-                  onChange={(e) => setDevToApiKey(e.target.value)}
+                  type="checkbox"
+                  role="switch"
+                  title={
+                    devToken ? "Update Dev.to API Key" : "Save Dev.to API Key"
+                  }
+                  id="flexSwitchCheckDisabled"
+                  className="form-check-input  message bg-success "
+                  checked={devToken && !isCrossPostDevTo}
+                  onChange={() => setIsCrossPostDevTo(!isCrossPostDevTo)}
                 />
-                <button
-                  className="message"
-                  title="Save"
-                  onClick={handleUpdateDevToToken}
-                >
-                  <img src={save} alt="save" />
-                </button>
+                <label
+                  htmlFor="switch"
+                  className="switch form-check-label"
+                ></label>
+                <p className="mt-3">Token is already set</p>
+                {isCrossPostDevTo && (
+                  <div>
+                    <input
+                      type="text"
+                      placeholder={devToken ? devToken : "Enter Dev.to API Key"}
+                      value={devToApiKey}
+                      onChange={(e) => setDevToApiKey(e.target.value)}
+                    />
+                    <button
+                      className="message"
+                      title="Save"
+                      onClick={handleUpdateDevToToken}
+                    >
+                      <img src={save} alt="save" />
+                    </button>
+                  </div>
+                )}
               </div>
-            )}
 
-            {devToken && (
-              <div>
-                <p className="mt-3">DevTo Token is already saved </p>
-              </div>
-            )}
+              {devToken && (
+                <div className="d-flex gap-2  align-items-center  ">
+                  <input
+                    type="checkbox"
+                    role="switch"
+                    title="Draft to Dev.to"
+                    id="flexSwitchCheckDisabled"
+                    className="form-check-input message bg-success "
+                  />
+                  <label
+                    htmlFor="switch"
+                    className="switch form-check-label"
+                  ></label>
+                  <p className="mt-3">Click if you want to Draft the Post</p>
+                </div>
+              )}
+            </div>
           </>
         )}
       </CrossPosts>
@@ -142,7 +162,6 @@ export default ModalBodyDevTo;
 
 const CrossPosts = styled.div`
   display: flex;
-  flex-direction: row;
   align-items: center;
   justify-content: flex-start;
   gap: 0.5rem;

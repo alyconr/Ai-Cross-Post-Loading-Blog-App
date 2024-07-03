@@ -5,8 +5,6 @@ const handleCrossPostToHashnode = async (
   title,
   content,
   description,
-  image,
-  category,
   tags,
   hashnodeToken,
   hashnodePublicationId
@@ -32,14 +30,13 @@ const handleCrossPostToHashnode = async (
   };
 
   try {
-    const response = await axios.post(hashnodeProxyEndPoint, articleData, {
+    await axios.post(hashnodeProxyEndPoint, articleData, {
       headers: {
         "Content-Type": "application/json",
       },
     });
 
-    console.log("Article published successfully:", response.data);
-    toast.success("Article published successfully", {
+    toast.success(" Article published to Hashnode successfully", {
       position: "top-center",
       autoClose: 5000,
       hideProgressBar: false,

@@ -12,6 +12,8 @@ const ModalBodyMedium = ({
   setIsCrossPostMediumTo,
   mediumToken,
   setMediumToken,
+  draftMedium,
+  setDraftMedium,
 }) => {
   const [mediumToApiToken, setMedumToApiToken] = useState("");
 
@@ -90,7 +92,7 @@ const ModalBodyMedium = ({
 
         {publishMediumTo && (
           <>
-            <div className="d-flex flex-w">
+            <div className="d-flex flex-wrap">
               {!mediumToken && (
                 <p className="mt-3">
                   Please toggle the checkbox to set your Medium Token
@@ -139,9 +141,11 @@ const ModalBodyMedium = ({
                   <input
                     type="checkbox"
                     role="switch"
-                    title="Draft to Dev.to"
+                    title="Draft Post"
                     id="flexSwitchCheckDisabled"
                     className="form-check-input message bg-success "
+                    checked={draftMedium}
+                    onChange={() => setDraftMedium(!draftMedium)}
                   />
                   <label
                     htmlFor="switch"

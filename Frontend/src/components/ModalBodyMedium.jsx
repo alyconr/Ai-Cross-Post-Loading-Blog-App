@@ -62,7 +62,6 @@ const ModalBodyMedium = ({
         console.log(response.data);
         setIsCrossPostMediumTo(false);
         setMediumToken(response.data.mediumToken);
-        
       } catch (error) {
         console.log(error);
       }
@@ -91,48 +90,67 @@ const ModalBodyMedium = ({
 
         {publishMediumTo && (
           <>
-            {!mediumToken && (
-              <p className="mt-3">
-                Please toggle the checkbox to set your Medium Token
-              </p>
-            )}
-
-            <input
-              type="checkbox"
-              role="switch"
-              title={
-                mediumToken ? "Update Dev.to API Key" : "Save Medium Token"
-              }
-              id="flexSwitchCheckDisabled"
-              className="form-check-input message bg-success "
-              checked={mediumToken && !isCrossPostMediumTo}
-              onChange={() => setIsCrossPostMediumTo(!isCrossPostMediumTo)}
-            />
-            <label htmlFor="switch" className="switch form-check-label"></label>
-
-            {isCrossPostMediumTo && (
-              <div>
+            <div className="d-flex flex-w">
+              {!mediumToken && (
+                <p className="mt-3">
+                  Please toggle the checkbox to set your Medium Token
+                </p>
+              )}
+              <div className="d-flex gap-2 me-2 align-items-center">
                 <input
-                  type="text"
-                  placeholder={mediumToken ? mediumToken : "Enter Medium Token"}
-                  value={mediumToApiToken}
-                  onChange={(e) => setMedumToApiToken(e.target.value)}
+                  type="checkbox"
+                  role="switch"
+                  title={
+                    mediumToken ? "Update Dev.to API Key" : "Save Medium Token"
+                  }
+                  id="flexSwitchCheckDisabled"
+                  className="form-check-input message bg-success "
+                  checked={mediumToken && !isCrossPostMediumTo}
+                  onChange={() => setIsCrossPostMediumTo(!isCrossPostMediumTo)}
                 />
-                <button
-                  className="message"
-                  title="Save"
-                  onClick={handleUpdateMediumToken}
-                >
-                  <img src={save} alt="save" />
-                </button>
+                <label
+                  htmlFor="switch"
+                  className="switch form-check-label"
+                ></label>
+                <p className="mt-3">Token is already set</p>
+                {isCrossPostMediumTo && (
+                  <div>
+                    <input
+                      type="text"
+                      placeholder={
+                        mediumToken ? mediumToken : "Enter Medium Token"
+                      }
+                      value={mediumToApiToken}
+                      onChange={(e) => setMedumToApiToken(e.target.value)}
+                    />
+                    <button
+                      className="message"
+                      title="Save"
+                      onClick={handleUpdateMediumToken}
+                    >
+                      <img src={save} alt="save" />
+                    </button>
+                  </div>
+                )}
               </div>
-            )}
 
-            {mediumToken && (
-              <div>
-                <p className="mt-3">Medium Token is already saved </p>
-              </div>
-            )}
+              {mediumToken && (
+                <div className="d-flex gap-2  align-items-center  ">
+                  <input
+                    type="checkbox"
+                    role="switch"
+                    title="Draft to Dev.to"
+                    id="flexSwitchCheckDisabled"
+                    className="form-check-input message bg-success "
+                  />
+                  <label
+                    htmlFor="switch"
+                    className="switch form-check-label"
+                  ></label>
+                  <p className="mt-3">Click if you want to Draft the Post</p>
+                </div>
+              )}
+            </div>
           </>
         )}
       </CrossPosts>

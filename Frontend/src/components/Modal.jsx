@@ -53,7 +53,8 @@ const CustomModal = ({
       image,
       category,
       tags,
-      mediumToken
+      mediumToken,
+      draftMedium
     );
   };
 
@@ -117,7 +118,9 @@ const CustomModal = ({
           publishMediumTo={publishMediumTo}
           setPublishMediumTo={setPublishMediumTo}
           mediumToken={mediumToken}
-          setMediumToken={setMediumToken}
+          setMediumToken={ setMediumToken }
+          draftMedium={ draftMedium }
+          setDraftMedium={ setDraftMedium }
         />
         <ModalBodyHashnode
           isCrossPostHashnodeTo={isCrossPostHashnodeTo}

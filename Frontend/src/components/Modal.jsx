@@ -74,7 +74,7 @@ const CustomModal = ({
   const handlePublishAll = async () => {
     await handlePublishAndDeleteDraft();
     await handleClose();
-
+    
     if (publishDevTo === true) {
       await handlePostDevTo();
     }

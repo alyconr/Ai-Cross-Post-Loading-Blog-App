@@ -142,7 +142,7 @@ const ModalBodyDevTo = ({
                     title="Draft Post"
                     id="flexSwitchCheckDisabled"
                     className="form-check-input message bg-success "
-                    checked={ draftDevto }
+                    checked={draftDevto}
                     onChange={() => setDraftDevto(!draftDevto)}
                   />
                   <label

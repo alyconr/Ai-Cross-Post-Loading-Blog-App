@@ -103,7 +103,7 @@ const ModalBodyMedium = ({
                   type="checkbox"
                   role="switch"
                   title={
-                    mediumToken ? "Update Dev.to API Key" : "Save Medium Token"
+                    mediumToken ? "Update Medium Api Key" : "Save Medium Token"
                   }
                   id="flexSwitchCheckDisabled"
                   className="form-check-input message bg-success "
@@ -127,7 +127,7 @@ const ModalBodyMedium = ({
                     />
                     <button
                       className="message"
-                      title="Save"
+                      title="Save Medium Token"
                       onClick={handleUpdateMediumToken}
                     >
                       <img src={save} alt="save" />

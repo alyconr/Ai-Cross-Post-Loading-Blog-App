@@ -16,7 +16,7 @@ const Home = () => {
       ? "http://localhost:9000/api/v1/posts"
       : `http://localhost:9000/api/v1/posts${category}`
   );
- 
+
   useEffect(() => {}, []);
 
   return (
@@ -31,12 +31,7 @@ const Home = () => {
           {Array.isArray(posts) && posts.length > 0 ? (
             posts.map((post) => (
               <Post key={post.id}>
-                {post.image && (
-                  <img
-                    src={post.image}
-                    alt={post.title}
-                  />
-                )}
+                {post.image && <img src={post.image} alt={post.title} />}
                 <div className="Content">
                   <PostLink
                     to={`/singlepost/${post.id}/title=${encodeURIComponent(

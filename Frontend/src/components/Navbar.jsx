@@ -23,6 +23,7 @@ import { LuBrainCircuit } from "react-icons/lu";
 import { BsDatabaseGear } from "react-icons/bs";
 import { GoHubot } from "react-icons/go";
 import { CiCircleMore } from "react-icons/ci";
+import write from "../assets/write.png";
 const Navbar = () => {
   const { currentUser, logout } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -222,7 +223,7 @@ const Navbar = () => {
                 onClick={fecthDraftPosts}
                 to={`/write?draftId=${draftId}`}
               >
-                Write <img className="write-img" src="../write.png" alt="" />
+                Write <img className="write-img" src={write} alt="" />
               </Write>
               <ImageProfile>
                 {currentUser?.user.image ? (
@@ -404,7 +405,7 @@ const Navbar = () => {
                 <Span>
                   <Write to="/write" onClick={closeMobileMenu}>
                     Write{" "}
-                    <img className="write-img" src="../write.png" alt="" />
+                    <img className="write-img" src={write} alt="" />
                   </Write>
                 </Span>
                 <ImageProfile>

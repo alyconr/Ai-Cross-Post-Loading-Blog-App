@@ -23,6 +23,7 @@ import { LuBrainCircuit } from "react-icons/lu";
 import { BsDatabaseGear } from "react-icons/bs";
 import { GoHubot } from "react-icons/go";
 import { CiCircleMore } from "react-icons/ci";
+import { MdOutlinePostAdd } from "react-icons/md";
 import write from "../assets/write.png";
 const Navbar = () => {
   const { currentUser, logout } = useContext(AuthContext);
@@ -64,8 +65,6 @@ const Navbar = () => {
         localStorage.setItem("draftId", newDraftId);
       } else {
         localStorage.removeItem("draftId");
-
-          
       }
     } catch (err) {
       console.log(err);
@@ -194,6 +193,15 @@ const Navbar = () => {
                     onClick={closeMobileMenu}
                   >
                     <CgProfile size={20} /> Profile
+                  </Dropdown.Item>
+
+                  <Dropdown.Item
+                    as={Link}
+                    className="menu-item text-decoration-none"
+                    to={`/profile/${currentUser?.user.username}/posts`}
+                    onClick={closeMobileMenu}
+                  >
+                    <MdOutlinePostAdd size={20} /> Posts
                   </Dropdown.Item>
                   <Dropdown.Item
                     as={Link}
@@ -381,6 +389,14 @@ const Navbar = () => {
                     </Dropdown.Item>
                     <Dropdown.Item
                       as={Link}
+                      className="menu-item text-decoration-none"
+                      to={`/profile/${currentUser?.user.username}/posts`}
+                      onClick={closeMobileMenu}
+                    >
+                      <MdOutlinePostAdd size={20} /> Posts
+                    </Dropdown.Item>
+                    <Dropdown.Item
+                      as={Link}
                       className="menu-item text-decoration-none hover:text-red-500"
                       to={`/profile/${currentUser?.user.username}/bookmarks`}
                     >
@@ -404,8 +420,7 @@ const Navbar = () => {
                 </Dropdown>
                 <Span>
                   <Write to="/write" onClick={closeMobileMenu}>
-                    Write{" "}
-                    <img className="write-img" src={write} alt="" />
+                    Write <img className="write-img" src={write} alt="" />
                   </Write>
                 </Span>
                 <ImageProfile>

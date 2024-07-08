@@ -14,6 +14,8 @@ const ModalBodyHashnode = ({
   setHashnodeToken,
   hashnodePublicationId,
   setHashnodePublicationId,
+  draftHashnode,
+  setDraftHashnode,
 }) => {
   const [hashnodeToApiToken, setHashnodeToApiToken] = useState("");
 
@@ -105,66 +107,86 @@ const ModalBodyHashnode = ({
                 Please set your Hashnode Token and your Publication Id
               </p>
             )}
+            <div className="d-flex gap-2  align-items-start flex-wrap ">
+              <input
+                type="checkbox"
+                role="switch"
+                title={
+                  hashnodeToken
+                    ? "Update Hashnode API Token and Publication Id"
+                    : "Save Dev.to API Key"
+                }
+                id="flexSwitchCheckDisabled"
+                className="form-check-input message bg-success "
+                checked={
+                  hashnodeToken &&
+                  hashnodePublicationId &&
+                  !isCrossPostHashnodeTo
+                }
+                onChange={() =>
+                  setIsCrossPostHashnodeTo(!isCrossPostHashnodeTo)
+                }
+              />
+              <label
+                htmlFor="switch"
+                className="switch form-check-label"
+              ></label>
+              {!isCrossPostHashnodeTo && (
+                <p>Hashnode Token and Publication Id are already saved </p>
+              )}
+              {isCrossPostHashnodeTo && (
+                <div className="d-flex flex-column gap-2   ">
+                  <input
+                    type="text"
+                    placeholder={
+                      hashnodeToken ? hashnodeToken : "Enter Hashnode Token"
+                    }
+                    value={hashnodeToApiToken}
+                    onChange={(e) => setHashnodeToApiToken(e.target.value)}
+                  />
+                  <p>Token Set</p>
 
-            <input
-              type="checkbox"
-              role="switch"
-              title={
-                hashnodeToken ? "Update Dev.to API Key" : "Save Dev.to API Key"
-              }
-              id="flexSwitchCheckDisabled"
-              className="form-check-input message bg-success "
-              checked={
-                hashnodeToken && hashnodePublicationId && !isCrossPostHashnodeTo
-              }
-              onChange={() => setIsCrossPostHashnodeTo(!isCrossPostHashnodeTo)}
-            />
-            <label htmlFor="switch" className="switch form-check-label"></label>
-
-            {isCrossPostHashnodeTo && (
-              <div className="d-flex flex-column gap-1">
-                {hashnodeToken && (
-                  <div>
-                    <p>Hashnode Token is already saved </p>
-                  </div>
-                )}
-                <input
-                  type="text"
-                  placeholder={
-                    hashnodeToken ? hashnodeToken : "Enter Hashnode Token"
-                  }
-                  value={hashnodeToApiToken}
-                  onChange={(e) => setHashnodeToApiToken(e.target.value)}
-                />
-
-                <input
-                  type="text"
-                  placeholder={
-                    hashnodePublicationId
-                      ? hashnodePublicationId
-                      : "Hashnode Publication Id"
-                  }
-                  value={hashnodePublicationIdToApi}
-                  onChange={(e) =>
-                    setHashnodePublicationIdToApi(e.target.value)
-                  }
-                />
-                <button
-                  className="message"
-                  title="Save"
-                  onClick={handleUpdateHashnodeToken}
-                >
-                  <img src={save} alt="save" />
-                </button>
-              </div>
-            )}
-            {hashnodeToken && (
-              <div>
-                <p className="mt-3">
-                  Hashnode Token and Publication Id are already saved{" "}
-                </p>
-              </div>
-            )}
+                  <input
+                    type="text"
+                    placeholder={
+                      hashnodePublicationId
+                        ? hashnodePublicationId
+                        : "Hashnode Publication Id"
+                    }
+                    value={hashnodePublicationIdToApi}
+                    onChange={(e) =>
+                      setHashnodePublicationIdToApi(e.target.value)
+                    }
+                  />
+                  <p>Publication Id Set</p>
+                  <button
+                    className="message"
+                    title="Save Token and Publication Id"
+                    onClick={handleUpdateHashnodeToken}
+                  >
+                    <img src={save} alt="save" />
+                  </button>
+                </div>
+              )}
+              {hashnodeToken && (
+                <div className="d-flex align-items-start gap-2">
+                  <input
+                    type="checkbox"
+                    role="switch"
+                    title="Draft Post"
+                    id="flexSwitchCheckDisabled"
+                    className="form-check-input message bg-success "
+                    checked={draftHashnode}
+                    onChange={() => setDraftHashnode(!draftHashnode)}
+                  />
+                  <label
+                    htmlFor="switch"
+                    className="switch form-check-label"
+                  ></label>
+                  <p>Click if you want to Draft the Post</p>
+                </div>
+              )}
+            </div>
           </>
         )}
       </CrossPosts>
@@ -177,7 +199,7 @@ export default ModalBodyHashnode;
 const CrossPosts = styled.div`
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
   gap: 0.5rem;
 

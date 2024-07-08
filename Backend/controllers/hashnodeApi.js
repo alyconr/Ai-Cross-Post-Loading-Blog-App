@@ -10,6 +10,7 @@ const postHashnodeApi = async (req, res) => {
       coverImageOptions,
       tags,
       hashnodeApiKey,
+      draft,
     } = req.body;
 
     const hashnodeEndpoint = "https://gql.hashnode.com";
@@ -22,6 +23,7 @@ const postHashnodeApi = async (req, res) => {
       coverImageOptions,
       tags,
       hashnodeApiKey,
+      draft,
     });
 
     const postMutation = `
@@ -29,6 +31,15 @@ const postHashnodeApi = async (req, res) => {
              publishPost(input: $input) {
                 post {
                  url
+                }
+            }
+        } `;
+
+    const draftMutation = `
+        mutation ($input: CreateDraftInput!) {
+             createDraft(input: $input) {
+                draft {
+                 id
                 }
             }
         } `;
@@ -52,8 +63,8 @@ const postHashnodeApi = async (req, res) => {
         Authorization: hashnodeApiKey,
       },
       body: JSON.stringify({
-        query: postMutation,
-        variables,
+        query: draft === true ? draftMutation : postMutation,
+        variables: variables,
       }),
     });
 

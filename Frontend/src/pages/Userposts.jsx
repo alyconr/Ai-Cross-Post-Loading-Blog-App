@@ -26,7 +26,7 @@ const Userposts = () => {
             posts.map((post) => (
               <Post key={post.id}>
                 <img
-                  src={`http://localhost:9000/uploads/${post.image}`}
+                  src={post.image}
                   alt={post.title}
                 />
                 <div className="Content">

@@ -554,6 +554,17 @@ const Write = () => {
             <input
               type="radio"
               name="cat"
+              checked={cat === "Internet-Of-Things"}
+              value="Internet-Of-Things"
+              id="Internet-Of-Things"
+              onChange={(e) => setCat(e.target.value)}
+            />
+            <label htmlFor="Internet-Of-Things"> Internet-Of-Things </label>
+          </Category>
+          <Category>
+            <input
+              type="radio"
+              name="cat"
               checked={cat === "Others"}
               value="Others"
               id="Others"

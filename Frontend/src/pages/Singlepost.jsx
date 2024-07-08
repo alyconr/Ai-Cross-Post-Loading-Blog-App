@@ -27,7 +27,7 @@ const Singlepost = () => {
 
   const [show, setShow] = useState(false);
   const [showBookmark, setShowBookmark] = useState(false);
-  const [bookmarks, setBookmarks] = useState([]);
+  const [bookmarks, setBookmarks] = useState("");
   const postId = location.pathname.split("/")[2];
 
   const handleClose = () => setShow(false);
@@ -124,11 +124,11 @@ const Singlepost = () => {
         const res = await axios.get(
           `http://localhost:9000/api/v1/bookmarks/${currentUser?.user?.id}`
         );
-        setBookmarks(res.data.bookmarks);
-        console.log(res.data.bookmarks);
+        setBookmarks(res.data);
+        console.log(res.data);
 
         // Check if any bookmark has the same postId
-        const isBookmarked = res.data.bookmarks.some(
+        const isBookmarked = res.data.some(
           (bookmark) => bookmark.id === parseInt(postId)
         );
 
@@ -170,11 +170,7 @@ const Singlepost = () => {
   return (
     <Wrapper>
       <Post>
-        <img
-          className="postImg"
-          src={post.image}
-          alt=""
-        />
+        <img className="postImg" src={post.image} alt="" />
         <div className="user">
           {userImage && (
             <img
@@ -198,7 +194,11 @@ const Singlepost = () => {
                   <FcEditImage size={30} />
                 </button>
               </Link>
-              <Link to={`/singlepost/${postId}/title=${encodeURIComponent(post.title.replace(/ /g, "-"))}`}>
+              <Link
+                to={`/singlepost/${postId}/title=${encodeURIComponent(
+                  post.title.replace(/ /g, "-")
+                )}`}
+              >
                 <button title="Delete" className="message">
                   <BsFillTrashFill
                     onClick={handleDelete}
@@ -239,7 +239,6 @@ const Singlepost = () => {
             </button>
           ) : null}
 
-      
           <Share post={post} />
         </div>
         <h1>{post.title}</h1>
@@ -276,9 +275,7 @@ const Singlepost = () => {
               {" "}
               <MdBookmarkAdd className="bookmark" size={35} color="#0D0D0E" />
             </button>
-          ) : null }
-       
-        
+          ) : null}
         </FooterAction>
 
         <Offcanvas show={show} onHide={handleClose} className="w-50 p-1 ">
@@ -314,8 +311,7 @@ const Singlepost = () => {
                   What are your thoughts?
                 </h3>
               )}
-
-              <Comments post={ post } setPost={ setPost } />
+              <Comments post={post} setPost={setPost} />
               test
             </ContainerComments>
           </Offcanvas.Body>
@@ -435,7 +431,6 @@ const Post = styled.div`
     margin-left: 5px;
     cursor: pointer;
     color: #884dff;
-    
   }
 `;
 

@@ -175,7 +175,7 @@ const Profile = () => {
         );
 
         setFollowers(res.data);
-
+        console.log(res.data);
         const values = res.data;
 
         const filter = values.filter(
@@ -213,7 +213,7 @@ const Profile = () => {
 
         if (filter.length > 0) {
           if (filter[0].id === currentUser?.user.id) {
-            setBookmarks(true);
+            setFollowing(true);
           }
         }
       } catch (error) {
@@ -232,6 +232,7 @@ const Profile = () => {
         );
 
         setBookmarks(res.data);
+        console.log(res.data);
       } catch (error) {
         console.log(error);
       }

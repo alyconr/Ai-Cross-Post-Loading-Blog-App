@@ -27,6 +27,7 @@ const CustomModal = ({
   const [publishHashnodeTo, setPublishHashnodeTo] = useState(false);
   const [draftDevto, setDraftDevto] = useState(false);
   const [draftMedium, setDraftMedium] = useState(false);
+  const [draftHashnode, setDraftHashnode] = useState(false);
   const [devToken, setDevToken] = useState("");
   const [mediumToken, setMediumToken] = useState("");
   const [hashnodeToken, setHashnodeToken] = useState("");
@@ -63,18 +64,17 @@ const CustomModal = ({
       title,
       cont,
       desc,
-      image,
-      category,
       tags,
       hashnodeToken,
-      hashnodePublicationId
+      hashnodePublicationId,
+      draftHashnode
     );
   };
 
   const handlePublishAll = async () => {
     await handlePublishAndDeleteDraft();
     await handleClose();
-    
+
     if (publishDevTo === true) {
       await handlePostDevTo();
     }
@@ -108,9 +108,9 @@ const CustomModal = ({
           publishDevTo={publishDevTo}
           setPublishDevTo={setPublishDevTo}
           devToken={devToken}
-          setDevToken={ setDevToken }
-          draftDevto={ draftDevto }
-          setDraftDevto={ setDraftDevto }
+          setDevToken={setDevToken}
+          draftDevto={draftDevto}
+          setDraftDevto={setDraftDevto}
         />
         <ModalBodyMedium
           isCrossPostMediumTo={isCrossPostMediumTo}
@@ -118,9 +118,9 @@ const CustomModal = ({
           publishMediumTo={publishMediumTo}
           setPublishMediumTo={setPublishMediumTo}
           mediumToken={mediumToken}
-          setMediumToken={ setMediumToken }
-          draftMedium={ draftMedium }
-          setDraftMedium={ setDraftMedium }
+          setMediumToken={setMediumToken}
+          draftMedium={draftMedium}
+          setDraftMedium={setDraftMedium}
         />
         <ModalBodyHashnode
           isCrossPostHashnodeTo={isCrossPostHashnodeTo}
@@ -131,6 +131,8 @@ const CustomModal = ({
           setHashnodeToken={setHashnodeToken}
           hashnodePublicationId={hashnodePublicationId}
           setHashnodePublicationId={setHashnodePublicationId}
+          draftHashnode={draftHashnode}
+          setDraftHashnode={setDraftHashnode}
         />
       </Modal.Body>
       <Modal.Footer>

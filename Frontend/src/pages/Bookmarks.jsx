@@ -22,7 +22,7 @@ const Bookmarks = () => {
         const res = await axios.get(
           `http://localhost:9000/api/v1/bookmarks/${currentUserId} `
         );
-        setBookmarks(res.data.bookmarks);
+        setBookmarks(res.data);
         console.log(res.data);
       } catch (err) {
         console.log(err);
@@ -47,16 +47,22 @@ const Bookmarks = () => {
           {Array.isArray(bookmarks) && bookmarks.length > 0 ? (
             bookmarks.map((post) => (
               <Posts key={post.id}>
-                <img
-                  src={`http://localhost:9000/uploads/${post.image}`}
-                  alt={post.title}
-                />
+                <img src={post.image} alt={post.title} />
                 <div className="Content">
-                  <PostLink to={`/singlepost/${post.id}`}>
+                  <PostLink
+                    to={`/singlepost/${post.id}/title=${encodeURIComponent(
+                      post.title.replace(/ /g, "-")
+                    )}`}
+                  >
                     <h2>{post.title}</h2>
                   </PostLink>
                   <h5>{post.description}</h5>
-                  <Link className="read-more" to={`/singlepost/${post.id}`}>
+                  <Link
+                    className="read-more"
+                    to={`/singlepost/${post.id}/title=${encodeURIComponent(
+                      post.title.replace(/ /g, "-")
+                    )}`}
+                  >
                     Read More
                   </Link>
                 </div>

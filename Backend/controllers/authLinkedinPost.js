@@ -1,6 +1,7 @@
-const client_id = "78c2aq8oqxkd1b";
-const redirect_uri = "http://localhost:9000/auth/linkedin/callback";
-const scope = "w_member_social";
+require("dotenv").config();
+const client_id = process.env.LINKEDIN_CLIENT_ID;
+const redirect_uri = process.env.LINKEDIN_REDIRECT_URI;
+const scope = "openid profile email w_member_social";
 const crypto = require("crypto");
 
 function generateState() {

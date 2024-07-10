@@ -1,12 +1,14 @@
 const axios = require("axios");
 const { StatusCodes } = require("http-status-codes");
 
+require("dotenv").config();
+
 const authLinkedinCallback = async (req, res) => {
   const { code } = req.query;
   const tokenURL = "https://www.linkedin.com/oauth/v2/accessToken";
-  const client_id = "78c2aq8oqxkd1b";
-  const client_secret = "vYctd4jo4bad3n14";
-  const redirect_uri = "http://localhost:9000/auth/linkedin/callback";
+  const client_id = process.env.LINKEDIN_CLIENT_ID;
+  const client_secret = process.env.LINKEDIN_CLIENT_SECRET;
+  const redirect_uri = process.env.LINKEDIN_REDIRECT_URI;
 
   try {
     const response = await axios.post(tokenURL, null, {

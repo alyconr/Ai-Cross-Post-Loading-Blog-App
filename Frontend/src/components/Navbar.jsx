@@ -396,6 +396,14 @@ const Navbar = () => {
                       <CgProfile size={20} /> Profile
                     </Dropdown.Item>
                     <Dropdown.Item
+                    as={Link}
+                    className="menu-item text-decoration-none"
+                    to={`/Dashboard/${currentUser?.user.username}`}
+                    onClick={closeMobileMenu}
+                  >
+                    <MdOutlineDashboard size={20} /> Dashboard
+                  </Dropdown.Item>
+                    <Dropdown.Item
                       as={Link}
                       className="menu-item text-decoration-none"
                       to={`/profile/${currentUser?.user.username}/posts`}

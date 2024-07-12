@@ -120,12 +120,7 @@ function App() {
 
 const Container = styled.div`
   display: flex;
-  width: 100%;
-  flex-direction: column; 
-  justify-content: center;
-  
-  
-
+  flex-direction: column;
 `;
 
 export default App;

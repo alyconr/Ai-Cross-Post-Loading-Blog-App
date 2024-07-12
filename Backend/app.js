@@ -81,29 +81,6 @@ app.use("/api/v1/linkedin-proxy", linkedinPost);
 app.use("/auth/linkedin", authLinkedinPost);
 app.use("/auth/linkedin/callback", authLinkedinCallback);
 
-app.get("/api/v1/profile", async (req, res) => {
-  const accessToken =
-    "AQUKAtsAq7-gAchMhtxeXcokYvO6Hp4rO64qH-9GIpgQuvDoIOHMwpuHRDyb9-mSOobVsclwFl4gzopNpdzxPhjcllfTmlReyg1GAbxqsOKqIEW8f2HEDD6QhxtnTjfh0hImc5WaKDII0M9C4NcmI1T7pg5BrXOYV7JGkzMzIPaORL5JhCKNmjYhaPAzA38fA-5UUXmdiTbgdxy4p5OTuopIQCzDLQX3-KYIoBSBFA7OcC78QY2EcamFS1yvydv5jL80Hiko1m7EhWcxq9ftC1XqIoBGBfGKNkQ61S4NcJWFvlCnuqhV0BPS36jKY7iNelyexaWD4SHB_C1M-qqt69p10GWXvg";
-
-  if (!accessToken) {
-    return res.status(401).send("Access token is missing");
-  }
-
-  try {
-    const profileResponse = await axios.get("https://api.linkedin.com/v2/userinfo", {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Cache-Control": "no-cache",
-        "X-Restli-Protocol-Version": "2.0.0",
-      },
-    });
-
-    res.json(profileResponse.data);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error retrieving profile");
-  }
-});
 
 app.get("/", (req, res) => {
   res.send("Hello World, IT WORKS");

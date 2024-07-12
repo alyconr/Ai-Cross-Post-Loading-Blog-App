@@ -24,6 +24,7 @@ import { BsDatabaseGear } from "react-icons/bs";
 import { GoHubot } from "react-icons/go";
 import { CiCircleMore } from "react-icons/ci";
 import { MdOutlinePostAdd } from "react-icons/md";
+import { MdOutlineDashboard } from "react-icons/md";
 import write from "../assets/write.png";
 const Navbar = () => {
   const { currentUser, logout } = useContext(AuthContext);
@@ -194,7 +195,14 @@ const Navbar = () => {
                   >
                     <CgProfile size={20} /> Profile
                   </Dropdown.Item>
-
+                  <Dropdown.Item
+                    as={Link}
+                    className="menu-item text-decoration-none"
+                    to={`/Dashboard/${currentUser?.user.username}`}
+                    onClick={closeMobileMenu}
+                  >
+                    <MdOutlineDashboard size={20} /> Dashboard
+                  </Dropdown.Item>
                   <Dropdown.Item
                     as={Link}
                     className="menu-item text-decoration-none"

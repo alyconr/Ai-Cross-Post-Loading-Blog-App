@@ -121,13 +121,8 @@ const Footer = () => {
 export default Footer;
 
 const Footers = styled.footer`
-  margin-top: 15vh;
   width: 100%;
   height: 100%;
-  top: 10;
-  left: 0;
-  right: 0;
-  bottom: 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -167,10 +162,10 @@ const Footers = styled.footer`
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
-    justify-content: center;     
+    justify-content: center;
   }
 
   span {
-    margin-top: -60px
+    margin-top: -60px;
   }
 `;

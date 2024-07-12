@@ -25,12 +25,12 @@ import ResetPassword from "./pages/ResetPassword";
 import ForgotPassword from "./pages/forgotPassword";
 import Settings from "./components/settings";
 import Bookmarks from "./pages/Bookmarks";
+import Dashboard from "./pages/Dashboard";
 
 const Layout = () => {
   const location = useLocation();
   const isHome = location.pathname === "/";
   const category = useLocation().search;
-  
 
   return (
     <>
@@ -46,8 +46,6 @@ const Layout = () => {
 
 const PrivateRoute = ({ element }) => {
   const { currentUser } = useContext(AuthContext);
-  
-
 
   return currentUser ? element : <Navigate to="/login" />;
 };
@@ -71,19 +69,23 @@ const Router = createBrowserRouter([
       },
       {
         path: "/profile/:username",
-        element: <PrivateRoute element={ <Profile /> } />,
+        element: <PrivateRoute element={<Profile />} />,
       },
       {
         path: "/settings/:username",
-        element: <PrivateRoute element={ <Settings /> } />,
+        element: <PrivateRoute element={<Settings />} />,
       },
       {
         path: "/profile/:username/posts",
-        element: <PrivateRoute element={ <Userposts /> } />,
+        element: <PrivateRoute element={<Userposts />} />,
       },
       {
         path: "/profile/:username/bookmarks",
-        element: <PrivateRoute element={ <Bookmarks /> } />,
+        element: <PrivateRoute element={<Bookmarks />} />,
+      },
+      {
+        path: "/Dashboard/:username",
+        element: <PrivateRoute element={<Dashboard />} />,
       },
       {
         path: "/login",
@@ -118,7 +120,12 @@ function App() {
 
 const Container = styled.div`
   display: flex;
-  flex-direction: column;
+  width: 100%;
+  flex-direction: column; 
+  justify-content: center;
+  
+  
+
 `;
 
 export default App;

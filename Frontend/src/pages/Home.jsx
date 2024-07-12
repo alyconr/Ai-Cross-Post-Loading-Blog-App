@@ -113,6 +113,7 @@ const Post = styled.div`
   flex-direction: row;
   margin: 50px auto 0;
   gap: 50px;
+  padding-bottom: 50px;
 
   .Content {
     display: flex;
@@ -147,6 +148,7 @@ const Post = styled.div`
     position: relative;
     z-index: 1;
     flex: 3;
+    
   }
 `;
 

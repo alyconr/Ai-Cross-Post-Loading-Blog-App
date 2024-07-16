@@ -1,20 +1,105 @@
-import React, { useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import styled from "styled-components";
 import Sidebar from "../components/Sidebar";
 import Card from "../components/card";
-
+import axios from "axios";
+import { useLocation } from "react-router-dom";
+import { AuthContext } from "../context/authContext";
+import useFetch from "../utils/useFetch";
 const Dashboard = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [followers, setFollowers] = useState([]);
+  const [following, setFollowing] = useState([]);
+  const [bookmarks, setBookmarks] = useState([]);
+  const [follow, setFollow] = useState(false);
+  const [username, setUsername] = useState("");
+  const [user, setUser] = useState({});
+  const { currentUser } = useContext(AuthContext);
+  const location = useLocation();
+  const userName = location.pathname.split("/")[2];
 
+  useEffect(() => {
+    const fetchFollowers = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:9000/api/v1/followers/${currentUser?.user.id}`
+        );
+
+        setFollowers(res.data);
+        console.log(res.data);
+        const values = res.data;
+
+        const filter = values.filter(
+          (value) => value.id === currentUser?.user.id
+        );
+
+        if (filter.length > 0) {
+          if (filter[0].id === currentUser?.user.id) {
+            setFollow(true);
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchFollowers();
+  }, [user.id]);
+
+  useEffect(() => {
+    const fetchFollowings = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:9000/api/v1/followings/${currentUser?.user.id}`
+        );
+
+        setFollowing(res.data);
+        console.log(res.data);
+
+        const values = res.data;
+
+        const filter = values.filter(
+          (value) => value.id === currentUser?.user.id
+        );
+
+        if (filter.length > 0) {
+          if (filter[0].id === currentUser?.user.id) {
+            setFollowing(true);
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchFollowings();
+  }, [user.id]);
+
+  useEffect(() => {
+    const fetchBookmarks = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:9000/api/v1/bookmarks/${currentUser?.user.id}`
+        );
+
+        setBookmarks(res.data);
+        console.log(res.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchBookmarks();
+  }, [currentUser?.user.id]);
   return (
     <DashboardContainer>
       <Sidebar menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
       <MainContent>
         <h1>Dashboard</h1>
         <CardsContainer>
-          <Card title="Followers" count={120} />
-          <Card title="Followings" count={80} />
-          <Card title="Bookmarks" count={50} />
+          <Card title="Followers" count={followers.length} />
+          <Card title="Followings" count={following.length} />
+          <Card title="Bookmarks" count={bookmarks.length} />
           <Card title="Medium Posts" count={10} />
           <Card title="Dev.to Posts" count={15} />
           <Card title="Hashnode Posts" count={5} />

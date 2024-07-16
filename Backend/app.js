@@ -62,6 +62,7 @@ const linkedinPost = require("./routes/linkedinPost");
 const authLinkedinPost = require("./routes/authLinkedinPost");
 const authLinkedinCallback = require("./routes/authLinkedinCallback");
 
+
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/posts", postsRouter);
 app.use("/api/v1/draftposts", draftPostsRouter);
@@ -80,6 +81,7 @@ app.use("/api/v1/hashnode-proxy", hashnodeApi);
 app.use("/api/v1/linkedin-proxy", linkedinPost);
 app.use("/auth/linkedin", authLinkedinPost);
 app.use("/auth/linkedin/callback", authLinkedinCallback);
+
 
 
 app.get("/", (req, res) => {

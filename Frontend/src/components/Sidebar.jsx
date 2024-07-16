@@ -7,14 +7,14 @@ import { AuthContext } from "../context/authContext";
 
 const Sidebar = ({ menuOpen, setMenuOpen }) => {
   const { currentUser } = useContext(AuthContext);
-
   const navigate = useNavigate();
+
   const handleToggle = (event) => {
     event.preventDefault();
     setMenuOpen(!menuOpen);
   };
   return (
-    <SidebarContainer menuOpen={menuOpen}>
+    <SidebarContainer $isOpen={menuOpen}>
       <ToggleButton onClick={handleToggle}>
         {menuOpen ? (
           <IoCloseCircleOutline size={35} />
@@ -23,7 +23,7 @@ const Sidebar = ({ menuOpen, setMenuOpen }) => {
         )}
       </ToggleButton>
 
-      <MenuItems menuOpen={menuOpen}>
+      <MenuItems $isOpen={menuOpen}>
         <MenuItem as={Link} to={`/profile/${currentUser?.user.username}`}>
           Profile
         </MenuItem>
@@ -46,7 +46,7 @@ const Sidebar = ({ menuOpen, setMenuOpen }) => {
 
 export default Sidebar;
 const SidebarContainer = styled.div`
-  width: ${(props) => (props.menuOpen ? "250px" : "50px")};
+  width: ${({ $isOpen }) => ($isOpen ? "250px" : "50px")};
   transition: width 0.3s;
   background-color: #343a40;
   color: white;
@@ -65,7 +65,7 @@ const ToggleButton = styled.div`
 `;
 
 const MenuItems = styled.div`
-  display: ${(props) => (props.menuOpen ? "block" : "none")};
+  display: ${({ $isOpen }) => ($isOpen ? "block" : "none")};
   padding: 10px;
   text-decoration: none;
 `;

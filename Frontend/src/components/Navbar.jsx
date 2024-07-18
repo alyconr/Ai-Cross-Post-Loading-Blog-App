@@ -190,42 +190,12 @@ const Navbar = () => {
                   <Dropdown.Item
                     as={Link}
                     className="menu-item text-decoration-none"
-                    to={`/profile/${currentUser?.user.username}`}
-                    onClick={closeMobileMenu}
-                  >
-                    <CgProfile size={20} /> Profile
-                  </Dropdown.Item>
-                  <Dropdown.Item
-                    as={Link}
-                    className="menu-item text-decoration-none"
                     to={`/Dashboard/${currentUser?.user.username}`}
                     onClick={closeMobileMenu}
                   >
                     <MdOutlineDashboard size={20} /> Dashboard
                   </Dropdown.Item>
-                  <Dropdown.Item
-                    as={Link}
-                    className="menu-item text-decoration-none"
-                    to={`/profile/${currentUser?.user.username}/posts`}
-                    onClick={closeMobileMenu}
-                  >
-                    <MdOutlinePostAdd size={20} /> Posts
-                  </Dropdown.Item>
-                  <Dropdown.Item
-                    as={Link}
-                    className="menu-item text-decoration-none hover:text-red-500"
-                    to={`/profile/${currentUser?.user.username}/bookmarks`}
-                  >
-                    <PiFileMagnifyingGlass /> Reading List
-                  </Dropdown.Item>
 
-                  <Dropdown.Item
-                    as={Link}
-                    className="menu-item text-decoration-none"
-                    to={`/settings/${currentUser?.user.username}`}
-                  >
-                    <IoSettingsOutline /> Settings
-                  </Dropdown.Item>
                   <Dropdown.Item
                     className="menu-item text-decoration-none"
                     onClick={handleLogout}
@@ -389,43 +359,13 @@ const Navbar = () => {
                   <Dropdown.Menu>
                     <Dropdown.Item
                       as={Link}
-                      to={`/profile/${currentUser?.user.username}`}
-                      onClick={closeMobileMenu}
                       className="menu-item text-decoration-none"
-                    >
-                      <CgProfile size={20} /> Profile
-                    </Dropdown.Item>
-                    <Dropdown.Item
-                    as={Link}
-                    className="menu-item text-decoration-none"
-                    to={`/Dashboard/${currentUser?.user.username}`}
-                    onClick={closeMobileMenu}
-                  >
-                    <MdOutlineDashboard size={20} /> Dashboard
-                  </Dropdown.Item>
-                    <Dropdown.Item
-                      as={Link}
-                      className="menu-item text-decoration-none"
-                      to={`/profile/${currentUser?.user.username}/posts`}
+                      to={`/Dashboard/${currentUser?.user.username}`}
                       onClick={closeMobileMenu}
                     >
-                      <MdOutlinePostAdd size={20} /> Posts
-                    </Dropdown.Item>
-                    <Dropdown.Item
-                      as={Link}
-                      className="menu-item text-decoration-none hover:text-red-500"
-                      to={`/profile/${currentUser?.user.username}/bookmarks`}
-                    >
-                      <PiFileMagnifyingGlass /> Reading List
+                      <MdOutlineDashboard size={20} /> Dashboard
                     </Dropdown.Item>
 
-                    <Dropdown.Item
-                      as={Link}
-                      className="menu-item text-decoration-none"
-                      to={`/settings/${currentUser?.user.username}`}
-                    >
-                      <IoSettingsOutline /> Settings
-                    </Dropdown.Item>
                     <Dropdown.Item
                       className="menu-item text-decoration-none"
                       onClick={logout}

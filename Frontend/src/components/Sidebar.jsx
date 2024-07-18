@@ -4,14 +4,20 @@ import { MdOutlineOpenInNew } from "react-icons/md";
 import { IoCloseCircleOutline } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
-
-const Sidebar = ({ menuOpen, setMenuOpen }) => {
+import { useState } from "react";
+import Dashboard from "./../pages/Dashboard";
+const Sidebar = ({ menuOpen, setMenuOpen, setActiveComponent }) => {
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleToggle = (event) => {
     event.preventDefault();
     setMenuOpen(!menuOpen);
+  };
+
+  const handleMenuItemClick = (component) => {
+    setActiveComponent(component);
+    setMenuOpen(true);
   };
   return (
     <SidebarContainer $isOpen={menuOpen}>
@@ -24,20 +30,20 @@ const Sidebar = ({ menuOpen, setMenuOpen }) => {
       </ToggleButton>
 
       <MenuItems $isOpen={menuOpen}>
-        <MenuItem as={Link} to={`/profile/${currentUser?.user.username}`}>
-          Profile
+        <MenuItem as={Link} onClick={() => handleMenuItemClick("dashboard")}>
+          Dashboard
         </MenuItem>
-        <MenuItem as={Link} to={`/profile/${currentUser?.user.username}/posts`}>
+        <MenuItem as={Link} onClick={() => handleMenuItemClick("profile")}>
+          Profile Account
+        </MenuItem>
+        <MenuItem as={Link} onClick={() => handleMenuItemClick("localPosts")}>
           Your Local Posts
         </MenuItem>
-        <MenuItem as={Link} to={`/settings/${currentUser?.user.username}`}>
-          Settings
-        </MenuItem>
-        <MenuItem
-          as={Link}
-          to={`/profile/${currentUser?.user.username}/bookmarks`}
-        >
+        <MenuItem as={Link} onClick={() => handleMenuItemClick("readingList")}>
           Reading List
+        </MenuItem>
+        <MenuItem as={Link} onClick={() => handleMenuItemClick("settings")}>
+          Settings
         </MenuItem>
       </MenuItems>
     </SidebarContainer>
@@ -50,7 +56,7 @@ const SidebarContainer = styled.div`
   transition: width 0.3s;
   background-color: #343a40;
   color: white;
-  height: 100vh;
+  height: auto;
   display: flex;
   flex-direction: column;
 `;
@@ -70,7 +76,7 @@ const MenuItems = styled.div`
   text-decoration: none;
 `;
 
-const MenuItem = styled(Link)`
+const MenuItem = styled.button`
   display: flex;
   padding: 10px 0;
   cursor: pointer;

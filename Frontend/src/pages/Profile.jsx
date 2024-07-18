@@ -652,6 +652,7 @@ const EditProfile = styled.div`
   display: flex;
   flex-direction: column;
   padding: 0 5rem;
+  width: 100%;
   border: 1px solid #ebe3d5;
   margin: 2rem auto;
   border-radius: 10px;

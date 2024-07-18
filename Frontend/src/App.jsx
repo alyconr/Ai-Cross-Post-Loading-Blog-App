@@ -31,6 +31,7 @@ const Layout = () => {
   const location = useLocation();
   const isHome = location.pathname === "/";
   const category = useLocation().search;
+  const isDashboard = location.pathname === "/Dashboard/:username";
 
   return (
     <>
@@ -39,7 +40,7 @@ const Layout = () => {
       <Navbar />
       {isHome && !category && <Hero />}
       <Outlet />
-      <Footer />
+      { isDashboard && <Footer /> }
     </>
   );
 };

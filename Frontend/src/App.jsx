@@ -40,7 +40,7 @@ const Layout = () => {
       <Navbar />
       {isHome && !category && <Hero />}
       <Outlet />
-      { isDashboard && <Footer /> }
+      {isHome && !isDashboard && <Footer />}
     </>
   );
 };

@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Sidebar from "../components/Sidebar";
 import Card from "../components/card";
 import axios from "axios";
-import { useLocation, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
 import useFetch from "../utils/useFetch";
 import Profile from "./Profile";
@@ -11,91 +11,45 @@ import Settings from "../components/settings";
 import Bookmarks from "./Bookmarks";
 import Home from "./Home";
 import followerUser from "../assets/follower.png";
+
 const Dashboard = () => {
   const [menuOpen, setMenuOpen] = useState(true);
   const [activeComponent, setActiveComponent] = useState("dashboard");
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [bookmarks, setBookmarks] = useState([]);
-  const [follow, setFollow] = useState(false);
   const [showFollowers, setShowFollowers] = useState(false);
-  const [user, setUser] = useState({});
+  const [showFollowings, setShowFollowings] = useState(false);
+  const [showBookmarks, setShowBookmarks] = useState(false);
   const { currentUser } = useContext(AuthContext);
-  const location = useLocation();
-  const userName = location.pathname.split("/")[2];
 
   useEffect(() => {
-    const fetchFollowers = async () => {
+    const fetchData = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:9000/api/v1/followers/${currentUser?.user.id}`
-        );
+        const [followersRes, followingRes, bookmarksRes] = await Promise.all([
+          axios.get(
+            `http://localhost:9000/api/v1/followers/${currentUser?.user.id}`
+          ),
+          axios.get(
+            `http://localhost:9000/api/v1/followings/${currentUser?.user.id}`
+          ),
+          axios.get(
+            `http://localhost:9000/api/v1/bookmarks/${currentUser?.user.id}`
+          ),
+        ]);
 
-        setFollowers(res.data);
-        console.log(res.data);
-        const values = res.data;
-
-        const filter = values.filter(
-          (value) => value.id === currentUser?.user.id
-        );
-
-        if (filter.length > 0) {
-          if (filter[0].id === currentUser?.user.id) {
-            setFollow(true);
-          }
-        }
+        console.log("Initial followers data:", followersRes.data);
+        setFollowers(followersRes.data);
+        setFollowing(followingRes.data);
+        setBookmarks(bookmarksRes.data);
       } catch (error) {
         console.error(error);
       }
     };
 
-    fetchFollowers();
-  }, [user.id]);
-
-  useEffect(() => {
-    const fetchFollowings = async () => {
-      try {
-        const res = await axios.get(
-          `http://localhost:9000/api/v1/followings/${currentUser?.user.id}`
-        );
-
-        setFollowing(res.data);
-        console.log(res.data);
-
-        const values = res.data;
-
-        const filter = values.filter(
-          (value) => value.id === currentUser?.user.id
-        );
-
-        if (filter.length > 0) {
-          if (filter[0].id === currentUser?.user.id) {
-            setFollowing(true);
-          }
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchFollowings();
-  }, [user.id]);
-
-  useEffect(() => {
-    const fetchBookmarks = async () => {
-      try {
-        const res = await axios.get(
-          `http://localhost:9000/api/v1/bookmarks/${currentUser?.user.id}`
-        );
-
-        setBookmarks(res.data);
-        console.log(res.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchBookmarks();
+    if (currentUser?.user.id) {
+      fetchData();
+    }
   }, [currentUser?.user.id]);
 
   const handleClickFollowers = async () => {
@@ -104,60 +58,134 @@ const Dashboard = () => {
       const res = await axios.get(
         `http://localhost:9000/api/v1/followers/${currentUser?.user.id}`
       );
-
+      console.log("Followers data after click:", res.data);
       setFollowers(res.data);
-      console.log(res.data);
-      const values = res.data;
-
-      const filter = values.filter(
-        (value) => value.id === currentUser?.user.id
-      );
-
-      if (filter.length > 0) {
-        if (filter[0].id === currentUser?.user.id) {
-          setFollow(true);
-        }
-      }
     } catch (error) {
       console.error(error);
     }
-    
   };
+
+  const handleClickFollowings = async () => {
+    setShowFollowings(true);
+    try {
+      const res = await axios.get(
+        `http://localhost:9000/api/v1/followings/${currentUser?.user.id}`
+      );
+      console.log("Followings data after click:", res.data);
+      setFollowing(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleClickBookmarks = async () => {
+    setShowBookmarks(true);
+    try {
+      const res = await axios.get(
+        `http://localhost:9000/api/v1/bookmarks/${currentUser?.user.id}`
+      );
+      console.log("Bookmarks data after click:", res.data);
+      setBookmarks(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleSetActiveComponent = (component) => {
     setActiveComponent(component);
     if (component === "dashboard") {
       setShowFollowers(false);
+      setShowFollowings(false);
+      setShowBookmarks(false);
     }
   };
 
   const renderFollowers = () => (
-    <Card title="Followers">
-      {Array.isArray(followers) &&
-        followers.map((follower, index) => (
-          <div
-            className="d-flex align-items-center gap-3 mb-2"
-            key={`${follower.id}_${index}`}
-          >
-            {follower.userImage ? (
-              <Image>
-                <img
-                  className="userImg-follower"
+    <FollowersContainer>
+      {Array.isArray(followers) && followers.length > 0 ? (
+        followers.map((follower) => (
+          <Card>
+            <FollowerItem key={follower.id}>
+              {follower.userImage ? (
+                <UserImage
                   src={`../upload/${follower.userImage}`}
                   alt={follower.fullname}
                 />
-              </Image>
-            ) : (
-              <img src={followerUser} alt={follower.username} />
-            )}
-            <Link
-              className="text-decoration-none text-dark"
-              to={`/profile/${follower.username}`}
-            >
-              {follower.fullname}
-            </Link>
-          </div>
-        ))}
-    </Card>
+              ) : (
+                <UserImage src={followerUser} alt={follower.username} />
+              )}
+              <FollowerInfo>
+                <FollowerName to={`/profile/${follower.username}`}>
+                  {follower.fullname}
+                </FollowerName>
+                <FollowerUsername>@{follower.username}</FollowerUsername>
+              </FollowerInfo>
+            </FollowerItem>
+          </Card>
+        ))
+      ) : (
+        <p>No followers to display</p>
+      )}
+    </FollowersContainer>
+  );
+
+  const renderFollowings = () => (
+    <FollowersContainer>
+      {Array.isArray(following) && following.length > 0 ? (
+        following.map((followings) => (
+          <Card>
+            <FollowerItem key={followings.id}>
+              {followings.userImage ? (
+                <UserImage
+                  src={`../upload/${followings.userImage}`}
+                  alt={followings.fullname}
+                />
+              ) : (
+                <UserImage src={followerUser} alt={followings.username} />
+              )}
+              <FollowerInfo>
+                <FollowerName to={`/profile/${followings.username}`}>
+                  {followings.fullname}
+                </FollowerName>
+                <FollowerUsername>@{followings.username}</FollowerUsername>
+              </FollowerInfo>
+            </FollowerItem>
+          </Card>
+        ))
+      ) : (
+        <p>No followings to display</p>
+      )}
+    </FollowersContainer>
+  );
+
+  const renderBookmarks = () => (
+    <BookmarksContainer>
+      {Array.isArray(bookmarks) && bookmarks.length > 0 ? (
+        bookmarks.map((bookmark) => (
+          <Card key={bookmark.id}>
+            <BookmarkItem>
+              <BookmarkImage src={bookmark.image} />
+              <BookmarkInfo>
+                <BookmarkTitle>{bookmark.title}</BookmarkTitle>
+                <BookmarkDescription></BookmarkDescription>
+                <BookmarkAuthor> By {bookmark.author_fullname}</BookmarkAuthor>
+              </BookmarkInfo>
+              <Link
+                className="btn btn-dark btn-sm btn-block "
+                to={`/singlepost/${bookmark.id}/title=${encodeURIComponent(
+                  bookmark.title.replace(/ /g, "-")
+                )}`}
+              >
+                {" "}
+                <Button className="text-white">Read More</Button>
+              </Link>
+            </BookmarkItem>
+          </Card>
+        ))
+      ) : (
+        <p>No bookmarks to display</p>
+      )}
+    </BookmarksContainer>
   );
 
   const renderDashboardCards = () => (
@@ -165,8 +193,12 @@ const Dashboard = () => {
       <Button onClick={handleClickFollowers}>
         <Card title="Followers" count={followers.length} />
       </Button>
-      <Card title="Followings" count={following.length} />
-      <Card title="Bookmarks" count={bookmarks.length} />
+      <Button onClick={handleClickFollowings}>
+        <Card title="Followings" count={following.length} />
+      </Button>
+      <Button onClick={handleClickBookmarks}>
+        <Card title="Bookmarks" count={bookmarks.length} />
+      </Button>
       <Card title="Medium Posts" count={10} />
       <Card title="Dev.to Posts" count={15} />
       <Card title="Hashnode Posts" count={5} />
@@ -188,9 +220,21 @@ const Dashboard = () => {
       default:
         return (
           <>
-            <h1>Dashboard</h1>
+            {showFollowers ? (
+              <h1>Followers</h1>
+            ) : showFollowings ? (
+              <h1>Followings</h1>
+            ) : (
+              <h1>Dashboard</h1>
+            )}
             <CardsContainer>
-              {showFollowers ? renderFollowers() : renderDashboardCards()}
+              {showFollowers
+                ? renderFollowers()
+                : showFollowings
+                ? renderFollowings()
+                : showBookmarks
+                ? renderBookmarks()
+                : renderDashboardCards()}
             </CardsContainer>
           </>
         );
@@ -240,5 +284,136 @@ const Button = styled.button`
   border: none;
   cursor: pointer;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+`;
+
+const FollowersContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 10px;
+  }
+`;
+
+const FollowerName = styled(Link)`
+  font-size: 1.1em;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #333;
+  text-decoration: none;
+`;
+
+const FollowerUsername = styled.span`
+  font-size: 0.9em;
+  color: #666;
+`;
+
+const FollowerItem = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #ffffff;
+`;
+
+const UserImage = styled.img`
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 15px;
+`;
+
+const FollowerInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  a {
+    font-weight: bold;
+    color: #333;
+    text-decoration: none;
+    margin-bottom: 5px;
+  }
+
+  span {
+    font-size: 0.9em;
+    color: #666;
+  }
+`;
+
+const BookmarksContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+    gap: 10px;
+  }
+`;
+
+const BookmarkItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #ffffff;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+`;
+
+const BookmarkImage = styled.img`
+  width: 200px;
+  height: 150px;
+  border-radius: 8px;
+  margin-right: 15px;
+  margin: 0 30px;
+`;
+
+const BookmarkTitle = styled(Link)`
+  font-size: 1.1em;
+  margin: 10px 0;
+  font-weight: bold;
+  color: #333;
+  text-decoration: none;
+`;
+
+const BookmarkInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  a {
+    font-weight: bold;
+    color: #333;
+    text-decoration: none;
+    margin-bottom: 5px;
+  }
+
+  span {
+    font-size: 0.9em;
+    color: #666;
+  }
+`;
+
+const BookmarkAuthor = styled.p`
+  font-size: 0.9em;
+  color: #666;
+  margin-top: 5px;
+`;
+
+const BookmarkDescription = styled.p`
+  font-size: 0.9em;
+  color: #666;
+  margin-top: 5px;
 `;

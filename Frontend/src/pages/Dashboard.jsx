@@ -3,21 +3,22 @@ import styled from "styled-components";
 import Sidebar from "../components/Sidebar";
 import Card from "../components/card";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
 import useFetch from "../utils/useFetch";
 import Profile from "./Profile";
 import Settings from "../components/settings";
 import Bookmarks from "./Bookmarks";
 import Home from "./Home";
+import followerUser from "../assets/follower.png";
 const Dashboard = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(true);
   const [activeComponent, setActiveComponent] = useState("dashboard");
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [bookmarks, setBookmarks] = useState([]);
   const [follow, setFollow] = useState(false);
-  const [username, setUsername] = useState("");
+  const [showFollowers, setShowFollowers] = useState(false);
   const [user, setUser] = useState({});
   const { currentUser } = useContext(AuthContext);
   const location = useLocation();
@@ -97,29 +98,99 @@ const Dashboard = () => {
     fetchBookmarks();
   }, [currentUser?.user.id]);
 
+  const handleClickFollowers = async () => {
+    setShowFollowers(true);
+    try {
+      const res = await axios.get(
+        `http://localhost:9000/api/v1/followers/${currentUser?.user.id}`
+      );
+
+      setFollowers(res.data);
+      console.log(res.data);
+      const values = res.data;
+
+      const filter = values.filter(
+        (value) => value.id === currentUser?.user.id
+      );
+
+      if (filter.length > 0) {
+        if (filter[0].id === currentUser?.user.id) {
+          setFollow(true);
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    
+  };
+  const handleSetActiveComponent = (component) => {
+    setActiveComponent(component);
+    if (component === "dashboard") {
+      setShowFollowers(false);
+    }
+  };
+
+  const renderFollowers = () => (
+    <Card title="Followers">
+      {Array.isArray(followers) &&
+        followers.map((follower, index) => (
+          <div
+            className="d-flex align-items-center gap-3 mb-2"
+            key={`${follower.id}_${index}`}
+          >
+            {follower.userImage ? (
+              <Image>
+                <img
+                  className="userImg-follower"
+                  src={`../upload/${follower.userImage}`}
+                  alt={follower.fullname}
+                />
+              </Image>
+            ) : (
+              <img src={followerUser} alt={follower.username} />
+            )}
+            <Link
+              className="text-decoration-none text-dark"
+              to={`/profile/${follower.username}`}
+            >
+              {follower.fullname}
+            </Link>
+          </div>
+        ))}
+    </Card>
+  );
+
+  const renderDashboardCards = () => (
+    <>
+      <Button onClick={handleClickFollowers}>
+        <Card title="Followers" count={followers.length} />
+      </Button>
+      <Card title="Followings" count={following.length} />
+      <Card title="Bookmarks" count={bookmarks.length} />
+      <Card title="Medium Posts" count={10} />
+      <Card title="Dev.to Posts" count={15} />
+      <Card title="Hashnode Posts" count={5} />
+      <Card title="Total Posts" count={30} />
+    </>
+  );
+
   const renderContent = () => {
     switch (activeComponent) {
       case "profile":
         return <Profile />;
       case "localPosts":
-        return <Home />;      
+        return <Home />;
       case "readingList":
         return <Bookmarks />;
-        case "settings":
-          return <Settings />;
+      case "settings":
+        return <Settings />;
       case "dashboard":
       default:
         return (
           <>
             <h1>Dashboard</h1>
             <CardsContainer>
-              <Card title="Followers" count={followers.length} />
-              <Card title="Followings" count={following.length} />
-              <Card title="Bookmarks" count={bookmarks.length} />
-              <Card title="Medium Posts" count={10} />
-              <Card title="Dev.to Posts" count={15} />
-              <Card title="Hashnode Posts" count={5} />
-              <Card title="Total Posts" count={30} />
+              {showFollowers ? renderFollowers() : renderDashboardCards()}
             </CardsContainer>
           </>
         );
@@ -131,7 +202,7 @@ const Dashboard = () => {
       <Sidebar
         menuOpen={menuOpen}
         setMenuOpen={setMenuOpen}
-        setActiveComponent={setActiveComponent}
+        setActiveComponent={handleSetActiveComponent}
       />
       <MainContent>{renderContent()}</MainContent>
     </DashboardContainer>
@@ -162,4 +233,12 @@ const CardsContainer = styled.div`
   gap: 20px;
   margin-top: 20px;
   justify-content: center;
+`;
+
+const Button = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 `;

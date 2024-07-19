@@ -1,15 +1,9 @@
-import React, { useContext } from "react";
 import styled from "styled-components";
 import { MdOutlineOpenInNew } from "react-icons/md";
 import { IoCloseCircleOutline } from "react-icons/io5";
-import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/authContext";
-import { useState } from "react";
-import Dashboard from "./../pages/Dashboard";
-const Sidebar = ({ menuOpen, setMenuOpen, setActiveComponent }) => {
-  const { currentUser } = useContext(AuthContext);
-  const navigate = useNavigate();
+import { Link } from "react-router-dom";
 
+const Sidebar = ({ menuOpen, setMenuOpen, setActiveComponent }) => {
   const handleToggle = (event) => {
     event.preventDefault();
     setMenuOpen(!menuOpen);

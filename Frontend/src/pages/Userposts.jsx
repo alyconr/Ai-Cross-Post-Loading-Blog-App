@@ -25,20 +25,21 @@ const Userposts = () => {
           {Array.isArray(posts) && posts.length > 0 ? (
             posts.map((post) => (
               <Post key={post.id}>
-                <img
-                  src={post.image}
-                  alt={post.title}
-                />
+                <img src={post.image} alt={post.title} />
                 <div className="Content">
-                  <PostLink to={`/singlepost/${post.id}/title=${encodeURIComponent(
+                  <PostLink
+                    to={`/singlepost/${post.id}/title=${encodeURIComponent(
                       post.title.replace(/ /g, "-")
-                    )}`}>
+                    )}`}
+                  >
                     <h1>{post.title}</h1>
                   </PostLink>
                   <h3>{post.description}</h3>
-                  <Link to={`/singlepost/${post.id}/title=${encodeURIComponent(
+                  <Link
+                    to={`/singlepost/${post.id}/title=${encodeURIComponent(
                       post.title.replace(/ /g, "-")
-                    )}`}>
+                    )}`}
+                  >
                     {" "}
                     <Button>Read More</Button>
                   </Link>

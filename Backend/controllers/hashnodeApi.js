@@ -79,4 +79,62 @@ const postHashnodeApi = async (req, res) => {
   }
 };
 
-module.exports = { postHashnodeApi };
+
+const getHashnodePosts = async (req, res) => { 
+
+  try {
+
+    const hashnodeEndpoint = "https://gql.hashnode.com";
+
+    const query = `
+        query ($host: String!) {
+            publication(host: $host) {
+                title
+                author {
+                    name
+                }
+                posts (first: 10) {
+                    edges {
+                        node {
+                            title,
+                            subtitle,
+                            
+                        }
+                    }
+                }
+        }
+} `;
+    
+    const variables = {
+      host: "alyconrdev.hashnode.dev",
+    };
+    
+    const response = await fetch(hashnodeEndpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        query: query,
+        variables: variables,
+      }),
+    });
+    
+    const data = await response.json();
+    
+    res.status(StatusCodes.OK).json(data);
+    
+    
+  } catch (error) {
+    console.error(error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      error: "An internal server error occurred. Please try again later.",
+    });
+  }
+
+
+
+}
+
+module.exports = { postHashnodeApi, getHashnodePosts };

@@ -236,14 +236,11 @@ const updateHashnodeToken = async (req, res) => {
         .json({ error: "User not found" });
     }
 
-    res
-
-      .status(StatusCodes.OK)
-      .json({
-        message: "Hashnode token and publication Id updated successfully",
-        hashnodeToken,
-        hashnodePublicationId,
-      });
+    res.status(StatusCodes.OK).json({
+      message: "Hashnode token and publication Id updated successfully",
+      hashnodeToken,
+      hashnodePublicationId,
+    });
   });
 };
 
@@ -319,12 +316,10 @@ const getHashnodeToken = async (req, res) => {
         .json({ error: "User not found" });
     }
 
-    res
-      .status(StatusCodes.OK)
-      .json({
-        hashnodeToken: results[0].HashNodeToken,
-        hashnodePublicationId: results[0].HashnodePublicationId,
-      });
+    res.status(StatusCodes.OK).json({
+      hashnodeToken: results[0].HashNodeToken,
+      hashnodePublicationId: results[0].HashnodePublicationId,
+    });
   });
 };
 

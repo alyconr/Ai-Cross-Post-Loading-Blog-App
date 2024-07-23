@@ -179,15 +179,6 @@ const getHashnodeTokenFromDb = async (userId) => {
   });
 };
 
-const getHashNodeUsername = async (req, res) => {
-  try {
-    const hashnodeEndpoint = "https://gql.hashnode.com";
-  } catch (error) {
-    console.error(error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      error: "An internal server error occurred. Please try again later.",
-    });
-  }
-};
+
 
 module.exports = { postHashnodeApi, getHashnodePosts };

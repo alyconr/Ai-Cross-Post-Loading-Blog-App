@@ -86,8 +86,6 @@ const getHashnodePosts = async (req, res) => {
 
     const hashNodeToken = await getHashnodeTokenFromDb(req.params.userId);
 
-    console.log(hashNodeToken);
-
     const userQuery = `
     query  {
         me {
@@ -133,8 +131,6 @@ const getHashnodePosts = async (req, res) => {
         }
 } `;
 
-    console.log(host);
-
     const variables = {
       host: host.toLowerCase(),
     };
@@ -152,8 +148,8 @@ const getHashnodePosts = async (req, res) => {
     });
 
     const postData = await postResponse.json();
-    console.log(postData);
-    res.status(StatusCodes.OK).json(postData);
+    
+    res.status(StatusCodes.OK).json(postData.data.publication.posts.edges);
   } catch (error) {
     console.error(error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -178,7 +174,5 @@ const getHashnodeTokenFromDb = async (userId) => {
     });
   });
 };
-
-
 
 module.exports = { postHashnodeApi, getHashnodePosts };

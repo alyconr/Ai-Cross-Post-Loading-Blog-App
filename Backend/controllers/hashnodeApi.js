@@ -91,8 +91,7 @@ const getHashnodePosts = async (req, res) => {
     const userQuery = `
     query  {
         me {
-            username
-            
+            username            
         }
     }
 
@@ -115,9 +114,6 @@ const getHashnodePosts = async (req, res) => {
     const host = `${username}.hashnode.dev`;
     // conver hosts to lowercase
 
-
-
-   
     const query = `
         query ($host: String!) {
             publication(host: $host) {
@@ -136,7 +132,7 @@ const getHashnodePosts = async (req, res) => {
                 }
         }
 } `;
-    
+
     console.log(host);
 
     const variables = {
@@ -156,7 +152,7 @@ const getHashnodePosts = async (req, res) => {
     });
 
     const postData = await postResponse.json();
-    console.log(postData)
+    console.log(postData);
     res.status(StatusCodes.OK).json(postData);
   } catch (error) {
     console.error(error);

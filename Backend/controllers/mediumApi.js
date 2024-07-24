@@ -1,7 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const axios = require("axios");
-const { query } = require("express");
 const pool = require("../db/connect");
+const Parser = require("rss-parser");
 const postMediumApi = async (req, res) => {
   try {
     const { title, content, tags, publishStatus, mediumToken } = req.body;
@@ -52,6 +52,7 @@ const postMediumApi = async (req, res) => {
 
 const getMediumPosts = async (req, res) => {
   const { userId } = req.params;
+  const parser = new Parser();
   try {
     const mediumToEndpoint = "https://api.medium.com/v1/me";
 
@@ -73,11 +74,30 @@ const getMediumPosts = async (req, res) => {
     const userMedium = response.data.data.username;
     const rssMedium = `https://medium.com/feed/@${userMedium}`;
 
-    const rssToJson = `https://api.rss2json.com/v1/api.json?rss_url=${rssMedium}`;
+    // Parse the RSS feed
+    try {
+      const feed = await parser.parseURL(rssMedium);
 
-    const { data } = await axios.get(rssToJson);
+      // Transform the feed items to match your desired output
+      const posts = feed.items.map((item) => ({
+        title: item.title,
+        pubDate: item.pubDate,
+        link: item.link,
+        guid: item.guid,
+        author: item.creator,
+        thumbnail: item.enclosure ? item.enclosure.url : "",
+        description: item.content,
+        content: item.content,
+        categories: item.categories || [],
+      }));
 
-    res.status(StatusCodes.OK).json(data.items);
+      res.status(StatusCodes.OK).json(posts);
+    } catch (parseError) {
+      console.error("Error parsing RSS feed:", parseError);
+      res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ error: "Unable to parse RSS feed" });
+    }
   } catch (error) {
     console.error(error);
     res

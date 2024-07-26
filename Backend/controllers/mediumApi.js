@@ -2,7 +2,7 @@ const { StatusCodes } = require("http-status-codes");
 const axios = require("axios");
 const pool = require("../db/connect");
 const Parser = require("rss-parser");
-const cheerio = require('cheerio');
+const cheerio = require("cheerio");
 
 const postMediumApi = async (req, res) => {
   try {
@@ -57,10 +57,10 @@ const getMediumPosts = async (req, res) => {
   const parser = new Parser({
     customFields: {
       item: [
-        ['content:encoded', 'content'],
-        ['dc:creator', 'creator']
-      ]
-    }
+        ["content:encoded", "content"],
+        ["dc:creator", "creator"],
+      ],
+    },
   });
   try {
     const mediumToEndpoint = "https://api.medium.com/v1/me";
@@ -88,11 +88,13 @@ const getMediumPosts = async (req, res) => {
       const feed = await parser.parseURL(rssMedium);
 
       // Transform the feed items to match your desired output
-      const posts = feed.items.map(item => {
-        const $ = cheerio.load(item.content || item['content:encoded'] || item.description || "");
-        const firstImage = $('img').first();
-        const imageUrl = firstImage.attr('src') || "";
-  
+      const posts = feed.items.map((item) => {
+        const $ = cheerio.load(
+          item.content || item["content:encoded"] || item.description || ""
+        );
+        const firstImage = $("img").first();
+        const imageUrl = firstImage.attr("src") || "";
+
         return {
           title: item.title,
           pubDate: item.pubDate,
@@ -101,8 +103,8 @@ const getMediumPosts = async (req, res) => {
           author: item.creator || item.author,
           thumbnail: imageUrl, // Use the extracted image URL as thumbnail
           description: $.text(), // Get text content without HTML tags
-          content: item.content || item['content:encoded'] || "",
-          categories: item.categories || []
+          content: item.content || item["content:encoded"] || "",
+          categories: item.categories || [],
         };
       });
 

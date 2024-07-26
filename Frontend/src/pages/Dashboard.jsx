@@ -18,30 +18,48 @@ const Dashboard = () => {
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [bookmarks, setBookmarks] = useState([]);
+  const [mediumPosts, setMediumPosts] = useState([]);
+  const [devtoPosts, setDevtoPosts] = useState([]);
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowings, setShowFollowings] = useState(false);
   const [showBookmarks, setShowBookmarks] = useState(false);
+  const [showMediumPosts, setShowMediumPosts] = useState(false);
+  const [showDevtoPosts, setShowDevtoPosts] = useState(false);
   const { currentUser } = useContext(AuthContext);
+
+  console.log("showMediumPosts:", showMediumPosts);
+
+  useEffect(() => {
+    console.log("showMediumPosts changed:", showMediumPosts);
+  }, [showMediumPosts]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [followersRes, followingRes, bookmarksRes] = await Promise.all([
-          axios.get(
-            `http://localhost:9000/api/v1/followers/${currentUser?.user.id}`
-          ),
-          axios.get(
-            `http://localhost:9000/api/v1/followings/${currentUser?.user.id}`
-          ),
-          axios.get(
-            `http://localhost:9000/api/v1/bookmarks/${currentUser?.user.id}`
-          ),
-        ]);
+        const [followersRes, followingRes, bookmarksRes, mediumRes, devtoRes] =
+          await Promise.all([
+            axios.get(
+              `http://localhost:9000/api/v1/followers/${currentUser?.user.id}`
+            ),
+            axios.get(
+              `http://localhost:9000/api/v1/followings/${currentUser?.user.id}`
+            ),
+            axios.get(
+              `http://localhost:9000/api/v1/bookmarks/${currentUser?.user.id}`
+            ),
+            axios.get(
+              `http://localhost:9000/api/v1/medium-proxy/${currentUser?.user.id}`
+            ),
+            axios.get(
+              `http://localhost:9000/api/v1/devto-proxy/${currentUser?.user.id}`
+            ),
+          ]);
 
-        console.log("Initial followers data:", followersRes.data);
         setFollowers(followersRes.data);
         setFollowing(followingRes.data);
         setBookmarks(bookmarksRes.data);
+        setMediumPosts(mediumRes.data);
+        setDevtoPosts(devtoRes.data);
       } catch (error) {
         console.error(error);
       }
@@ -54,6 +72,7 @@ const Dashboard = () => {
 
   const handleClickFollowers = async () => {
     setShowFollowers(true);
+
     try {
       const res = await axios.get(
         `http://localhost:9000/api/v1/followers/${currentUser?.user.id}`
@@ -91,12 +110,39 @@ const Dashboard = () => {
     }
   };
 
+  const handleClickMediumPosts = async () => {
+    setShowMediumPosts(true);
+    try {
+      const res = await axios.get(
+        `http://localhost:9000/api/v1/medium-proxy/${currentUser?.user.id}`
+      );
+      console.log("Medium Posts data after click:", res.data);
+      setMediumPosts(Array.isArray(res.data) ? res.data : [res.data]);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleClickDevtoPosts = async () => {
+    setShowDevtoPosts(true);
+    try {
+      const res = await axios.get(
+        `http://localhost:9000/api/v1/devto-proxy/${currentUser?.user.id}`
+      );
+      console.log("Devto Posts data after click:", res.data);
+      setDevtoPosts(Array.isArray(res.data) ? res.data : [res.data]);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleSetActiveComponent = (component) => {
     setActiveComponent(component);
     if (component === "dashboard") {
       setShowFollowers(false);
       setShowFollowings(false);
       setShowBookmarks(false);
+      setShowMediumPosts(false);
     }
   };
 
@@ -188,6 +234,59 @@ const Dashboard = () => {
     </BookmarksContainer>
   );
 
+  const renderMediumPosts = () => {
+    console.log("Medium Posts data:", mediumPosts);
+    return (
+      <MediumPostsContainer>
+        {mediumPosts.length > 0 ? (
+          mediumPosts.map((post) => (
+            <Card key={post.guid}>
+              <MediumPostItem>
+                <MediumPostTitle>{post.title}</MediumPostTitle>
+                <MediumImage src={post.thumbnail} alt={post.title} />
+                <Button>
+                  <a href={post.link} target="_blank" rel="noopener noreferrer">
+                    Read on Medium
+                  </a>
+                </Button>
+              </MediumPostItem>
+            </Card>
+          ))
+        ) : (
+          <p>No Medium posts to display</p>
+        )}
+      </MediumPostsContainer>
+    );
+  };
+
+  const renderDevtoPosts = () => {
+    console.log("Devto Posts data:", devtoPosts);
+    return (
+      <DevtoPostsContainer>
+        {devtoPosts.length > 0 ? (
+          devtoPosts.map((post) => (
+            <Card key={post.id}>
+              <DevtoPostItem>
+                <DevtoPostTitle>{post.title}</DevtoPostTitle>
+                {post.cover_image && (
+                  <DevtoImage src={post.cover_image} alt={post.title} />
+                )}
+                <DevtoDescription>{post.description}</DevtoDescription>
+                <Button>
+                  <a href={post.url} target="_blank" rel="noopener noreferrer">
+                    Read on Dev.to
+                  </a>
+                </Button>
+              </DevtoPostItem>
+            </Card>
+          ))
+        ) : (
+          <p>No Dev.to posts to display</p>
+        )}
+      </DevtoPostsContainer>
+    );
+  };
+
   const renderDashboardCards = () => (
     <>
       <Button onClick={handleClickFollowers}>
@@ -199,14 +298,20 @@ const Dashboard = () => {
       <Button onClick={handleClickBookmarks}>
         <Card title="Bookmarks" count={bookmarks.length} />
       </Button>
-      <Card title="Medium Posts" count={10} />
-      <Card title="Dev.to Posts" count={15} />
+      <Button onClick={handleClickMediumPosts}>
+        <Card title="Medium Posts" count={mediumPosts.length} />
+      </Button>
+      <Button onClick={handleClickDevtoPosts}>
+        <Card title="Dev.to Posts" count={devtoPosts.length} />
+      </Button>
+
       <Card title="Hashnode Posts" count={5} />
       <Card title="Total Posts" count={30} />
     </>
   );
 
   const renderContent = () => {
+    console.log("Rendering content. showMediumPosts:", showMediumPosts);
     switch (activeComponent) {
       case "profile":
         return <Profile />;
@@ -224,6 +329,10 @@ const Dashboard = () => {
               <h1>Followers</h1>
             ) : showFollowings ? (
               <h1>Followings</h1>
+            ) : showBookmarks ? (
+              <h1>Bookmarks</h1>
+            ) : showMediumPosts ? (
+              <h1>Medium Posts</h1>
             ) : (
               <h1>Dashboard</h1>
             )}
@@ -234,6 +343,10 @@ const Dashboard = () => {
                 ? renderFollowings()
                 : showBookmarks
                 ? renderBookmarks()
+                : showMediumPosts
+                ? renderMediumPosts()
+                : showDevtoPosts
+                ? renderDevtoPosts()
                 : renderDashboardCards()}
             </CardsContainer>
           </>
@@ -280,21 +393,29 @@ const CardsContainer = styled.div`
 `;
 
 const Button = styled.button`
-  background: none;
+  background: radial-gradient(
+    circle at 12.3% 19.3%,
+    rgb(85, 88, 218) 0%,
+    rgb(95, 209, 249) 100.2%
+  );
   border: none;
   cursor: pointer;
   border-radius: 10px;
+  padding: 10px 20px;
+
+  a {
+    color: white;
+    text-decoration: none;
+  }
 `;
 
 const FollowersContainer = styled.div`
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 0 50px;
   gap: 20px;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 10px;
-  }
 `;
 
 const FollowerName = styled(Link)`
@@ -346,17 +467,10 @@ const FollowerInfo = styled.div`
 const BookmarksContainer = styled.div`
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 0 50px;
   gap: 20px;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  @media (max-width: 1024px) {
-    flex-direction: column;
-    gap: 10px;
-  }
 `;
 
 const BookmarkItem = styled.div`
@@ -413,6 +527,84 @@ const BookmarkAuthor = styled.p`
 `;
 
 const BookmarkDescription = styled.p`
+  font-size: 0.9em;
+  color: #666;
+  margin-top: 5px;
+`;
+
+const MediumPostsContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 0 50px;
+  gap: 20px;
+`;
+
+const MediumPostItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #ffffff;
+`;
+
+const MediumImage = styled.img`
+  width: 300px;
+  height: 200px;
+  border-radius: 8px;
+  margin-right: 15px;
+  margin: 0 30px;
+`;
+
+const MediumPostTitle = styled(Link)`
+  font-size: 1.1em;
+  margin: 10px 0;
+  font-weight: bold;
+  color: #333;
+  text-decoration: none;
+`;
+
+const DevtoPostsContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 0 50px;
+  gap: 20px;
+`;
+
+const DevtoPostItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #ffffff;
+`;
+
+const DevtoImage = styled.img`
+  width: 300px;
+  height: 200px;
+  border-radius: 8px;
+  margin-right: 15px;
+  margin: 0 30px;
+`;
+
+const DevtoPostTitle = styled(Link)`
+  font-size: 1.1em;
+  margin: 10px 0;
+  font-weight: bold;
+  color: #333;
+  text-decoration: none;
+`;
+
+const DevtoDescription = styled.p`
   font-size: 0.9em;
   color: #666;
   margin-top: 5px;

@@ -10,6 +10,7 @@ import Profile from "./Profile";
 import Settings from "../components/settings";
 import Bookmarks from "./Bookmarks";
 import Home from "./Home";
+import ApiKeys from "./ApiKeys";
 
 import RenderFollowers from "../components/RenderFollowers";
 import RenderFollowings from "../components/RenderFollowings";
@@ -229,6 +230,8 @@ const Dashboard = () => {
         return <Home />;
       case "readingList":
         return <Bookmarks />;
+      case "apikeys":
+        return <ApiKeys />;
       case "settings":
         return <Settings />;
       case "dashboard":
@@ -245,6 +248,10 @@ const Dashboard = () => {
               <h1>Medium Posts</h1>
             ) : showDevtoPosts ? (
               <h1>Devto Posts</h1>
+            ) : showHashNodePosts ? (
+              <h1>Hashnode Posts</h1>
+            ) : showLocalPosts ? (
+              <h1>Local Posts</h1>
             ) : (
               <h1>Dashboard</h1>
             )}

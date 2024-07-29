@@ -57,14 +57,16 @@ const Bookmarks = () => {
                     <h2>{post.title}</h2>
                   </PostLink>
                   <h5>{post.description}</h5>
-                  <Link
-                    className="read-more"
-                    to={`/singlepost/${post.id}/title=${encodeURIComponent(
-                      post.title.replace(/ /g, "-")
-                    )}`}
-                  >
-                    Read More
-                  </Link>
+                  <Button>
+                    <Link
+                      className="read-more"
+                      to={`/singlepost/${post.id}/title=${encodeURIComponent(
+                        post.title.replace(/ /g, "-")
+                      )}`}
+                    >
+                      Read More
+                    </Link>
+                  </Button>
                 </div>
               </Posts>
             ))
@@ -232,8 +234,7 @@ const Posts = styled.div`
     padding: 0.5rem 0;
     border: none;
     border-radius: 5px;
-    background-color: #fff;
-    color: #000;
+    color: #fff;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
@@ -245,4 +246,23 @@ const PostLink = styled(Link)`
   color: #333;
   font-weight: bold;
   font-size: 20px;
+`;
+
+const Button = styled.button`
+  background: linear-gradient(
+    45deg,
+    hsl(240deg 100% 20%) 0%,
+    hsl(289deg 100% 18%) 11%,
+    hsl(317deg 100% 21%) 22%,
+    hsl(331deg 100% 25%) 33%,
+    hsl(339deg 100% 27%) 44%,
+    hsl(1deg 60% 35%) 56%,
+    hsl(19deg 66% 34%) 67%,
+    hsl(31deg 66% 34%) 78%,
+    hsl(42deg 55% 35%) 89%,
+    hsl(55deg 39% 37%) 100%
+  );
+  border: none;
+  width: auto;
+  padding: 10px 20px;
 `;

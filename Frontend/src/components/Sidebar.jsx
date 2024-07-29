@@ -36,6 +36,9 @@ const Sidebar = ({ menuOpen, setMenuOpen, setActiveComponent }) => {
         <MenuItem as={Link} onClick={() => handleMenuItemClick("readingList")}>
           Reading List
         </MenuItem>
+        <MenuItem as={Link} onClick={() => handleMenuItemClick("apikeys")}>
+          Api Keys
+        </MenuItem>
         <MenuItem as={Link} onClick={() => handleMenuItemClick("settings")}>
           Settings
         </MenuItem>

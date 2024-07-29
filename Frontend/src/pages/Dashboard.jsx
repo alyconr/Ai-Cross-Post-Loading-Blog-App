@@ -5,13 +5,19 @@ import Card from "../components/card";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
-import useFetch from "../utils/useFetch";
+
 import Profile from "./Profile";
 import Settings from "../components/settings";
 import Bookmarks from "./Bookmarks";
 import Home from "./Home";
-import followerUser from "../assets/follower.png";
 
+import RenderFollowers from "../components/RenderFollowers";
+import RenderFollowings from "../components/RenderFollowings";
+import RenderBookmarks from "../components/RenderBookmarks";
+import RenderMediumPosts from "../components/RenderMediumPosts";
+import RenderDevtoPosts from "../components/RenderDevtoPosts";
+import RenderHashNodePosts from "../components/RenderHashnodePosts";
+import RenderLocalPosts from "../components/LocalPosts";
 const Dashboard = () => {
   const [menuOpen, setMenuOpen] = useState(true);
   const [activeComponent, setActiveComponent] = useState("dashboard");
@@ -20,46 +26,60 @@ const Dashboard = () => {
   const [bookmarks, setBookmarks] = useState([]);
   const [mediumPosts, setMediumPosts] = useState([]);
   const [devtoPosts, setDevtoPosts] = useState([]);
+  const [hashNodePosts, setHashNodePosts] = useState([]);
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowings, setShowFollowings] = useState(false);
   const [showBookmarks, setShowBookmarks] = useState(false);
   const [showMediumPosts, setShowMediumPosts] = useState(false);
   const [showDevtoPosts, setShowDevtoPosts] = useState(false);
+  const [showHashNodePosts, setShowHashNodePosts] = useState(false);
+  const [showLocalPosts, setShowLocalPosts] = useState(false);
+  const [localPosts, setLocalPosts] = useState([]);
   const { currentUser } = useContext(AuthContext);
-
-  console.log("showMediumPosts:", showMediumPosts);
-
-  useEffect(() => {
-    console.log("showMediumPosts changed:", showMediumPosts);
-  }, [showMediumPosts]);
+  console.log(localPosts);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [followersRes, followingRes, bookmarksRes, mediumRes, devtoRes] =
-          await Promise.all([
-            axios.get(
-              `http://localhost:9000/api/v1/followers/${currentUser?.user.id}`
-            ),
-            axios.get(
-              `http://localhost:9000/api/v1/followings/${currentUser?.user.id}`
-            ),
-            axios.get(
-              `http://localhost:9000/api/v1/bookmarks/${currentUser?.user.id}`
-            ),
-            axios.get(
-              `http://localhost:9000/api/v1/medium-proxy/${currentUser?.user.id}`
-            ),
-            axios.get(
-              `http://localhost:9000/api/v1/devto-proxy/${currentUser?.user.id}`
-            ),
-          ]);
+        const [
+          followersRes,
+          followingRes,
+          bookmarksRes,
+          mediumRes,
+          devtoRes,
+          hashNodeRes,
+          localPostsRes,
+        ] = await Promise.all([
+          axios.get(
+            `http://localhost:9000/api/v1/followers/${currentUser?.user.id}`
+          ),
+          axios.get(
+            `http://localhost:9000/api/v1/followings/${currentUser?.user.id}`
+          ),
+          axios.get(
+            `http://localhost:9000/api/v1/bookmarks/${currentUser?.user.id}`
+          ),
+          axios.get(
+            `http://localhost:9000/api/v1/medium-proxy/${currentUser?.user.id}`
+          ),
+          axios.get(
+            `http://localhost:9000/api/v1/devto-proxy/${currentUser?.user.id}`
+          ),
+          axios.get(
+            `http://localhost:9000/api/v1/hashnode-proxy/${currentUser?.user.id}`
+          ),
+          axios.get(
+            `http://localhost:9000/api/v1/user/posts/${currentUser?.user?.username}`
+          ),
+        ]);
 
         setFollowers(followersRes.data);
         setFollowing(followingRes.data);
         setBookmarks(bookmarksRes.data);
         setMediumPosts(mediumRes.data);
         setDevtoPosts(devtoRes.data);
+        setHashNodePosts(hashNodeRes.data);
+        setLocalPosts(localPostsRes.data.posts);
       } catch (error) {
         console.error(error);
       }
@@ -136,6 +156,32 @@ const Dashboard = () => {
     }
   };
 
+  const handleClickHashNodePosts = async () => {
+    setShowHashNodePosts(true);
+    try {
+      const res = await axios.get(
+        `http://localhost:9000/api/v1/hashnode-proxy/${currentUser?.user.id}`
+      );
+      console.log("HashNode Posts data after click:", res.data);
+      setHashNodePosts(Array.isArray(res.data) ? res.data : [res.data]);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleClickLocalPosts = async () => {
+    setShowLocalPosts(true);
+    try {
+      const res = await axios.get(
+        `http://localhost:9000/api/v1/user/posts/${currentUser?.user?.username}`
+      );
+      console.log("Local Posts data after click:", res.data);
+      setLocalPosts(res.data.posts);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleSetActiveComponent = (component) => {
     setActiveComponent(component);
     if (component === "dashboard") {
@@ -143,148 +189,10 @@ const Dashboard = () => {
       setShowFollowings(false);
       setShowBookmarks(false);
       setShowMediumPosts(false);
+      setShowDevtoPosts(false);
+      setShowHashNodePosts(false);
+      setShowLocalPosts(false);
     }
-  };
-
-  const renderFollowers = () => (
-    <FollowersContainer>
-      {Array.isArray(followers) && followers.length > 0 ? (
-        followers.map((follower) => (
-          <Card>
-            <FollowerItem key={follower.id}>
-              {follower.userImage ? (
-                <UserImage
-                  src={`../upload/${follower.userImage}`}
-                  alt={follower.fullname}
-                />
-              ) : (
-                <UserImage src={followerUser} alt={follower.username} />
-              )}
-              <FollowerInfo>
-                <FollowerName to={`/profile/${follower.username}`}>
-                  {follower.fullname}
-                </FollowerName>
-                <FollowerUsername>@{follower.username}</FollowerUsername>
-              </FollowerInfo>
-            </FollowerItem>
-          </Card>
-        ))
-      ) : (
-        <p>No followers to display</p>
-      )}
-    </FollowersContainer>
-  );
-
-  const renderFollowings = () => (
-    <FollowersContainer>
-      {Array.isArray(following) && following.length > 0 ? (
-        following.map((followings) => (
-          <Card>
-            <FollowerItem key={followings.id}>
-              {followings.userImage ? (
-                <UserImage
-                  src={`../upload/${followings.userImage}`}
-                  alt={followings.fullname}
-                />
-              ) : (
-                <UserImage src={followerUser} alt={followings.username} />
-              )}
-              <FollowerInfo>
-                <FollowerName to={`/profile/${followings.username}`}>
-                  {followings.fullname}
-                </FollowerName>
-                <FollowerUsername>@{followings.username}</FollowerUsername>
-              </FollowerInfo>
-            </FollowerItem>
-          </Card>
-        ))
-      ) : (
-        <p>No followings to display</p>
-      )}
-    </FollowersContainer>
-  );
-
-  const renderBookmarks = () => (
-    <BookmarksContainer>
-      {Array.isArray(bookmarks) && bookmarks.length > 0 ? (
-        bookmarks.map((bookmark) => (
-          <Card key={bookmark.id}>
-            <BookmarkItem>
-              <BookmarkImage src={bookmark.image} />
-              <BookmarkInfo>
-                <BookmarkTitle>{bookmark.title}</BookmarkTitle>
-                <BookmarkDescription></BookmarkDescription>
-                <BookmarkAuthor> By {bookmark.author_fullname}</BookmarkAuthor>
-              </BookmarkInfo>
-              <Link
-                className="btn btn-dark btn-sm btn-block "
-                to={`/singlepost/${bookmark.id}/title=${encodeURIComponent(
-                  bookmark.title.replace(/ /g, "-")
-                )}`}
-              >
-                {" "}
-                <Button className="text-white">Read More</Button>
-              </Link>
-            </BookmarkItem>
-          </Card>
-        ))
-      ) : (
-        <p>No bookmarks to display</p>
-      )}
-    </BookmarksContainer>
-  );
-
-  const renderMediumPosts = () => {
-    console.log("Medium Posts data:", mediumPosts);
-    return (
-      <MediumPostsContainer>
-        {mediumPosts.length > 0 ? (
-          mediumPosts.map((post) => (
-            <Card key={post.guid}>
-              <MediumPostItem>
-                <MediumPostTitle>{post.title}</MediumPostTitle>
-                <MediumImage src={post.thumbnail} alt={post.title} />
-                <Button>
-                  <a href={post.link} target="_blank" rel="noopener noreferrer">
-                    Read on Medium
-                  </a>
-                </Button>
-              </MediumPostItem>
-            </Card>
-          ))
-        ) : (
-          <p>No Medium posts to display</p>
-        )}
-      </MediumPostsContainer>
-    );
-  };
-
-  const renderDevtoPosts = () => {
-    console.log("Devto Posts data:", devtoPosts);
-    return (
-      <DevtoPostsContainer>
-        {devtoPosts.length > 0 ? (
-          devtoPosts.map((post) => (
-            <Card key={post.id}>
-              <DevtoPostItem>
-                <DevtoPostTitle>{post.title}</DevtoPostTitle>
-                {post.cover_image && (
-                  <DevtoImage src={post.cover_image} alt={post.title} />
-                )}
-                <DevtoDescription>{post.description}</DevtoDescription>
-                <Button>
-                  <a href={post.url} target="_blank" rel="noopener noreferrer">
-                    Read on Dev.to
-                  </a>
-                </Button>
-              </DevtoPostItem>
-            </Card>
-          ))
-        ) : (
-          <p>No Dev.to posts to display</p>
-        )}
-      </DevtoPostsContainer>
-    );
   };
 
   const renderDashboardCards = () => (
@@ -304,14 +212,16 @@ const Dashboard = () => {
       <Button onClick={handleClickDevtoPosts}>
         <Card title="Dev.to Posts" count={devtoPosts.length} />
       </Button>
-
-      <Card title="Hashnode Posts" count={5} />
-      <Card title="Total Posts" count={30} />
+      <Button onClick={handleClickHashNodePosts}>
+        <Card title="Hashnode Posts" count={hashNodePosts.length} />
+      </Button>
+      <Button onClick={handleClickLocalPosts}>
+        <Card title="Total Local Posts" count={localPosts.length} />
+      </Button>
     </>
   );
 
   const renderContent = () => {
-    console.log("Rendering content. showMediumPosts:", showMediumPosts);
     switch (activeComponent) {
       case "profile":
         return <Profile />;
@@ -333,21 +243,29 @@ const Dashboard = () => {
               <h1>Bookmarks</h1>
             ) : showMediumPosts ? (
               <h1>Medium Posts</h1>
+            ) : showDevtoPosts ? (
+              <h1>Devto Posts</h1>
             ) : (
               <h1>Dashboard</h1>
             )}
             <CardsContainer>
-              {showFollowers
-                ? renderFollowers()
-                : showFollowings
-                ? renderFollowings()
-                : showBookmarks
-                ? renderBookmarks()
-                : showMediumPosts
-                ? renderMediumPosts()
-                : showDevtoPosts
-                ? renderDevtoPosts()
-                : renderDashboardCards()}
+              {showFollowers ? (
+                <RenderFollowers followers={followers} />
+              ) : showFollowings ? (
+                <RenderFollowings following={following} />
+              ) : showBookmarks ? (
+                <RenderBookmarks bookmarks={bookmarks} />
+              ) : showMediumPosts ? (
+                <RenderMediumPosts mediumPosts={mediumPosts} />
+              ) : showDevtoPosts ? (
+                <RenderDevtoPosts devtoPosts={devtoPosts} />
+              ) : showHashNodePosts ? (
+                <RenderHashNodePosts hashNodePosts={hashNodePosts} />
+              ) : showLocalPosts ? (
+                <RenderLocalPosts localPosts={localPosts} />
+              ) : (
+                renderDashboardCards()
+              )}
             </CardsContainer>
           </>
         );
@@ -407,205 +325,4 @@ const Button = styled.button`
     color: white;
     text-decoration: none;
   }
-`;
-
-const FollowersContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin: 0 50px;
-  gap: 20px;
-`;
-
-const FollowerName = styled(Link)`
-  font-size: 1.1em;
-  margin-bottom: 5px;
-  font-weight: bold;
-  color: #333;
-  text-decoration: none;
-`;
-
-const FollowerUsername = styled.span`
-  font-size: 0.9em;
-  color: #666;
-`;
-
-const FollowerItem = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 15px;
-  padding: 10px;
-  border-radius: 8px;
-  background-color: #ffffff;
-`;
-
-const UserImage = styled.img`
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  margin-right: 15px;
-`;
-
-const FollowerInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-
-  a {
-    font-weight: bold;
-    color: #333;
-    text-decoration: none;
-    margin-bottom: 5px;
-  }
-
-  span {
-    font-size: 0.9em;
-    color: #666;
-  }
-`;
-
-const BookmarksContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin: 0 50px;
-  gap: 20px;
-`;
-
-const BookmarkItem = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 200px;
-  align-items: center;
-  margin-bottom: 15px;
-  padding: 10px;
-  border-radius: 8px;
-  background-color: #ffffff;
-
-  @media (max-width: 768px) {
-    width: 100%;
-  }
-`;
-
-const BookmarkImage = styled.img`
-  width: 200px;
-  height: 150px;
-  border-radius: 8px;
-  margin-right: 15px;
-  margin: 0 30px;
-`;
-
-const BookmarkTitle = styled(Link)`
-  font-size: 1.1em;
-  margin: 10px 0;
-  font-weight: bold;
-  color: #333;
-  text-decoration: none;
-`;
-
-const BookmarkInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  a {
-    font-weight: bold;
-    color: #333;
-    text-decoration: none;
-    margin-bottom: 5px;
-  }
-
-  span {
-    font-size: 0.9em;
-    color: #666;
-  }
-`;
-
-const BookmarkAuthor = styled.p`
-  font-size: 0.9em;
-  color: #666;
-  margin-top: 5px;
-`;
-
-const BookmarkDescription = styled.p`
-  font-size: 0.9em;
-  color: #666;
-  margin-top: 5px;
-`;
-
-const MediumPostsContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin: 0 50px;
-  gap: 20px;
-`;
-
-const MediumPostItem = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 300px;
-  align-items: center;
-  margin-bottom: 15px;
-  padding: 10px;
-  border-radius: 8px;
-  background-color: #ffffff;
-`;
-
-const MediumImage = styled.img`
-  width: 300px;
-  height: 200px;
-  border-radius: 8px;
-  margin-right: 15px;
-  margin: 0 30px;
-`;
-
-const MediumPostTitle = styled(Link)`
-  font-size: 1.1em;
-  margin: 10px 0;
-  font-weight: bold;
-  color: #333;
-  text-decoration: none;
-`;
-
-const DevtoPostsContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin: 0 50px;
-  gap: 20px;
-`;
-
-const DevtoPostItem = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 300px;
-  align-items: center;
-  margin-bottom: 15px;
-  padding: 10px;
-  border-radius: 8px;
-  background-color: #ffffff;
-`;
-
-const DevtoImage = styled.img`
-  width: 300px;
-  height: 200px;
-  border-radius: 8px;
-  margin-right: 15px;
-  margin: 0 30px;
-`;
-
-const DevtoPostTitle = styled(Link)`
-  font-size: 1.1em;
-  margin: 10px 0;
-  font-weight: bold;
-  color: #333;
-  text-decoration: none;
-`;
-
-const DevtoDescription = styled.p`
-  font-size: 0.9em;
-  color: #666;
-  margin-top: 5px;
 `;

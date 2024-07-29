@@ -122,16 +122,13 @@ const getHashnodePosts = async (req, res) => {
                 posts (first: 10) {
                     edges {
                         node {
+                            id,
                             title,
                             subtitle,
                             url,
                             coverImage {
                                 url
-                                }
-                            content {
-                                text
-                            }
-                            
+                               }                    
                         }
                     }
                 }

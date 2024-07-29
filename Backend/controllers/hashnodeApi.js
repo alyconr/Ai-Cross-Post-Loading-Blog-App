@@ -124,6 +124,13 @@ const getHashnodePosts = async (req, res) => {
                         node {
                             title,
                             subtitle,
+                            url,
+                            coverImage {
+                                url
+                                }
+                            content {
+                                text
+                            }
                             
                         }
                     }
@@ -148,7 +155,7 @@ const getHashnodePosts = async (req, res) => {
     });
 
     const postData = await postResponse.json();
-    
+
     res.status(StatusCodes.OK).json(postData.data.publication.posts.edges);
   } catch (error) {
     console.error(error);

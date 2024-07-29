@@ -323,6 +323,26 @@ const getHashnodeToken = async (req, res) => {
   });
 };
 
+const getApiKeys = async (req, res) => {
+  const { userId } = req.params;
+
+  const sql =
+    "SELECT users.id, `DevToToken`, `MediumToken`, `HashNodeToken`, `HashnodePublicationId` FROM users WHERE `id` = ?";
+
+  const values = [userId];
+
+  pool.query(sql, values, (queryError, results) => {
+    if (queryError) {
+      console.error("Database query error:", queryError);
+      res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: "Database query error" });
+    } else {
+      res.status(StatusCodes.OK).json(results);
+    }
+  });
+};
+
 module.exports = {
   getCurrentUser,
   updateUser,
@@ -335,4 +355,5 @@ module.exports = {
   getMediumToken,
   getDevToken,
   getHashnodeToken,
+  getApiKeys,
 };

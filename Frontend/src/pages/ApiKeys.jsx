@@ -3,10 +3,15 @@ import Card from "../components/card";
 import { AuthContext } from "../context/authContext";
 import axios from "axios";
 import { useContext, useState, useEffect } from "react";
-
+import { IoMdEyeOff } from "react-icons/io";
+import { FaEye } from "react-icons/fa";
+import { Button } from "react-bootstrap";
 const ApiKeys = () => {
   const { currentUser } = useContext(AuthContext);
   const [getapiKeys, setGetApiKeys] = useState([]);
+  const [showApiKeysDevto, setShowApiKeysDevto] = useState(false);
+  const [showApiKeysMedium, setShowApiKeysMedium] = useState(false);
+  const [showApiKeysHashnode, setShowApiKeysHashnode] = useState(false);
 
   useEffect(() => {
     const fetchApiKeys = async () => {
@@ -33,14 +38,22 @@ const ApiKeys = () => {
       <h1>Api Keys</h1>
       {getapiKeys[0]?.DevToToken ? (
         <Card title="Devto Token">
-          <p>{getapiKeys[0]?.DevToToken}</p>
+          <Button onClick={() => setShowApiKeysDevto(!showApiKeysDevto)}>
+            {" "}
+            {showApiKeysDevto ? <IoMdEyeOff /> : <FaEye />}
+          </Button>
+          {showApiKeysDevto && <p>{getapiKeys[0]?.DevToToken}</p>}
         </Card>
       ) : (
         <Card title="Devto Token">No Devto Api Keys configured yet</Card>
       )}
       {getapiKeys[0]?.MediumToken ? (
         <Card title="Medium Token">
-          <p>{getapiKeys[0]?.MediumToken}</p>
+          <Button onClick={() => setShowApiKeysMedium(!showApiKeysMedium)}>
+            {" "}
+            {showApiKeysMedium ? <IoMdEyeOff /> : <FaEye />}
+          </Button>
+          {showApiKeysMedium && <p>{getapiKeys[0]?.MediumToken}</p>}
         </Card>
       ) : (
         <Card title="Medium Token">No Medium Api Keys configured yet</Card>
@@ -48,8 +61,14 @@ const ApiKeys = () => {
 
       {getapiKeys[0]?.HashNodeToken ? (
         <Card title="Hashnode Token">
-          <p>{getapiKeys[0]?.HashNodeToken}</p>
-          <p>{getapiKeys[0]?.HashnodePublicationId}</p>
+          <Button onClick={() => setShowApiKeysHashnode(!showApiKeysHashnode)}>
+            {" "}
+            {showApiKeysHashnode ? <IoMdEyeOff /> : <FaEye />}
+          </Button>
+          {showApiKeysHashnode && <p>Token: {getapiKeys[0]?.HashNodeToken}</p>}
+          {showApiKeysHashnode && (
+            <p>Publication Id: {getapiKeys[0]?.HashnodePublicationId}</p>
+          )}
         </Card>
       ) : (
         <Card title="Hashnode Token">No Hashnode Api Keys configured yet</Card>

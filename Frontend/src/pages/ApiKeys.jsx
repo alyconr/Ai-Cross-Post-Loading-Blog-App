@@ -7,7 +7,7 @@ import { useContext, useState, useEffect } from "react";
 const ApiKeys = () => {
   const { currentUser } = useContext(AuthContext);
   const [getapiKeys, setGetApiKeys] = useState([]);
-  console.log("apikeys", getapiKeys);
+
   useEffect(() => {
     const fetchApiKeys = async () => {
       try {
@@ -31,24 +31,29 @@ const ApiKeys = () => {
   return (
     <ApiKeysContainer>
       <h1>Api Keys</h1>
-      <Card title="Devto Token">
-        {getapiKeys &&
-          getapiKeys.map((getapiKeys) => <p>{getapiKeys?.DevToToken}</p>)}
-      </Card>
-      <Card title="Medium Token">
-        {getapiKeys &&
-          getapiKeys.map((getapiKeys) => <p>{getapiKeys?.MediumToken}</p>)}
-      </Card>
+      {getapiKeys[0]?.DevToToken ? (
+        <Card title="Devto Token">
+          <p>{getapiKeys[0]?.DevToToken}</p>
+        </Card>
+      ) : (
+        <Card title="Devto Token">No Devto Api Keys configured yet</Card>
+      )}
+      {getapiKeys[0]?.MediumToken ? (
+        <Card title="Medium Token">
+          <p>{getapiKeys[0]?.MediumToken}</p>
+        </Card>
+      ) : (
+        <Card title="Medium Token">No Medium Api Keys configured yet</Card>
+      )}
 
-      <Card title="Hashnode Token">
-        {getapiKeys &&
-          getapiKeys.map((getapiKeys) => (
-            <div>
-              <p>{getapiKeys?.HashNodeToken}</p>
-              <p>{getapiKeys?.HashnodePublicationId}</p>
-            </div>
-          ))}
-      </Card>
+      {getapiKeys[0]?.HashNodeToken ? (
+        <Card title="Hashnode Token">
+          <p>{getapiKeys[0]?.HashNodeToken}</p>
+          <p>{getapiKeys[0]?.HashnodePublicationId}</p>
+        </Card>
+      ) : (
+        <Card title="Hashnode Token">No Hashnode Api Keys configured yet</Card>
+      )}
     </ApiKeysContainer>
   );
 };

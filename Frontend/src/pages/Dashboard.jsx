@@ -37,7 +37,6 @@ const Dashboard = () => {
   const [showLocalPosts, setShowLocalPosts] = useState(false);
   const [localPosts, setLocalPosts] = useState([]);
   const { currentUser } = useContext(AuthContext);
-  console.log(localPosts);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -98,7 +97,7 @@ const Dashboard = () => {
       const res = await axios.get(
         `http://localhost:9000/api/v1/followers/${currentUser?.user.id}`
       );
-      console.log("Followers data after click:", res.data);
+
       setFollowers(res.data);
     } catch (error) {
       console.error(error);
@@ -111,7 +110,7 @@ const Dashboard = () => {
       const res = await axios.get(
         `http://localhost:9000/api/v1/followings/${currentUser?.user.id}`
       );
-      console.log("Followings data after click:", res.data);
+
       setFollowing(res.data);
     } catch (error) {
       console.error(error);
@@ -124,7 +123,7 @@ const Dashboard = () => {
       const res = await axios.get(
         `http://localhost:9000/api/v1/bookmarks/${currentUser?.user.id}`
       );
-      console.log("Bookmarks data after click:", res.data);
+
       setBookmarks(res.data);
     } catch (error) {
       console.error(error);
@@ -137,7 +136,7 @@ const Dashboard = () => {
       const res = await axios.get(
         `http://localhost:9000/api/v1/medium-proxy/${currentUser?.user.id}`
       );
-      console.log("Medium Posts data after click:", res.data);
+
       setMediumPosts(Array.isArray(res.data) ? res.data : [res.data]);
     } catch (error) {
       console.error(error);
@@ -150,7 +149,7 @@ const Dashboard = () => {
       const res = await axios.get(
         `http://localhost:9000/api/v1/devto-proxy/${currentUser?.user.id}`
       );
-      console.log("Devto Posts data after click:", res.data);
+
       setDevtoPosts(Array.isArray(res.data) ? res.data : [res.data]);
     } catch (error) {
       console.error(error);
@@ -163,7 +162,7 @@ const Dashboard = () => {
       const res = await axios.get(
         `http://localhost:9000/api/v1/hashnode-proxy/${currentUser?.user.id}`
       );
-      console.log("HashNode Posts data after click:", res.data);
+
       setHashNodePosts(Array.isArray(res.data) ? res.data : [res.data]);
     } catch (error) {
       console.error(error);
@@ -176,7 +175,7 @@ const Dashboard = () => {
       const res = await axios.get(
         `http://localhost:9000/api/v1/user/posts/${currentUser?.user?.username}`
       );
-      console.log("Local Posts data after click:", res.data);
+
       setLocalPosts(res.data.posts);
     } catch (error) {
       console.error(error);

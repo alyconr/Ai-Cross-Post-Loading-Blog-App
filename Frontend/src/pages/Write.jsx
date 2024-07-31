@@ -17,7 +17,7 @@ import {
   base64ToFile,
 } from "../utils/uploadImagesUtils";
 
-import CustomModal from "../components/Modal";
+
 
 const Write = () => {
   const location = useLocation();

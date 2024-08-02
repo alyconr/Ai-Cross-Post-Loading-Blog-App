@@ -17,8 +17,6 @@ import {
   base64ToFile,
 } from "../utils/uploadImagesUtils";
 
-
-
 const Write = () => {
   const location = useLocation();
 
@@ -40,7 +38,12 @@ const Write = () => {
 
   console.log(file);
   console.log(image);
+  const [showPublishComponent, setShowPublishComponent] = useState(true);
 
+  const handleToggle = (event) => {
+    event.preventDefault();
+    setShowPublishComponent(!showPublishComponent);
+  };
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
@@ -344,9 +347,12 @@ const Write = () => {
 
   return (
     <Container>
-      <PreviewPublish>
-        <MdOutlineOpenInNew size={35} />
-        <IoCloseCircleOutline size={35} />
+      <PreviewPublish onClick={handleToggle}>
+        {showPublishComponent ? (
+          <MdOutlineOpenInNew size={35} />
+        ) : (
+          <IoCloseCircleOutline size={35} />
+        )}
       </PreviewPublish>
 
       <Wrapper>
@@ -404,23 +410,28 @@ const Write = () => {
             ]}
           />
         </div>
-
-        <PublishComponent
-          title={title}
-          desc={desc}
-          cont={cont}
-          cat={cat}
-          tags={tags}
-          file={file}
-          image={image}
-          postId={postId}
-          draftId={draftId}
-          handleFileChange={handleFileChange}
-          handleDeleteDraftPost={handleDeleteDraftPost}
-          handleCancel={handleCancel}
-          handlePublishAndDeleteDraft={handlePublishAndDeleteDraft}
-          setCat={setCat}
-        />
+        <PublishWrapper showPublishComponent={showPublishComponent}>
+          <PublishComponent
+            title={title}
+            desc={desc}
+            cont={cont}
+            cat={cat}
+            tags={tags}
+            file={file}
+            image={image}
+            postId={postId}
+            draftId={draftId}
+            handleFileChange={handleFileChange}
+            handleDeleteDraftPost={handleDeleteDraftPost}
+            handleCancel={handleCancel}
+            handlePublishAndDeleteDraft={handlePublishAndDeleteDraft}
+            setCat={setCat}
+            showPublishComponent={showPublishComponent}
+            setShowPublishComponent={setShowPublishComponent}
+            handleToggle={handleToggle}
+            handlePublish={handlePublish}
+          />
+        </PublishWrapper>
       </Wrapper>
     </Container>
   );
@@ -438,6 +449,7 @@ const PreviewPublish = styled.div`
   flex-direction: row;
   justify-content: flex-end;
   padding: 10px;
+  cursor: pointer;
 `;
 
 const Wrapper = styled.div`
@@ -475,7 +487,7 @@ const Wrapper = styled.div`
     }
 
     .Box-editor {
-      height: auto;
+      height: 100%;
       max-width: 100%;
       display: flex;
       flex-direction: column;
@@ -498,4 +510,13 @@ const Wrapper = styled.div`
       outline: none;
     }
   }
+`;
+
+const PublishWrapper = styled.div`
+  flex: 2;
+  transition: all 0.3s ease-in-out;
+  opacity: ${({ showPublishComponent }) => (showPublishComponent ? 1 : 0)};
+  max-width: ${({ showPublishComponent }) =>
+    showPublishComponent ? "100%" : 0};
+  overflow: hidden;
 `;

@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Sidebar from "../components/Sidebar";
 import Card from "../components/card";
 import axios from "axios";
-import { Link } from "react-router-dom";
+
 import { AuthContext } from "../context/authContext";
 
 import Profile from "./Profile";
@@ -11,7 +11,7 @@ import Settings from "../components/settings";
 import Bookmarks from "./Bookmarks";
 import Home from "./Home";
 import ApiKeys from "./ApiKeys";
-
+import RenderDrafts from "../components/RenderDrafts";
 import RenderFollowers from "../components/RenderFollowers";
 import RenderFollowings from "../components/RenderFollowings";
 import RenderBookmarks from "../components/RenderBookmarks";
@@ -36,7 +36,12 @@ const Dashboard = () => {
   const [showHashNodePosts, setShowHashNodePosts] = useState(false);
   const [showLocalPosts, setShowLocalPosts] = useState(false);
   const [localPosts, setLocalPosts] = useState([]);
+
+  const [drafts, setDrafts] = useState([]);
+  const [showDrafts, setShowDrafts] = useState(false);
   const { currentUser } = useContext(AuthContext);
+
+  console.log(drafts);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,6 +54,7 @@ const Dashboard = () => {
           devtoRes,
           hashNodeRes,
           localPostsRes,
+          drafts,
         ] = await Promise.all([
           axios.get(
             `http://localhost:9000/api/v1/followers/${currentUser?.user.id}`
@@ -71,6 +77,7 @@ const Dashboard = () => {
           axios.get(
             `http://localhost:9000/api/v1/user/posts/${currentUser?.user?.username}`
           ),
+          axios.get(`http://localhost:9000/api/v1/draftposts`),
         ]);
 
         setFollowers(followersRes.data);
@@ -80,6 +87,7 @@ const Dashboard = () => {
         setDevtoPosts(devtoRes.data);
         setHashNodePosts(hashNodeRes.data);
         setLocalPosts(localPostsRes.data.posts);
+        setDrafts(drafts.data.posts);
       } catch (error) {
         console.error(error);
       }
@@ -182,6 +190,17 @@ const Dashboard = () => {
     }
   };
 
+  const handleDraftPosts = async () => {
+    setShowDrafts(true);
+    try {
+      const res = await axios.get(`http://localhost:9000/api/v1/draftposts`);
+
+      setDrafts(res.data.posts);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleSetActiveComponent = (component) => {
     setActiveComponent(component);
     if (component === "dashboard") {
@@ -192,6 +211,7 @@ const Dashboard = () => {
       setShowDevtoPosts(false);
       setShowHashNodePosts(false);
       setShowLocalPosts(false);
+      setShowDrafts(false);
     }
   };
 
@@ -214,6 +234,9 @@ const Dashboard = () => {
       </Button>
       <Button onClick={handleClickHashNodePosts}>
         <Card title="Hashnode Posts" count={hashNodePosts.length} />
+      </Button>
+      <Button onClick={handleDraftPosts}>
+        <Card title="Drafts" count={drafts.length} />
       </Button>
       <Button onClick={handleClickLocalPosts}>
         <Card title="Total Local Posts" count={localPosts.length} />
@@ -251,6 +274,8 @@ const Dashboard = () => {
               <h1>Hashnode Posts</h1>
             ) : showLocalPosts ? (
               <h1>Local Posts</h1>
+            ) : showDrafts ? (
+              <h1>Drafts</h1>
             ) : (
               <h1>Dashboard</h1>
             )}
@@ -269,6 +294,8 @@ const Dashboard = () => {
                 <RenderHashNodePosts hashNodePosts={hashNodePosts} />
               ) : showLocalPosts ? (
                 <RenderLocalPosts localPosts={localPosts} />
+              ) : showDrafts ? (
+                <RenderDrafts drafts={drafts} />
               ) : (
                 renderDashboardCards()
               )}

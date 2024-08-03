@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
@@ -43,33 +43,6 @@ const Navbar = () => {
 
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
-  };
-
-  // Load the draftId from localStorage on component mount
-  useEffect(() => {
-    const storedDraftId = localStorage.getItem("draftId");
-    if (storedDraftId) {
-      setDraftId(storedDraftId);
-    }
-  }, []); // Empty dependency array means this effect runs once on mount
-
-  const fecthDraftPosts = async () => {
-    try {
-      const res = await axios.get(`http://localhost:9000/api/v1/draftposts`);
-      if (res.data.posts.length > 0) {
-        setDraftPost(res.data.posts[0]);
-        const newDraftId = res.data.posts[0].draft_id;
-        setDraftId(newDraftId);
-
-        //Save the new draftId to localStorage
-
-        localStorage.setItem("draftId", newDraftId);
-      } else {
-        localStorage.removeItem("draftId");
-      }
-    } catch (err) {
-      console.log(err);
-    }
   };
 
   const handleLogout = () => {
@@ -204,11 +177,7 @@ const Navbar = () => {
                   </Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
-              <Write
-                state={draftPost}
-                onClick={fecthDraftPosts}
-                to={`/write?draftId=${draftId}`}
-              >
+              <Write to={"/write"}>
                 Write <img className="write-img" src={write} alt="" />
               </Write>
               <ImageProfile>

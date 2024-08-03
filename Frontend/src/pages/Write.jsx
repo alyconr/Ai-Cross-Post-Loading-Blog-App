@@ -33,9 +33,10 @@ const Write = () => {
   );
   const [draftId, setDraftId] = useState(draftParamId);
   const [postId, setPostId] = useState(location?.state?.pid || "");
+  const [metadataPost, setMetadataPost] = useState("");
 
   const [image, setImage] = useState("");
-
+  console.log(metadataPost);
   console.log(file);
   console.log(image);
   const [showPublishComponent, setShowPublishComponent] = useState(true);
@@ -78,34 +79,51 @@ const Write = () => {
     }
   }, []);
 
-  useEffect(() => {
-    const saveDraftAutomatically = async () => {
-      if (title && desc && cont && file && cat && tags && !postId) {
-        try {
-          const endpoint = draftId
-            ? `http://localhost:9000/api/v1/draftposts/${draftId}` // Use the existing draftId for updates
-            : "http://localhost:9000/api/v1/draftposts"; // Create a new draft only if no draftId is present
-          const imageUrl = file?.metadata?.name;
+  const saveDraftAndPostAutomatically = async () => {
+    if (title && desc && cont && cat && tags) {
+      try {
+        let endpoint;
+        let method;
 
-          const response = await axios({
-            method: draftId ? "put" : "post",
-            url: endpoint,
-            data: {
-              title,
-              description: desc,
-              content: cont,
-              image: imageUrl,
-              date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-              category: cat,
-              tags,
-            },
-            withCredentials: true,
-          });
+        if (postId) {
+          endpoint = `http://localhost:9000/api/v1/posts/${location.state.pid}`;
+          method = "put";
+        } else if (draftId) {
+          endpoint = `http://localhost:9000/api/v1/draftposts/${draftId}`;
+          method = "put";
+        } else {
+          endpoint = "http://localhost:9000/api/v1/draftposts";
+          method = "post";
+        }
 
-          const newDraftId = response.data.post || draftId;
+        const imageUrl = file?.metadata?.name || image?.metadata?.name;
+
+        const metadata = JSON.parse(localStorage.getItem("uploadedImage"));
+
+        const response = await axios({
+          method: method,
+          url: endpoint,
+          data: {
+            title,
+            description: desc,
+            content: cont,
+            image: !postId ? imageUrl : image,
+            date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+            category: cat,
+            tags,
+            metadata,
+          },
+          withCredentials: true,
+        });
+
+        if (!postId && !draftId) {
+          const newDraftId = response.data.post;
           setDraftId(newDraftId);
+        }
 
-          toast.info("Draft saved successfully", {
+        toast.info(
+          postId ? "Post updated successfully" : "Draft saved successfully",
+          {
             position: "bottom-center",
             autoClose: 2500,
             hideProgressBar: false,
@@ -114,15 +132,20 @@ const Write = () => {
             draggable: true,
             progress: undefined,
             theme: "dark",
-          });
-        } catch (err) {
-          console.error("Error saving draft:", err);
-          toast.error("Error saving draft");
-        }
+          }
+        );
+      } catch (err) {
+        console.error("Error saving draft:", err);
+        toast.error("Error saving draft");
       }
-    };
+    }
+  };
 
-    const debounceSaveDraft = debounced.debounced(saveDraftAutomatically, 2000);
+  useEffect(() => {
+    const debounceSaveDraft = debounced.debounced(
+      saveDraftAndPostAutomatically,
+      2000
+    );
 
     // Listen for changes in title, desc, cont, cat, and file
     debounceSaveDraft();
@@ -130,47 +153,55 @@ const Write = () => {
     return () => {
       debounced.cancel();
     };
-  }, [title, desc, cont, file?.metadata, cat, tags]);
+  }, [title, desc, cont, cat, tags, postId, draftId]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const endpoint = postId
-          ? `http://localhost:9000/api/v1/posts/${postId}`
-          : "http://localhost:9000/api/v1/draftposts";
+        let endpoint;
+        if (postId) {
+          endpoint = `http://localhost:9000/api/v1/posts/${postId}`;
+        } else if (draftId) {
+          endpoint = `http://localhost:9000/api/v1/draftposts/${draftId}`;
+        } else {
+          return;
+        }
+
         const response = await axios({
           method: "get",
           url: endpoint,
           withCredentials: true,
         });
 
-        const postData = response.data.post;
-        console.log("The Object is: ", postData);
+        const data = response.data;
+        console.log("Fetched data:", data);
 
-        const draftData = response.data.posts || [];
-
-        console.log(draftData);
-
-        if (postData) {
+        if (data.post) {
+          // Handle single post or draft
+          const postData = data.post;
           setTitle(postData?.title || "");
           setDesc(postData?.description || "");
           setCont(postData?.content || "");
           setCat(postData?.category || "");
           setTags(Array.isArray(postData?.tags) ? postData.tags : []);
-          setImage(JSON.parse(postData?.metadata) || "");
-        } else {
-          setTitle(draftData[0]?.title || "");
-          setDesc(draftData[0]?.description || "");
-          setCont(draftData[0]?.content || "");
-          setCat(draftData[0]?.category || "");
-          setTags(Array.isArray(draftData[0]?.tags) ? draftData[0].tags : []);
-          //setFile(localStorage.getItem("uploadedFile"));
+          setImage(postData?.image || "");
+          setMetadataPost(
+            postData?.metadata ? JSON.parse(postData.metadata) : ""
+          );
+        } else if (data.posts && data.posts.length > 0) {
+          // Handle multiple drafts (though we're only using the first one)
+          const draftData = data.posts[0];
+          setTitle(draftData?.title || "");
+          setDesc(draftData?.description || "");
+          setCont(draftData?.content || "");
+          setCat(draftData?.category || "");
+          setTags(Array.isArray(draftData?.tags) ? draftData.tags : []);
+          setImage(draftData?.metadata ? JSON.parse(draftData.metadata) : "");
         }
       } catch (err) {
         console.log(err);
       }
     };
-
     // Only fetch draft data when the component mounts
 
     fetchData();
@@ -225,7 +256,7 @@ const Write = () => {
     try {
       let fileUrl = "";
 
-      if (file) {
+      if (draftId) {
         toast.info("Uploading image...", {
           position: "bottom-right",
           autoClose: 2500,
@@ -237,25 +268,30 @@ const Write = () => {
           theme: "dark",
         });
 
-        const fileObject = base64ToFile(
-          file.base64String,
-          file.metadata.name,
-          file.metadata.type
-        );
+        let fileObject;
 
-        const formData = new FormData(); //
+        if (file) {
+          fileObject = base64ToFile(
+            file.base64String,
+            file?.metadata?.name,
+            file?.metadata?.type
+          );
+         
 
-        formData.set("file", fileObject); // Append the image URL to the formData
-        console.log(formData.get("file"));
+          const formData = new FormData(); //
 
-        const res = await axios.post(
-          "http://localhost:9000/api/v1/upload",
-          formData
-        );
-        const filename = res.data;
+          formData.set("file", fileObject); // Append the image URL to the formData
+          console.log(formData.get("file"));
 
-        fileUrl = `http://localhost:9000/uploads/${filename}`;
-        console.log(fileUrl);
+          const res = await axios.post(
+            "http://localhost:9000/api/v1/upload",
+            formData
+          );
+          const filename = res.data;
+
+          fileUrl = `http://localhost:9000/uploads/${filename}`;
+          console.log(fileUrl);
+        }
       } else {
         toast.info("Uploading image...", {
           position: "bottom-right",
@@ -269,10 +305,12 @@ const Write = () => {
         });
 
         const imageObject = base64ToFile(
-          image.base64String,
-          image.metadata.name,
-          image.metadata.type
-        );
+          metadataPost.base64String,
+          metadataPost?.metadata?.name,
+          metadataPost?.metadata?.type
+        ) || metadataPost.metadata.name;
+
+        
 
         const formData = new FormData(); //
 
@@ -301,7 +339,7 @@ const Write = () => {
             date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
             category: cat,
             tags,
-            metadata: image || file,
+            metadata: localStorage.getItem("uploadedImage") || localStorage.getItem("uploadedFile")
           },
           withCredentials: true,
         });
@@ -317,7 +355,7 @@ const Write = () => {
             date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
             category: cat,
             tags,
-            metadata: image || file,
+            metadata: localStorage.getItem("uploadedImage") || localStorage.getItem("uploadedFile")
           },
           withCredentials: true,
         });
@@ -410,7 +448,7 @@ const Write = () => {
             ]}
           />
         </div>
-        <PublishWrapper showPublishComponent={showPublishComponent}>
+        <PublishWrapper $showPublishComponent={showPublishComponent}>
           <PublishComponent
             title={title}
             desc={desc}
@@ -430,6 +468,7 @@ const Write = () => {
             setShowPublishComponent={setShowPublishComponent}
             handleToggle={handleToggle}
             handlePublish={handlePublish}
+            metadataPost={metadataPost}
           />
         </PublishWrapper>
       </Wrapper>
@@ -515,8 +554,8 @@ const Wrapper = styled.div`
 const PublishWrapper = styled.div`
   flex: 2;
   transition: all 0.3s ease-in-out;
-  opacity: ${({ showPublishComponent }) => (showPublishComponent ? 1 : 0)};
-  max-width: ${({ showPublishComponent }) =>
-    showPublishComponent ? "100%" : 0};
+  opacity: ${({ $showPublishComponent }) => ($showPublishComponent ? 1 : 0)};
+  max-width: ${({ $showPublishComponent }) =>
+    $showPublishComponent ? "100%" : 0};
   overflow: hidden;
 `;

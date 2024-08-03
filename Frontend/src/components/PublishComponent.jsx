@@ -1,6 +1,5 @@
 import styled from "styled-components";
-import React from "react";
-
+import { useState } from "react";
 import CustomModal from "../components/Modal";
 
 const PublishComponent = ({
@@ -18,12 +17,36 @@ const PublishComponent = ({
   handleCancel,
   handlePublishAndDeleteDraft,
   setCat,
+  metadataPost
 }) => {
-  const [showModal, setShowModal] = React.useState(false);
+  const [showModal, setShowModal] = useState(false);
+  let metadataObject = null;
+  
+  console.log('Original metadataPost:', metadataPost);
 
+  if (metadataPost) {
+    if (typeof metadataPost === 'string') {
+      try {
+        metadataObject = JSON.parse(metadataPost);
+        console.log('Parsed metadataObject from string:', metadataObject);
+      } catch (error) {
+        console.error('Failed to parse metadataPost string:', error);
+        // Handle the error appropriately
+      }
+    } else if (typeof metadataPost === 'object' && metadataPost !== null) {
+      metadataObject = metadataPost;
+      console.log('metadataPost is already an object:', metadataObject);
+    } else {
+      console.log('metadataPost is neither a string nor an object');
+    }
+  } else {
+    console.log('metadataPost is null or undefined');
+  }
+  
+  
   const handleShowModal = () => setShowModal(true);
   return (
-    <Preview>
+    <Preview >
       <div className="box-1">
         <h1>Publish</h1>
         <span>
@@ -54,20 +77,20 @@ const PublishComponent = ({
           </button>
         )}
         <h5>
-          {image || file
-            ? image?.metadata?.name || file?.metadata?.name
-            : "No uploaded image"}
+        {image || file
+    ? image?.metadata?.name || file?.metadata?.name || metadataObject?.metadata?.name
+    : "No uploaded image"}
         </h5>
         <hr />
-        {file?.metadata || image?.metadata?.name ? (
-          <div className="actions d-flex justify-content-between gap-3">
-            <button className="btn" onClick={handleShowModal}>
-              Publish
-            </button>
-          </div>
-        ) : (
-          <p> Please before Publish your post select an image</p>
-        )}
+        {(file?.metadata || image?.metadata?.name  ||  metadataObject?.metadata) ? (
+  <div className="actions d-flex justify-content-between gap-3">
+    <button className="btn" onClick={handleShowModal}>
+      Publish
+    </button>
+  </div>
+) : (
+  <p>Please select an image before publishing your post</p>
+)}
       </div>
       <div className="box-2">
         <h1>Category</h1>

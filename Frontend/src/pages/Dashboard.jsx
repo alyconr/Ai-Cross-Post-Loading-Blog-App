@@ -19,6 +19,7 @@ import RenderMediumPosts from "../components/RenderMediumPosts";
 import RenderDevtoPosts from "../components/RenderDevtoPosts";
 import RenderHashNodePosts from "../components/RenderHashnodePosts";
 import RenderLocalPosts from "../components/LocalPosts";
+import AiFaqs from "../components/AiFaqs";
 const Dashboard = () => {
   const [menuOpen, setMenuOpen] = useState(true);
   const [activeComponent, setActiveComponent] = useState("dashboard");
@@ -256,6 +257,8 @@ const Dashboard = () => {
         return <ApiKeys />;
       case "settings":
         return <Settings />;
+      case "AiAgents":
+        return <AiFaqs />;
       case "dashboard":
       default:
         return (

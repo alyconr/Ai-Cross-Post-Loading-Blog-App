@@ -23,7 +23,7 @@ const RenderDrafts = ({ drafts }) => {
           </Card>
         ))
       ) : (
-        <p>No Hashnode posts to display</p>
+        <p>No   Draft posts to display</p>
       )}
     </DraftPostsContainer>
   );

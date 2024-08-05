@@ -39,6 +39,9 @@ const Sidebar = ({ menuOpen, setMenuOpen, setActiveComponent }) => {
         <MenuItem as={Link} onClick={() => handleMenuItemClick("apikeys")}>
           Api Keys
         </MenuItem>
+        <MenuItem as={Link} onClick={() => handleMenuItemClick("AiAgents")}>
+          AiAgents FAQs
+        </MenuItem>
         <MenuItem as={Link} onClick={() => handleMenuItemClick("settings")}>
           Settings
         </MenuItem>

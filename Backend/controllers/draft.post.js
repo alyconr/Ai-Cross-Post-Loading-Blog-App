@@ -99,7 +99,7 @@ const updateDraftPost = async (req, res) => {
   ];
 
   const sql =
-    "UPDATE posts_draft SET `title` = ?, `description` = ?, `content` = ?, `image` = ?, `date` = ?, `userId` = ?, `category` = ?, `tags` = ? ";
+    "UPDATE posts_draft SET `title` = ?, `description` = ?, `content` = ?, `image` = ?, `date` = ?, `userId` = ?, `category` = ?, `tags` = ? WHERE `draft_id` = ?";
 
   pool.query(sql, values, (queryError, results) => {
     if (queryError) {
@@ -115,7 +115,7 @@ const updateDraftPost = async (req, res) => {
 
 const getSingleDraftPost = async (req, res) => {
   const values = [req.params.id];
-  const sql = "SELECT * FROM posts_draft ";
+  const sql = "SELECT posts_draft.* FROM posts_draft WHERE draft_id = ?";
 
   pool.query(sql, values, (queryError, results) => {
     if (queryError) {

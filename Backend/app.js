@@ -61,6 +61,7 @@ const hashnodeApi = require("./routes/hashnodeApi");
 const linkedinPost = require("./routes/linkedinPost");
 const authLinkedinPost = require("./routes/authLinkedinPost");
 const authLinkedinCallback = require("./routes/authLinkedinCallback");
+const aiBlogPostGenerator = require("./routes/aiBlogPostRoutes");
 
 
 app.use("/api/v1/auth", authRouter);
@@ -81,6 +82,7 @@ app.use("/api/v1/hashnode-proxy", hashnodeApi);
 app.use("/api/v1/linkedin-proxy", linkedinPost);
 app.use("/auth/linkedin", authLinkedinPost);
 app.use("/auth/linkedin/callback", authLinkedinCallback);
+app.use("/api/v1/ai-blog-generator", aiBlogPostGenerator);
 
 
 

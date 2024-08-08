@@ -23,7 +23,7 @@ const AiFaqs = () => {
           <Accordion.Body>
             <p>
               <p className="fw-bolder">How does it work?</p> The Blog Post
-              Generator uses web references from top rankigh search engines
+              Generator uses web references from top ranking search engines
               to generate blog posts.
             </p>
             <p>

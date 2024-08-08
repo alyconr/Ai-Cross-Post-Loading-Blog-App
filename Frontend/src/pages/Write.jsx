@@ -16,6 +16,7 @@ import {
   fileToBase64WithMetadata,
   base64ToFile,
 } from "../utils/uploadImagesUtils";
+import ArtificialIntelligenceComponent from "../components/ArtificialIntelligence";
 
 const Write = () => {
   const location = useLocation();
@@ -394,7 +395,9 @@ const Write = () => {
       </PreviewPublish>
 
       <Wrapper>
+      
         <div className="Editor">
+        <ArtificialIntelligenceComponent />
           <input
             className="h1"
             type="text"
@@ -447,7 +450,9 @@ const Write = () => {
               "align",
             ]}
           />
+          
         </div>
+        
         <PublishWrapper $showPublishComponent={showPublishComponent}>
           <PublishComponent
             title={title}

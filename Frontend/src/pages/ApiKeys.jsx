@@ -82,7 +82,7 @@ export default ApiKeys;
 const ApiKeysContainer = styled.div`
   display: flex;
   flex-direction: column;
-  width: 50%;
+  width: 60%;
   justify-content: center;
   margin: 0 auto;
   gap: 20px;
@@ -91,5 +91,11 @@ const ApiKeysContainer = styled.div`
     font-size: 1.5em;
 
     color: #333;
+  }
+
+  p {
+    font-size: 1em;
+    color: #666;
+    margin-top: 5px;
   }
 `;

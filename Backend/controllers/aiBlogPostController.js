@@ -8,18 +8,24 @@ const cheerio = require("cheerio");
 const { OpenAIEmbeddings } = require("@langchain/openai");
 const { ChatOpenAI } = require("@langchain/openai");
 const { ChatPromptTemplate } = require("@langchain/core/prompts");
-const { duckDuckGoSearch } = require("duckduckgo-search");
+const  { google }   = require("googleapis");
 const { Document } = require("langchain/document");
+
 const qdrantClient = new QdrantClient({
   url: process.env.QDRANT_URL,
   apiKey: process.env.QDRANT_API_KEY,
 });
 
+function sanitizeCollectionName(name) { 
+  return name.replace(/[^a-zA-Z0-9_]/g, '_');
+}
+
 const generateBlogPost = async (req, res) => {
   try {
-    const { keyword, numReferences, apiKey } = req.body;
+    const { keyword, numReferences, openAiApiKey } = req.body;
+    console.log(keyword, numReferences, openAiApiKey);
 
-    if (!keyword || !numReferences || !apiKey) {
+    if (!keyword || !numReferences || !openAiApiKey) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
@@ -30,7 +36,7 @@ const generateBlogPost = async (req, res) => {
     }
     //1. Document loading (webscrapping)
 
-    const searchResults = await searchDuckDuckgo(keyword, numReferences);
+    const searchResults = await searchGoogle(keyword, numReferences);
 
     const documents = await loadDocuments(searchResults);
 
@@ -45,9 +51,11 @@ const generateBlogPost = async (req, res) => {
 
     //3. embedding
 
-    const embeddings = new OpenAIEmbeddings({ openAIApiKey: apiKey });
+    const embeddings = new OpenAIEmbeddings({ openAIApiKey: openAiApiKey });
 
-    const collectionName = `blogposts_${new Date().toISOString()}`;
+ 
+
+    const collectionName = sanitizeCollectionName(`blogposts_${new Date().getTime()}`);
 
     //create Qdrant client
     await qdrantClient.createCollection(collectionName, {
@@ -61,7 +69,7 @@ const generateBlogPost = async (req, res) => {
       splitDocs,
       embeddings,
       {
-        client: QdrantClient,
+        client: qdrantClient,
         collectionName: collectionName,
       }
     );
@@ -74,12 +82,12 @@ const generateBlogPost = async (req, res) => {
     //5. Blog post generation
 
     const model = new ChatOpenAI({
-      openAIApiKey: apiKey,
+      openAIApiKey: openAiApiKey,
       temperature: 0.7,
       modelName: "gpt-3.5-turbo",
     });
 
-    const prompt = new ChatPromptTemplate.fromTemplate(`
+    const prompt =  ChatPromptTemplate.fromTemplate(`
             Given the following information, generate a blog post
       Write a full blog post that will rank for the following keywords: {keyword}
       
@@ -108,16 +116,20 @@ const generateBlogPost = async (req, res) => {
   }
 };
 
-const searchDuckDuckgo = async (keyword, numResults) => {
+const searchGoogle = async (keyword, numResults) => {
   try {
-    const results = await duckDuckGoSearch(keyword, {
-      max_results: numResults,
+    const customsearch = google.customsearch('v1');
+    const result = await customsearch.cse.list({
+      auth: process.env.GOOGLE_API_KEY,
+      cx: process.env.GOOGLE_SEARCH_ENGINE_ID,
+      q: keyword,
+      num: numResults
     });
 
-    return results.map((result) => result.url);
+    return result.data.items.map(item => item.link);
   } catch (error) {
-    console.error("Error searching DuckDuckGo:", error);
-    throw new Error("Failed to search DuckDuckGo");
+    console.error("Error searching Google:", error);
+    throw new Error("Failed to search Google");
   }
 };
 

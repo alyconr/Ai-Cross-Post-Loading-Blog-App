@@ -82,7 +82,7 @@ app.use("/api/v1/hashnode-proxy", hashnodeApi);
 app.use("/api/v1/linkedin-proxy", linkedinPost);
 app.use("/auth/linkedin", authLinkedinPost);
 app.use("/auth/linkedin/callback", authLinkedinCallback);
-app.use("/api/v1/ai-blog-generator", aiBlogPostGenerator);
+app.use("/api/v1/generateBlogPost", aiBlogPostGenerator);
 
 
 

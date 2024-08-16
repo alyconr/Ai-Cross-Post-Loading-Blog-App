@@ -3,6 +3,11 @@
 // Convert file to base64 string with metadata
 export const fileToBase64WithMetadata = (file) => {
   return new Promise((resolve, reject) => {
+    if (!(file instanceof Blob)) {
+      reject(new Error('Input is not a valid File or Blob object'));
+      return;
+    }
+
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = () => {

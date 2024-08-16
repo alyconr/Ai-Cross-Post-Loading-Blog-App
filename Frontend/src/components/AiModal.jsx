@@ -10,6 +10,7 @@ import { solarizedlight } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { toast } from "react-toastify";
 import { FaArrowAltCircleDown } from "react-icons/fa";
 import styled, { keyframes } from "styled-components";
+import save from "../assets/save.png";
 const AiModal = ({ aiAgent, handleClose }) => {
   const { currentUser } = useContext(AuthContext);
   const [numReferences, setNumReferences] = useState(1);
@@ -64,63 +65,70 @@ const AiModal = ({ aiAgent, handleClose }) => {
             GREAT, THIS IS YOU AI AGENT BASED ON OPEN AI MODEL
           </Modal.Title>
         </Modal.Header>
-        <div className=" d-flex justify-content-center flex-column align-items-center  mt-3">
+        <CenteredDiv>
           <StyledButton onClick={handleShowCard}>
             <p>Let's Generate A Blog Post</p>
-            <AnimatedArrow  />
+            <AnimatedArrow />
           </StyledButton>
-        </div>
+        </CenteredDiv>
 
         {showCard && (
-          <Modal.Body className="d-flex flex-column align-items-center">
-            <div className="d-flex justify-content-center flex-column align-items-center p-3 bg-light rounded border w-50 ">
-              <p>Enter The number of web references (Max 10)</p>
-              <input
-                className="w-50 mb-3 p-1 rounded border-0 bg-dark text-white"
-                type="number"
-                min="1"
-                max="10"
-                onChange={(e) =>
-                  setNumReferences(
-                    Math.min(10, Math.max(1, parseInt(e.target.value)))
-                  )
-                }
-                value={numReferences}
-              />
+          <StyledModalBody>
+            <OpenaiCard>
+              <InputGroup>
+                <p>Enter The number of web references (Max 10)</p>
+                <StyledInput
+                  type="number"
+                  min="1"
+                  max="10"
+                  onChange={(e) =>
+                    setNumReferences(
+                      Math.min(10, Math.max(1, parseInt(e.target.value)))
+                    )
+                  }
+                  value={numReferences}
+                />
+              </InputGroup>
 
-              <p>
-                Enter Your OpenAi API key{" "}
-                <a
-                  href="https://platform.openai.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  OpenAi API key
-                </a>
-              </p>
-              <input
-                className="w-50 mb-3 p-1 rounded border-0 bg-dark text-white"
-                type="password"
-                onChange={(e) => setOpenAiApiKey(e.target.value)}
-                value={openAiApiKey}
-              />
+              <InputGroup>
+                <p>
+                  Enter Your OpenAi API key{" "}
+                  <a
+                    href="https://platform.openai.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    OpenAi API key
+                  </a>
+                </p>
+                <div className="openai-key">
+                  <StyledInput
+                    type="password"
+                    onChange={(e) => setOpenAiApiKey(e.target.value)}
+                    value={openAiApiKey}
+                  />
+                  <OpenaiButton title="Save">
+                    <img src={save} alt="save" />
+                  </OpenaiButton>
+                </div>
+              </InputGroup>
 
-              <p>Enter The topic that you want to generate</p>
-              <input
-                className="w-50 mb-3 p-1 rounded border-0 bg-dark text-white"
-                type="text"
-                onChange={(e) => setKeyword(e.target.value)}
-                value={keyword}
-              />
+              <InputGroup>
+                <p>Enter The topic that you want to generate</p>
+                <StyledInput
+                  type="text"
+                  onChange={(e) => setKeyword(e.target.value)}
+                  value={keyword}
+                />
+              </InputGroup>
 
-              <Button
-                className="p-2 mb-3"
+              <StyledGenerateButton
                 variant="primary"
                 onClick={handleGenerateBlogPost}
                 disabled={loading || !keyword || !openAiApiKey}
               >
                 {loading ? "Generating..." : "Generate Blog"}
-              </Button>
+              </StyledGenerateButton>
 
               {error && <p className="text-danger">{error}</p>}
 
@@ -131,17 +139,17 @@ const AiModal = ({ aiAgent, handleClose }) => {
                 </Link>{" "}
                 to our AiAgents FAQ's{" "}
               </p>
-            </div>
+            </OpenaiCard>
 
             {blogPost && (
-              <div className="w-75 mt-3">
-                <div className="d-flex justify-content-between align-items-center mb-2">
+              <BlogPostContainer>
+                <div className="header">
                   <h3>Generated Blog Post:</h3>
                   <Button variant="secondary" onClick={copyToClipboard}>
                     Copy to Clipboard
                   </Button>
                 </div>
-                <div className="bg-white p-3 rounded">
+                <BlogPostContent>
                   <ReactMarkdown
                     components={{
                       code({ node, inline, className, children, ...props }) {
@@ -165,19 +173,13 @@ const AiModal = ({ aiAgent, handleClose }) => {
                   >
                     {blogPost}
                   </ReactMarkdown>
-                </div>
-              </div>
+                </BlogPostContent>
+              </BlogPostContainer>
             )}
-          </Modal.Body>
+          </StyledModalBody>
         )}
 
-        {showCard && (
-          <Modal.Footer>
-            <Button variant="primary" onClick={handleClose}>
-              Save Changes
-            </Button>
-          </Modal.Footer>
-        )}
+       
       </Modal>
     </>
   );
@@ -196,12 +198,90 @@ const moveArrow = keyframes`
     transform: translateY(-10px);
   }
 `;
+const CenteredDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+`;
+
+const StyledModalBody = styled(Modal.Body)`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+`;
+
+const OpenaiCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-radius: 10px;
+  background-color: #fff;
+  color: #000;
+  box-shadow: 0 2px 4px 6px rgba(0.1, 0.1, 0, 0.1);
+
+  .openai-key {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+  }
+`;
+
+const InputGroup = styled.div`
+  width: 100%;
+  margin-bottom: 1rem;
+  text-align: center;
+
+  p {
+    margin-bottom: 0.5rem;
+  }
+`;
+
+const StyledInput = styled.input`
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  color: #333;
+`;
+const StyledGenerateButton = styled(Button)`
+  margin-top: 1rem;
+  width: 100%;
+`;
+
+const BlogPostContainer = styled.div`
+  width: 100%;
+  max-width: 800px;
+  margin-top: 2rem;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+`;
+
+const BlogPostContent = styled.div`
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+`;
 
 const AnimatedArrow = styled(FaArrowAltCircleDown)`
-  position: absolute; 
+  position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  animation: ${moveArrow} 2.0s infinite;
+  animation: ${moveArrow} 2s infinite;
 `;
 
 const StyledButton = styled(Button)`
@@ -209,4 +289,20 @@ const StyledButton = styled(Button)`
   padding-bottom: 30px;
   background: linear-gradient(to top, #007adf 0%, #00ecbc 100%);
   border: none;
+`;
+
+const OpenaiButton = styled(Button)`
+  position: relative;
+  background: transparent;
+  border: none;
+  width: 5%;
+
+  img {
+    width: 30px;
+    height: 30px;
+  }
+
+  &:hover {
+    background: transparent;
+  }
 `;

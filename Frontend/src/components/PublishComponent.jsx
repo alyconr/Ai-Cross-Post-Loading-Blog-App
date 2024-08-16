@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CustomModal from "../components/Modal";
 
 const PublishComponent = ({
@@ -20,28 +20,34 @@ const PublishComponent = ({
   metadataPost
 }) => {
   const [showModal, setShowModal] = useState(false);
-  let metadataObject = null;
+  const [metadataObject, setMetadataObject] = useState("");
   
   console.log('Original metadataPost:', metadataPost);
 
-  if (metadataPost) {
-    if (typeof metadataPost === 'string') {
-      try {
-        metadataObject = JSON.parse(metadataPost);
-        console.log('Parsed metadataObject from string:', metadataObject);
-      } catch (error) {
-        console.error('Failed to parse metadataPost string:', error);
-        // Handle the error appropriately
+  useEffect(() => {
+    if (metadataPost) {
+      if (typeof metadataPost === 'string') {
+        try {
+          setMetadataObject(JSON.parse(metadataPost));
+          console.log('The metadataPost is already an object:', metadataObject)
+          
+        } catch (error) {
+          console.error('Failed to parse metadataPost string:', error);
+          // Handle the error appropriately
+        }
+      } else if (typeof metadataPost === 'object' && metadataPost !== null) {
+        setMetadataObject(metadataPost);
+        console.log('The metadataPost is already an object:', metadataObject)
+      
+      } else {
+        console.log('metadataPost is neither a string nor an object');
       }
-    } else if (typeof metadataPost === 'object' && metadataPost !== null) {
-      metadataObject = metadataPost;
-      console.log('metadataPost is already an object:', metadataObject);
     } else {
-      console.log('metadataPost is neither a string nor an object');
+      console.log('metadataPost is null or undefined');
     }
-  } else {
-    console.log('metadataPost is null or undefined');
-  }
+    
+    
+  } , [metadataPost]);
   
   
   const handleShowModal = () => setShowModal(true);
@@ -78,11 +84,11 @@ const PublishComponent = ({
         )}
         <h5>
         {image || file
-    ? image?.metadata?.name || file?.metadata?.name || metadataObject?.metadata?.name
+    ? image?.metadata?.name || file?.metadata?.name || metadataObject?.name
     : "No uploaded image"}
         </h5>
         <hr />
-        {(file?.metadata || image?.metadata?.name  ||  metadataObject?.metadata) ? (
+        {(file?.metadata || image?.metadata?.name  ||  metadataObject?.name) ? (
   <div className="actions d-flex justify-content-between gap-3">
     <button className="btn" onClick={handleShowModal}>
       Publish

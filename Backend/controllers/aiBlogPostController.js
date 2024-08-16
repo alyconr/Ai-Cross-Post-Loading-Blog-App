@@ -8,7 +8,7 @@ const cheerio = require("cheerio");
 const { OpenAIEmbeddings } = require("@langchain/openai");
 const { ChatOpenAI } = require("@langchain/openai");
 const { ChatPromptTemplate } = require("@langchain/core/prompts");
-const  { google }   = require("googleapis");
+const { google } = require("googleapis");
 const { Document } = require("langchain/document");
 
 const qdrantClient = new QdrantClient({
@@ -16,8 +16,8 @@ const qdrantClient = new QdrantClient({
   apiKey: process.env.QDRANT_API_KEY,
 });
 
-function sanitizeCollectionName(name) { 
-  return name.replace(/[^a-zA-Z0-9_]/g, '_');
+function sanitizeCollectionName(name) {
+  return name.replace(/[^a-zA-Z0-9_]/g, "_");
 }
 
 const generateBlogPost = async (req, res) => {
@@ -53,9 +53,9 @@ const generateBlogPost = async (req, res) => {
 
     const embeddings = new OpenAIEmbeddings({ openAIApiKey: openAiApiKey });
 
- 
-
-    const collectionName = sanitizeCollectionName(`blogposts_${new Date().getTime()}`);
+    const collectionName = sanitizeCollectionName(
+      `blogposts_${new Date().getTime()}`
+    );
 
     //create Qdrant client
     await qdrantClient.createCollection(collectionName, {
@@ -87,7 +87,7 @@ const generateBlogPost = async (req, res) => {
       modelName: "gpt-3.5-turbo",
     });
 
-    const prompt =  ChatPromptTemplate.fromTemplate(`
+    const prompt = ChatPromptTemplate.fromTemplate(`
             Given the following information, generate a blog post
       Write a full blog post that will rank for the following keywords: {keyword}
       
@@ -118,15 +118,15 @@ const generateBlogPost = async (req, res) => {
 
 const searchGoogle = async (keyword, numResults) => {
   try {
-    const customsearch = google.customsearch('v1');
+    const customsearch = google.customsearch("v1");
     const result = await customsearch.cse.list({
       auth: process.env.GOOGLE_API_KEY,
       cx: process.env.GOOGLE_SEARCH_ENGINE_ID,
       q: keyword,
-      num: numResults
+      num: numResults,
     });
 
-    return result.data.items.map(item => item.link);
+    return result.data.items.map((item) => item.link);
   } catch (error) {
     console.error("Error searching Google:", error);
     throw new Error("Failed to search Google");
@@ -170,7 +170,7 @@ const getInstructions = () => {
       Sub-section headings should be clearly marked.
       Clearly indicate the title, headings, and sub-headings using markdown.
       Each section should cover the specific aspects as outlined.
-      For each section, generate detailed content that aligns with the provided subtopics. Ensure that the content is informative and covers the key points.
+      For each section, generate detailed content that aligns with the provided subtopics and provides  code examples and screenshots that aligns with the provided subtopics. Ensure that the content is informative and covers the key points. 
       Ensure that the content is consistent with the title and subtopics. Do not mention an entity in the title and not write about it in the content.
       Ensure that the content flows logically from one section to another, maintaining coherence and readability.
       Where applicable, include examples, case studies, or insights that can provide a deeper understanding of the topic.
@@ -179,7 +179,8 @@ const getInstructions = () => {
       Please ensure proper and standard markdown formatting always.
       Make the blog post sound as human and as engaging as possible, add real world examples and make it as informative as possible.
       Each blog post should have at least 5 sections with 3 sub-sections each.
-      Each sub section should have at least 3 paragraphs.
+      Each sub section should have at least 5 paragraphs.
+      Each sub-section should have code examples and screenshots that aligns with the provided subtopics .
     `;
 };
 

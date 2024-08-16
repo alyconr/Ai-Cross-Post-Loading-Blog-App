@@ -15,6 +15,7 @@ import { IoCloseCircleOutline } from "react-icons/io5";
 import {
   fileToBase64WithMetadata,
   base64ToFile,
+  
 } from "../utils/uploadImagesUtils";
 import ArtificialIntelligenceComponent from "../components/ArtificialIntelligence";
 
@@ -34,7 +35,7 @@ const Write = () => {
   );
   const [draftId, setDraftId] = useState(draftParamId);
   const [postId, setPostId] = useState(location?.state?.pid || "");
-  const [metadataPost, setMetadataPost] = useState("");
+  const [metadataPost, setMetadataPost] = useState();
 
   const [image, setImage] = useState("");
   console.log(metadataPost);
@@ -49,21 +50,20 @@ const Write = () => {
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
-      const { base64String, metadata } = await fileToBase64WithMetadata(
-        selectedFile
-      );
-      if (postId) {
-        setImage({ base64String, metadata });
-        localStorage.setItem(
-          "uploadedImage",
-          JSON.stringify({ base64String, metadata })
-        );
-      } else {
-        setFile({ base64String, metadata });
-        localStorage.setItem(
-          "uploadedFile",
-          JSON.stringify({ base64String, metadata })
-        );
+      try {
+        const { base64String, metadata } = await fileToBase64WithMetadata(selectedFile);
+        const fileData = { base64String, metadata };
+        
+        if (postId) {
+          setImage(fileData);
+          localStorage.setItem("uploadedImage", JSON.stringify(fileData));
+        } else {
+          setFile(fileData);
+          localStorage.setItem("uploadedFile", JSON.stringify(fileData));
+        }
+      } catch (error) {
+        console.error("Error processing file:", error);
+        toast.error("Error processing file. Please try again.");
       }
     }
   };
@@ -98,8 +98,12 @@ const Write = () => {
         }
 
         const imageUrl = file?.metadata?.name || image?.metadata?.name;
-
+       
+        
         const metadata = JSON.parse(localStorage.getItem("uploadedImage"));
+        console.log(metadata)
+
+        const metadataUrl = `http://localhost:9000/uploads/${metadata.metadata.name}`
 
         const response = await axios({
           method: method,
@@ -108,11 +112,11 @@ const Write = () => {
             title,
             description: desc,
             content: cont,
-            image: !postId ? imageUrl : image,
+            image: !postId ? imageUrl : metadataUrl,
             date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
             category: cat,
             tags,
-            metadata,
+            metadata: metadata?.metadata,
           },
           withCredentials: true,
         });
@@ -154,7 +158,7 @@ const Write = () => {
     return () => {
       debounced.cancel();
     };
-  }, [title, desc, cont, cat, tags, postId, draftId]);
+  }, [title, desc, cont, image, cat, tags, postId, draftId]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -185,7 +189,7 @@ const Write = () => {
           setCont(postData?.content || "");
           setCat(postData?.category || "");
           setTags(Array.isArray(postData?.tags) ? postData.tags : []);
-          setImage(postData?.image || "");
+          setImage(postData?.metadata ? JSON.parse(postData.metadata) : "");
           setMetadataPost(
             postData?.metadata ? JSON.parse(postData.metadata) : ""
           );
@@ -225,6 +229,7 @@ const Write = () => {
         setCont("");
         setDesc(" ");
         setFile("");
+        setImage("");
         setDraftId("");
         navigate("/");
         window.location.reload();
@@ -249,119 +254,16 @@ const Write = () => {
   };
 
   const handlePublish = async () => {
-    if (!title || !desc || !cont || !cat) {
-      toast.error("Please fill all the fields");
-      return;
-    }
+  if (!title || !desc || !cont || !cat) {
+    toast.error("Please fill all the fields");
+    return;
+  }
 
-    try {
-      let fileUrl = "";
+  try {
+    let fileUrl = "";
 
-      if (draftId) {
-        toast.info("Uploading image...", {
-          position: "bottom-right",
-          autoClose: 2500,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
-
-        let fileObject;
-
-        if (file) {
-          fileObject = base64ToFile(
-            file.base64String,
-            file?.metadata?.name,
-            file?.metadata?.type
-          );
-         
-
-          const formData = new FormData(); //
-
-          formData.set("file", fileObject); // Append the image URL to the formData
-          console.log(formData.get("file"));
-
-          const res = await axios.post(
-            "http://localhost:9000/api/v1/upload",
-            formData
-          );
-          const filename = res.data;
-
-          fileUrl = `http://localhost:9000/uploads/${filename}`;
-          console.log(fileUrl);
-        }
-      } else {
-        toast.info("Uploading image...", {
-          position: "bottom-right",
-          autoClose: 2500,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
-
-        const imageObject = base64ToFile(
-          metadataPost.base64String,
-          metadataPost?.metadata?.name,
-          metadataPost?.metadata?.type
-        ) || metadataPost.metadata.name;
-
-        
-
-        const formData = new FormData(); //
-
-        formData.set("file", imageObject); // Append the image URL to the formData
-        console.log(formData.get("file"));
-
-        const res = await axios.post(
-          "http://localhost:9000/api/v1/upload",
-          formData
-        );
-        const filename = res.data;
-
-        fileUrl = `http://localhost:9000/uploads/${filename}`;
-        console.log(fileUrl);
-      }
-
-      if (location.state?.pid) {
-        await axios({
-          method: "put",
-          url: `http://localhost:9000/api/v1/posts/${location.state.pid}`,
-          data: {
-            title,
-            description: desc,
-            content: cont,
-            image: fileUrl,
-            date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-            category: cat,
-            tags,
-            metadata: localStorage.getItem("uploadedImage") || localStorage.getItem("uploadedFile")
-          },
-          withCredentials: true,
-        });
-      } else {
-        await axios({
-          method: "post",
-          url: "http://localhost:9000/api/v1/posts",
-          data: {
-            title,
-            description: desc,
-            content: cont,
-            image: fileUrl,
-            date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-            category: cat,
-            tags,
-            metadata: localStorage.getItem("uploadedImage") || localStorage.getItem("uploadedFile")
-          },
-          withCredentials: true,
-        });
-      }
-      toast.success("Post published successfully", {
+    if (file || image) {
+      toast.info("Uploading image...", {
         position: "bottom-right",
         autoClose: 2500,
         hideProgressBar: false,
@@ -372,12 +274,86 @@ const Write = () => {
         theme: "dark",
       });
 
-      navigate("/");
-    } catch (err) {
-      console.error(err);
-      toast.error("Error uploading image or publishing post");
+      let fileObject;
+
+      if (file && file.base64String) {
+        fileObject = base64ToFile(
+          file.base64String,
+          file.metadata?.name || "image.jpg",
+          file.metadata?.type || "image/jpeg"
+        );
+      } else if (image && image.base64String) {
+        fileObject = base64ToFile(
+          image.base64String,
+          image.metadata?.name || "image.jpg",
+          image.metadata?.type || "image/jpeg"
+        );
+      } else if (image instanceof File) {
+        fileObject = image;
+      }
+
+      if (fileObject) {
+        const formData = new FormData();
+        formData.set("file", fileObject);
+
+        const res = await axios.post(
+          "http://localhost:9000/api/v1/upload",
+          formData
+        );
+        const filename = res.data;
+
+        fileUrl = `http://localhost:9000/uploads/${filename}`;
+      }
     }
-  };
+
+    const metadata = localStorage.getItem("uploadedImage")
+      ? JSON.parse(localStorage.getItem("uploadedImage"))
+      : null;
+
+    const postData = {
+      title,
+      description: desc,
+      content: cont,
+      image: fileUrl,
+      date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+      category: cat,
+      tags,
+      metadata,
+    };
+
+    if (location.state?.pid) {
+      await axios({
+        method: "put",
+        url: `http://localhost:9000/api/v1/posts/${location.state.pid}`,
+        data: postData,
+        withCredentials: true,
+      });
+    } else {
+      await axios({
+        method: "post",
+        url: "http://localhost:9000/api/v1/posts",
+        data: postData,
+        withCredentials: true,
+      });
+    }
+
+    toast.success("Post published successfully", {
+      position: "bottom-right",
+      autoClose: 2500,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+    });
+
+    navigate("/");
+  } catch (err) {
+    console.error(err);
+    toast.error("Error uploading image or publishing post");
+  }
+};
 
   const handlePublishAndDeleteDraft = async () => {
     await handlePublish();
@@ -395,9 +371,8 @@ const Write = () => {
       </PreviewPublish>
 
       <Wrapper>
-      
         <div className="Editor">
-        <ArtificialIntelligenceComponent />
+          <ArtificialIntelligenceComponent />
           <input
             className="h1"
             type="text"
@@ -450,9 +425,8 @@ const Write = () => {
               "align",
             ]}
           />
-          
         </div>
-        
+
         <PublishWrapper $showPublishComponent={showPublishComponent}>
           <PublishComponent
             title={title}
@@ -538,15 +512,13 @@ const Wrapper = styled.div`
     }
 
     input {
-      padding: 0.5rem;
       background-color: transparent;
       border: none;
-      margin-top: 1rem;
+      margin-top: 0.5rem;
       outline: none;
     }
 
     textarea {
-      padding: 0.5rem;
       background-color: transparent;
       border: none;
 

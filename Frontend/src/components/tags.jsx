@@ -48,8 +48,7 @@ const TagsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  padding: 0.5rem;
-  margin-top: 1rem;
+  margin-top:0.5rem;
 `;
 
 const Tag = styled.div`

@@ -5,11 +5,10 @@ const cookieParser = require("cookie-parser");
 const multer = require("multer");
 const app = express();
 const bodyParser = require("body-parser");
-const axios = require("axios");
 app.use(express.json());
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: "50" }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
 app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
 app.use(cookieParser());

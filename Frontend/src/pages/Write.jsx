@@ -81,7 +81,7 @@ const Write = () => {
   }, []);
 
   const saveDraftAndPostAutomatically = async () => {
-    if (title && desc && cont && cat && tags) {
+    if (title && desc && cont && cat && tags && file || image) {
       try {
         let endpoint;
         let method;
@@ -100,7 +100,7 @@ const Write = () => {
         const imageUrl = file?.metadata?.name || image?.metadata?.name;
        
         
-        const metadata = JSON.parse(localStorage.getItem("uploadedImage"));
+        const metadata = JSON.parse(localStorage.getItem("uploadedImage")) || JSON.parse(localStorage.getItem("uploadedFile"));
         console.log(metadata)
 
         const metadataUrl = `http://localhost:9000/uploads/${metadata.metadata.name}`
@@ -327,6 +327,8 @@ const Write = () => {
         url: `http://localhost:9000/api/v1/posts/${location.state.pid}`,
         data: postData,
         withCredentials: true,
+        
+      
       });
     } else {
       await axios({

@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { Link } from "react-router-dom";
@@ -11,15 +11,19 @@ import { toast } from "react-toastify";
 import { FaArrowAltCircleDown } from "react-icons/fa";
 import styled, { keyframes } from "styled-components";
 import save from "../assets/save.png";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
 const AiModal = ({ aiAgent, handleClose }) => {
   const { currentUser } = useContext(AuthContext);
   const [numReferences, setNumReferences] = useState(1);
   const [openAiApiKey, setOpenAiApiKey] = useState("");
+  const [openAiApiKeySaved, setOpenAiApiKeySaved] = useState("");
   const [keyword, setKeyword] = useState("");
   const [blogPost, setBlogPost] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showCard, setShowCard] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleGenerateBlogPost = async () => {
     setLoading(true);
@@ -42,6 +46,9 @@ const AiModal = ({ aiAgent, handleClose }) => {
       setLoading(false);
     }
   };
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleShowCard = () => {
     setShowCard(!showCard);
@@ -56,6 +63,46 @@ const AiModal = ({ aiAgent, handleClose }) => {
       toast.error("Failed to copy blog post to clipboard.");
     }
   };
+
+  const handleSaveOpenAiApiKey = async () => {
+    try {
+      const response = await axios.put(
+        `http://localhost:9000/api/v1/user/openAiApiKey/${currentUser?.user.id}`,
+        {
+          openAiApiKey,
+        },
+        {
+          withCredentials: true,
+          credentials: "include",
+        }
+      );
+
+      setOpenAiApiKeySaved(response.data.openAiApiKey);
+
+      toast.success("OpenAi API key saved successfully!");
+    } catch (error) {
+      console.error("Error saving OpenAi API key:", error);
+      toast.error("Failed to save OpenAi API key.");
+    }
+  };
+
+  useEffect(() => {
+    const getOpenAiApiKey = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:9000/api/v1/user/openAiApiKey/${currentUser?.user.id}`,
+          {
+            withCredentials: true,
+            credentials: "include",
+          }
+        );
+        setOpenAiApiKeySaved(response.data.openAiApiKey);
+      } catch (error) {
+        console.error("Error getting OpenAi API key:", error);
+      }
+    };
+    getOpenAiApiKey();
+  }, [currentUser?.user.id, showCard]);
 
   return (
     <>
@@ -102,12 +149,18 @@ const AiModal = ({ aiAgent, handleClose }) => {
                   </a>
                 </p>
                 <div className="openai-key">
-                  <StyledInput
-                    type="password"
-                    onChange={(e) => setOpenAiApiKey(e.target.value)}
-                    value={openAiApiKey}
-                  />
-                  <OpenaiButton title="Save">
+                  <PasswordInputWrapper>
+                    <StyledInput
+                      type={showPassword ? "text" : "password"}
+                      onChange={(e) => setOpenAiApiKey(e.target.value)}
+                      value={openAiApiKeySaved || openAiApiKey}
+                    />
+                    <TogglePasswordButton onClick={togglePasswordVisibility}>
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </TogglePasswordButton>
+                  </PasswordInputWrapper>
+
+                  <OpenaiButton title="Save" onClick={handleSaveOpenAiApiKey}>
                     <img src={save} alt="save" />
                   </OpenaiButton>
                 </div>
@@ -178,8 +231,6 @@ const AiModal = ({ aiAgent, handleClose }) => {
             )}
           </StyledModalBody>
         )}
-
-       
       </Modal>
     </>
   );
@@ -242,6 +293,21 @@ const InputGroup = styled.div`
   p {
     margin-bottom: 0.5rem;
   }
+`;
+const PasswordInputWrapper = styled.div`
+  position: relative;
+  width: 100%;
+`;
+
+const TogglePasswordButton = styled.button`
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
 `;
 
 const StyledInput = styled.input`

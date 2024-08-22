@@ -244,6 +244,65 @@ const updateHashnodeToken = async (req, res) => {
   });
 };
 
+const updateOpenAiApiKey = async (req, res) => {
+  const { userId } = req.params;
+  const { openAiApiKey } = req.body;
+
+  if (!openAiApiKey) {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ error: "OpenAI API key is required" });
+  }
+
+  const sql = "UPDATE users SET `OpenAiApiKey` = ? WHERE `id` = ?";
+
+  const values = [openAiApiKey, userId];
+
+  pool.query(sql, values, (queryError, results) => {
+    if (queryError) {
+      console.error("Database query error:", queryError);
+      res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: "Database query error" });
+    }
+
+    if (results.affectedRows === 0) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ error: "User not found" });
+    }
+
+    res
+      .status(StatusCodes.OK) 
+      .json({ message: "OpenAI API key updated successfully", openAiApiKey });
+  });
+};
+
+const getOpenAiApiKey = async (req, res) => {
+  const { userId } = req.params;
+
+  const sql = "SELECT `OpenAiApiKey` FROM users WHERE `id` = ?";
+
+  const values = [userId];
+
+  pool.query(sql, values, (queryError, results) => {
+    if (queryError) {
+      console.error("Database query error:", queryError);
+      res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: "Database query error" });
+    }
+
+    if (results.length === 0) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ error: "User not found" });
+    }
+
+    res.status(StatusCodes.OK).json({ openAiApiKey: results[0].OpenAiApiKey });
+  });
+};
+
 const getDevToken = async (req, res) => {
   const { userId } = req.params;
 
@@ -352,6 +411,8 @@ module.exports = {
   updateDevToken,
   updateMediumToken,
   updateHashnodeToken,
+  updateOpenAiApiKey,
+  getOpenAiApiKey,
   getMediumToken,
   getDevToken,
   getHashnodeToken,

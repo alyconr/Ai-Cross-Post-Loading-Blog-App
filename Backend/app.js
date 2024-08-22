@@ -3,9 +3,13 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const multer = require("multer");
+const sharp = require("sharp");
+const path = require("path");
+const fs = require("fs");
 const app = express();
 const bodyParser = require("body-parser");
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 app.use(bodyParser.json({ limit: "50" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
@@ -16,20 +20,12 @@ app.use(cookieParser());
 app.use("/uploads", express.static("uploads"));
 
 // multer
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + file.originalname);
-  },
-});
-
 const upload = multer({
-  storage: storage,
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
 });
 
-app.post("/api/v1/upload", upload.single("file"), (req, res) => {
+app.post("/api/v1/upload", upload.single("file"), async (req, res) => {
   const file = req.file;
 
   if (!file) {
@@ -37,9 +33,21 @@ app.post("/api/v1/upload", upload.single("file"), (req, res) => {
     return res.status(400).json({ error: "No file uploaded" });
   }
 
-  const filename = file.filename;
+  const filename = Date.now() + path.extname(file.originalname);
+  const filepath = path.join(__dirname, "uploads", filename);
 
-  return res.status(200).json(filename);
+  try {
+    // Compress and resize image
+    await sharp(file.buffer)
+      .resize(1920, 1080, { fit: "inside", withoutEnlargement: true })
+      .jpeg({ quality: 80 })
+      .toFile(filepath);
+
+    return res.status(200).json(filename);
+  } catch (error) {
+    console.error("Error processing image:", error);
+    return res.status(500).json({ error: "Error processing image" });
+  }
 });
 
 const authRouter = require("./routes/auth");
@@ -62,7 +70,6 @@ const authLinkedinPost = require("./routes/authLinkedinPost");
 const authLinkedinCallback = require("./routes/authLinkedinCallback");
 const aiBlogPostGenerator = require("./routes/aiBlogPostRoutes");
 
-
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/posts", postsRouter);
 app.use("/api/v1/draftposts", draftPostsRouter);
@@ -82,8 +89,6 @@ app.use("/api/v1/linkedin-proxy", linkedinPost);
 app.use("/auth/linkedin", authLinkedinPost);
 app.use("/auth/linkedin/callback", authLinkedinCallback);
 app.use("/api/v1/generateBlogPost", aiBlogPostGenerator);
-
-
 
 app.get("/", (req, res) => {
   res.send("Hello World, IT WORKS");

@@ -267,10 +267,9 @@ const Singlepost = () => {
         </div>
         <h1>{post.title}</h1>
         <h3>{post.description}</h3>
-        <div
-          className="paragraph"
+        <MdxContent
           dangerouslySetInnerHTML={renderContent(post.content)}
-          style={{ maxWidth: "100%", overflow: "hidden" }}
+       
         />
         <FooterAction>
           <ApplauseButton />
@@ -349,6 +348,59 @@ const Singlepost = () => {
 };
 
 export default Singlepost;
+
+const MdxContent = styled.div`
+  max-width: 100%;
+  overflow: hidden;
+  
+  /* Styles for markdown elements */
+  h1, h2, h3, h4, h5, h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+
+  p {
+    margin-bottom: 1em;
+    line-height: 1.6;
+  }
+
+  ul, ol {
+    margin-bottom: 1em;
+    padding-left: 2em;
+  }
+
+  li {
+    margin-bottom: 0.5em;
+  }
+
+  blockquote {
+    border-left: 4px solid #ccc;
+    margin-left: 0;
+    padding-left: 1em;
+    font-style: italic;
+  }
+
+  pre {
+    background-color: #f4f4f4;
+    padding: 1em;
+    border-radius: 4px;
+    overflow-x: auto;
+  }
+
+  code {
+    background-color: #f4f4f4;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-family: monospace;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+`;
 
 const Wrapper = styled.div`
   display: flex;

@@ -1,7 +1,37 @@
 import styled from "styled-components";
-import { useEffect, useState, useContext } from "react";
-import ReactQuill from "react-quill";
+import { useEffect, useState, useRef } from "react";
 import "react-quill/dist/quill.snow.css";
+import "@mdxeditor/editor/style.css";
+import * as marked from 'marked';
+import DOMPurify from "dompurify";
+import { codeMirrorPlugin } from "@mdxeditor/editor";
+import {
+  MDXEditor,
+  BlockTypeSelect,
+  UndoRedo,
+  BoldItalicUnderlineToggles,
+  toolbarPlugin,
+  headingsPlugin,
+  markdownShortcutPlugin,
+  linkPlugin,
+  imagePlugin,
+  tablePlugin,
+  listsPlugin,
+  codeBlockPlugin,
+  CodeToggle,
+  InsertCodeBlock,
+  InsertTable,
+  InsertImage,
+  ListsToggle,
+  Separator,
+  CreateLink,
+  linkDialogPlugin,
+  InsertThematicBreak,
+  thematicBreakPlugin,
+  quotePlugin,
+  diffSourcePlugin,
+  DiffSourceToggleWrapper,
+} from "@mdxeditor/editor";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
@@ -15,7 +45,6 @@ import { IoCloseCircleOutline } from "react-icons/io5";
 import {
   fileToBase64WithMetadata,
   base64ToFile,
-  
 } from "../utils/uploadImagesUtils";
 import ArtificialIntelligenceComponent from "../components/ArtificialIntelligence";
 
@@ -36,12 +65,25 @@ const Write = () => {
   const [draftId, setDraftId] = useState(draftParamId);
   const [postId, setPostId] = useState(location?.state?.pid || "");
   const [metadataPost, setMetadataPost] = useState();
+  const [initialMarkdown, setInitialMarkdown] = useState("");
 
   const [image, setImage] = useState("");
   console.log(metadataPost);
   console.log(file);
   console.log(image);
   const [showPublishComponent, setShowPublishComponent] = useState(true);
+
+  const editorRef = useRef(null);
+
+  const handleEditorChange = (content) => {
+    setCont(content);
+    if (!initialMarkdown) {
+      setInitialMarkdown(content);
+    }
+    saveDraftAndPostAutomatically();
+  };
+
+ 
 
   const handleToggle = (event) => {
     event.preventDefault();
@@ -51,9 +93,11 @@ const Write = () => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       try {
-        const { base64String, metadata } = await fileToBase64WithMetadata(selectedFile);
+        const { base64String, metadata } = await fileToBase64WithMetadata(
+          selectedFile
+        );
         const fileData = { base64String, metadata };
-        
+
         if (postId) {
           setImage(fileData);
           localStorage.setItem("uploadedImage", JSON.stringify(fileData));
@@ -81,7 +125,7 @@ const Write = () => {
   }, []);
 
   const saveDraftAndPostAutomatically = async () => {
-    if (title && desc && cont && cat && tags && file || image) {
+    if ((title && desc && cont && cat && tags && file) || image) {
       try {
         let endpoint;
         let method;
@@ -98,12 +142,13 @@ const Write = () => {
         }
 
         const imageUrl = file?.metadata?.name || image?.metadata?.name;
-       
-        
-        const metadata = JSON.parse(localStorage.getItem("uploadedImage")) || JSON.parse(localStorage.getItem("uploadedFile"));
-        console.log(metadata)
 
-        const metadataUrl = `http://localhost:9000/uploads/${metadata.metadata.name}`
+        const metadata =
+          JSON.parse(localStorage.getItem("uploadedImage")) ||
+          JSON.parse(localStorage.getItem("uploadedFile"));
+        console.log(metadata);
+
+        const metadataUrl = `http://localhost:9000/uploads/${metadata.metadata.name}`;
 
         const response = await axios({
           method: method,
@@ -254,16 +299,92 @@ const Write = () => {
   };
 
   const handlePublish = async () => {
-  if (!title || !desc || !cont || !cat) {
-    toast.error("Please fill all the fields");
-    return;
-  }
+    if (!title || !desc || !cont || !cat) {
+      toast.error("Please fill all the fields");
+      return;
+    }
 
-  try {
-    let fileUrl = "";
+    try {
+      let fileUrl = "";
 
-    if (file || image) {
-      toast.info("Uploading image...", {
+      if (file || image) {
+        toast.info("Uploading image...", {
+          position: "bottom-right",
+          autoClose: 2500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+
+        let fileObject;
+
+        if (file && file.base64String) {
+          fileObject = base64ToFile(
+            file.base64String,
+            file.metadata?.name || "image.jpg",
+            file.metadata?.type || "image/jpeg"
+          );
+        } else if (image && image.base64String) {
+          fileObject = base64ToFile(
+            image.base64String,
+            image.metadata?.name || "image.jpg",
+            image.metadata?.type || "image/jpeg"
+          );
+        } else if (image instanceof File) {
+          fileObject = image;
+        }
+
+        if (fileObject) {
+          const formData = new FormData();
+          formData.set("file", fileObject);
+
+          const res = await axios.post(
+            "http://localhost:9000/api/v1/upload",
+            formData
+          );
+          const filename = res.data;
+
+          fileUrl = `http://localhost:9000/uploads/${filename}`;
+        }
+      }
+
+      const metadata = localStorage.getItem("uploadedImage")
+        ? JSON.parse(localStorage.getItem("uploadedImage"))
+        : null;
+
+     
+
+      const postData = {
+        title,
+        description: desc,
+        content: cont,
+        image: fileUrl,
+        date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+        category: cat,
+        tags,
+        metadata,
+      };
+
+      if (location.state?.pid) {
+        await axios({
+          method: "put",
+          url: `http://localhost:9000/api/v1/posts/${location.state.pid}`,
+          data: postData,
+          withCredentials: true,
+        });
+      } else {
+        await axios({
+          method: "post",
+          url: "http://localhost:9000/api/v1/posts",
+          data: postData,
+          withCredentials: true,
+        });
+      }
+
+      toast.success("Post published successfully", {
         position: "bottom-right",
         autoClose: 2500,
         hideProgressBar: false,
@@ -274,88 +395,12 @@ const Write = () => {
         theme: "dark",
       });
 
-      let fileObject;
-
-      if (file && file.base64String) {
-        fileObject = base64ToFile(
-          file.base64String,
-          file.metadata?.name || "image.jpg",
-          file.metadata?.type || "image/jpeg"
-        );
-      } else if (image && image.base64String) {
-        fileObject = base64ToFile(
-          image.base64String,
-          image.metadata?.name || "image.jpg",
-          image.metadata?.type || "image/jpeg"
-        );
-      } else if (image instanceof File) {
-        fileObject = image;
-      }
-
-      if (fileObject) {
-        const formData = new FormData();
-        formData.set("file", fileObject);
-
-        const res = await axios.post(
-          "http://localhost:9000/api/v1/upload",
-          formData
-        );
-        const filename = res.data;
-
-        fileUrl = `http://localhost:9000/uploads/${filename}`;
-      }
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+      toast.error("Error uploading image or publishing post");
     }
-
-    const metadata = localStorage.getItem("uploadedImage")
-      ? JSON.parse(localStorage.getItem("uploadedImage"))
-      : null;
-
-    const postData = {
-      title,
-      description: desc,
-      content: cont,
-      image: fileUrl,
-      date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-      category: cat,
-      tags,
-      metadata,
-    };
-
-    if (location.state?.pid) {
-      await axios({
-        method: "put",
-        url: `http://localhost:9000/api/v1/posts/${location.state.pid}`,
-        data: postData,
-        withCredentials: true,
-        
-      
-      });
-    } else {
-      await axios({
-        method: "post",
-        url: "http://localhost:9000/api/v1/posts",
-        data: postData,
-        withCredentials: true,
-      });
-    }
-
-    toast.success("Post published successfully", {
-      position: "bottom-right",
-      autoClose: 2500,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-    });
-
-    navigate("/");
-  } catch (err) {
-    console.error(err);
-    toast.error("Error uploading image or publishing post");
-  }
-};
+  };
 
   const handlePublishAndDeleteDraft = async () => {
     await handlePublish();
@@ -391,41 +436,72 @@ const Write = () => {
             onChange={(e) => setDesc(e.target.value)}
           />
 
-          <ReactQuill
-            className="Box-editor"
-            value={cont}
-            onChange={setCont}
-            placeholder="Write your blog here..."
-            modules={{
-              toolbar: [
-                [{ header: [1, 2, 3, 4, 5, 6, false] }],
-                [{ font: ["serif", "sans-serif", "monospace", "Arial"] }],
-                [{ size: ["small", false, "large", "huge"] }],
-                ["bold", "italic", "underline", "strike", "blockquote"],
-                [{ list: "ordered" }, { list: "bullet" }],
-                ["link", "image"],
-                ["clean"],
-                [{ color: [] }],
-                [{ align: [] }],
-                ["code-block"],
-              ],
-            }}
-            formats={[
-              "header",
-              "font",
-              "size",
-              "bold",
-              "italic",
-              "underline",
-              "strike",
-              "blockquote",
-              "list",
-              "code-block",
-              "link",
-              "image",
-              "color",
-              "align",
+          <MDXEditor
+            ref={editorRef}
+            markdown={cont}
+            onChange={handleEditorChange}
+            plugins={[
+              headingsPlugin(),
+              linkPlugin(),
+              markdownShortcutPlugin(),
+              listsPlugin(),
+              thematicBreakPlugin(),
+              linkDialogPlugin(),
+              codeBlockPlugin({
+                defaultCodeBlockLanguage: "javascript",
+              }),
+              imagePlugin(),
+              tablePlugin(),
+              thematicBreakPlugin(),
+              quotePlugin(),
+              diffSourcePlugin({
+                diffMarkdown: initialMarkdown,
+                viewMode: "rich-text",
+              }),
+              codeBlockPlugin({
+                defaultCodeBlockLanguage: "js",
+                defaultCodeBlockTheme: "dark",
+                codeBlockLanguages: {
+                  javascript: "JavaScript",
+                  python: "Python",
+                  css: "CSS",
+                  shell: "Shell",
+                  html: "HTML",
+                  json: "JSON",
+                },
+              }),
+              codeMirrorPlugin({
+                codeBlockLanguages: {
+                  javascript: "javascript",
+                  python: "python",
+                  css: "css",
+                  html: "html",
+                  json: "json",
+                  shell: "shell",
+                },
+              }),
+              toolbarPlugin({
+                toolbarContents: () => (
+                  <>
+                    {" "}
+                    <DiffSourceToggleWrapper>
+                      <UndoRedo />
+                      <BlockTypeSelect />
+                      <BoldItalicUnderlineToggles />
+                      <InsertTable />
+                      <InsertImage />
+                      <InsertThematicBreak />
+                      <InsertCodeBlock />
+                      <CodeToggle />
+                      <ListsToggle />
+                      <CreateLink />
+                      <Separator />
+                    </DiffSourceToggleWrapper>
+                  </>
+                ),
+              }),
             ]}
+            contentEditableClassName="mdx-editor"
           />
         </div>
 
@@ -462,6 +538,13 @@ export default Write;
 const Container = styled.div`
   display: flex;
   flex-direction: column;
+  .mdx-editor {
+    max-width: 100%;
+    min-height: 400px;
+    padding: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
 `;
 
 const PreviewPublish = styled.div`

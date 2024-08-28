@@ -17,6 +17,8 @@ import Comments from "../components/comments";
 import { FaCommentDots } from "react-icons/fa";
 import { Offcanvas } from "react-bootstrap";
 import { MdBookmarkAdd } from "react-icons/md";
+import { marked } from "marked";
+import DOMPurify from "dompurify";
 
 import Share from "../components/share";
 const Singlepost = () => {
@@ -36,6 +38,28 @@ const Singlepost = () => {
   const navigate = useNavigate();
 
   const currentUserUsername = currentUser?.user?.username;
+
+  const renderContent = (content) => {
+    if (!content) {
+      return { __html: "" };
+    }
+
+    if (
+      typeof content === "string" &&
+      (content.includes("```") ||
+        content.includes("#") ||
+        content.includes("*"))
+    ) {
+      // If it's markdown, parse it to HTML
+      const rawMarkup = marked(content);
+      // Sanitize the HTML
+      const sanitizedMarkup = DOMPurify.sanitize(rawMarkup);
+      return { __html: sanitizedMarkup };
+    } else {
+      // If it's not markdown, treat it as HTML (but still sanitize)
+      return { __html: DOMPurify.sanitize(content) };
+    }
+  };
 
   useEffect(() => {
     const getPost = async () => {
@@ -245,7 +269,7 @@ const Singlepost = () => {
         <h3>{post.description}</h3>
         <div
           className="paragraph"
-          dangerouslySetInnerHTML={createMarkup(post.content)}
+          dangerouslySetInnerHTML={renderContent(post.content)}
           style={{ maxWidth: "100%", overflow: "hidden" }}
         />
         <FooterAction>

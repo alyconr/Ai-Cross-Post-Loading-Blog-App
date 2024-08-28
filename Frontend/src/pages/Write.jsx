@@ -2,8 +2,6 @@ import styled from "styled-components";
 import { useEffect, useState, useRef } from "react";
 import "react-quill/dist/quill.snow.css";
 import "@mdxeditor/editor/style.css";
-import * as marked from 'marked';
-import DOMPurify from "dompurify";
 import { codeMirrorPlugin } from "@mdxeditor/editor";
 import {
   MDXEditor,
@@ -42,6 +40,7 @@ import PublishComponent from "../components/PublishComponent";
 
 import { MdOutlineOpenInNew } from "react-icons/md";
 import { IoCloseCircleOutline } from "react-icons/io5";
+import { MdPostAdd } from "react-icons/md";
 import {
   fileToBase64WithMetadata,
   base64ToFile,
@@ -82,8 +81,6 @@ const Write = () => {
     }
     saveDraftAndPostAutomatically();
   };
-
- 
 
   const handleToggle = (event) => {
     event.preventDefault();
@@ -355,8 +352,6 @@ const Write = () => {
         ? JSON.parse(localStorage.getItem("uploadedImage"))
         : null;
 
-     
-
       const postData = {
         title,
         description: desc,
@@ -411,9 +406,9 @@ const Write = () => {
     <Container>
       <PreviewPublish onClick={handleToggle}>
         {showPublishComponent ? (
-          <MdOutlineOpenInNew size={35} />
+          <MdPostAdd size={50} />
         ) : (
-          <IoCloseCircleOutline size={35} />
+          <IoCloseCircleOutline size={50} />
         )}
       </PreviewPublish>
 
@@ -505,7 +500,7 @@ const Write = () => {
           />
         </div>
 
-        <PublishWrapper $showPublishComponent={showPublishComponent}>
+        <PublishWrapper $showPublishComponent={!showPublishComponent}>
           <PublishComponent
             title={title}
             desc={desc}
@@ -538,13 +533,6 @@ export default Write;
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  .mdx-editor {
-    max-width: 100%;
-    min-height: 400px;
-    padding: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
 `;
 
 const PreviewPublish = styled.div`

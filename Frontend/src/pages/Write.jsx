@@ -413,92 +413,94 @@ const Write = () => {
       </PreviewPublish>
 
       <Wrapper>
-        <div className="Editor">
-          <ArtificialIntelligenceComponent />
-          <input
-            className="h1"
-            type="text"
-            placeholder="Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          <TagsInput tags={tags} setTags={setTags} />
-          <textarea
-            className="h3"
-            type="text"
-            placeholder="Short Description"
-            value={desc}
-            onChange={(e) => setDesc(e.target.value)}
-          />
+        <EditorWrapper>
+          <StickyEditor>
+            <ArtificialIntelligenceComponent />
+            <input
+              className="h1"
+              type="text"
+              placeholder="Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+            <TagsInput tags={tags} setTags={setTags} />
+            <textarea
+              className="h3"
+              type="text"
+              placeholder="Short Description"
+              value={desc}
+              onChange={(e) => setDesc(e.target.value)}
+            />
 
-          <MDXEditor
-            ref={editorRef}
-            markdown={cont}
-            onChange={handleEditorChange}
-            plugins={[
-              headingsPlugin(),
-              linkPlugin(),
-              markdownShortcutPlugin(),
-              listsPlugin(),
-              thematicBreakPlugin(),
-              linkDialogPlugin(),
-              codeBlockPlugin({
-                defaultCodeBlockLanguage: "javascript",
-              }),
-              imagePlugin(),
-              tablePlugin(),
-              thematicBreakPlugin(),
-              quotePlugin(),
-              diffSourcePlugin({
-                diffMarkdown: initialMarkdown,
-                viewMode: "rich-text",
-              }),
-              codeBlockPlugin({
-                defaultCodeBlockLanguage: "js",
-                defaultCodeBlockTheme: "dark",
-                codeBlockLanguages: {
-                  javascript: "JavaScript",
-                  python: "Python",
-                  css: "CSS",
-                  shell: "Shell",
-                  html: "HTML",
-                  json: "JSON",
-                },
-              }),
-              codeMirrorPlugin({
-                codeBlockLanguages: {
-                  javascript: "javascript",
-                  python: "python",
-                  css: "css",
-                  html: "html",
-                  json: "json",
-                  shell: "shell",
-                },
-              }),
-              toolbarPlugin({
-                toolbarContents: () => (
-                  <>
-                    {" "}
-                    <DiffSourceToggleWrapper>
-                      <UndoRedo />
-                      <BlockTypeSelect />
-                      <BoldItalicUnderlineToggles />
-                      <InsertTable />
-                      <InsertImage />
-                      <InsertThematicBreak />
-                      <InsertCodeBlock />
-                      <CodeToggle />
-                      <ListsToggle />
-                      <CreateLink />
-                      <Separator />
-                    </DiffSourceToggleWrapper>
-                  </>
-                ),
-              }),
-            ]}
-            contentEditableClassName="mdx-editor"
-          />
-        </div>
+            <MDXEditor
+              ref={editorRef}
+              markdown={cont}
+              onChange={handleEditorChange}
+              plugins={[
+                headingsPlugin(),
+                linkPlugin(),
+                markdownShortcutPlugin(),
+                listsPlugin(),
+                thematicBreakPlugin(),
+                linkDialogPlugin(),
+                codeBlockPlugin({
+                  defaultCodeBlockLanguage: "javascript",
+                }),
+                imagePlugin(),
+                tablePlugin(),
+                thematicBreakPlugin(),
+                quotePlugin(),
+                diffSourcePlugin({
+                  diffMarkdown: initialMarkdown,
+                  viewMode: "rich-text",
+                }),
+                codeBlockPlugin({
+                  defaultCodeBlockLanguage: "js",
+                  defaultCodeBlockTheme: "dark",
+                  codeBlockLanguages: {
+                    javascript: "JavaScript",
+                    python: "Python",
+                    css: "CSS",
+                    shell: "Shell",
+                    html: "HTML",
+                    json: "JSON",
+                  },
+                }),
+                codeMirrorPlugin({
+                  codeBlockLanguages: {
+                    javascript: "javascript",
+                    python: "python",
+                    css: "css",
+                    html: "html",
+                    json: "json",
+                    shell: "shell",
+                  },
+                }),
+                toolbarPlugin({
+                  toolbarContents: () => (
+                    <>
+                      {" "}
+                      <DiffSourceToggleWrapper>
+                        <UndoRedo />
+                        <BlockTypeSelect />
+                        <BoldItalicUnderlineToggles />
+                        <InsertTable />
+                        <InsertImage />
+                        <InsertThematicBreak />
+                        <InsertCodeBlock />
+                        <CodeToggle />
+                        <ListsToggle />
+                        <CreateLink />
+                        <Separator />
+                      </DiffSourceToggleWrapper>
+                    </>
+                  ),
+                }),
+              ]}
+              contentEditableClassName="mdx-editor"
+            />
+          </StickyEditor>
+        </EditorWrapper>
 
         <PublishWrapper $showPublishComponent={!showPublishComponent}>
           <PublishComponent
@@ -533,6 +535,7 @@ export default Write;
 const Container = styled.div`
   display: flex;
   flex-direction: column;
+  height: 100vh;
 `;
 
 const PreviewPublish = styled.div`
@@ -547,10 +550,11 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
   gap: 2rem;
-  margin: 1rem;
+  height: calc(100vh - 70px); // Adjust based on the height of PreviewPublish
+  overflow: hidden;
+
 
   .btn {
-    width: 50%;
     padding: 0.5rem 1rem;
     border: none;
     border-radius: 5px;
@@ -559,45 +563,50 @@ const Wrapper = styled.div`
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
+    width: 50%;
   }
 
   @media only screen and (max-width: 768px) {
     flex-direction: column;
-    margin: 0 auto;
+    height: auto;
+    overflow: visible;
+  }
+`;
+const EditorWrapper = styled.div`
+  flex: 5;
+  overflow-y: auto;
+  padding: 0 1rem;
+
+  @media only screen and (max-width: 768px) {
+    flex: none;
+    height: auto;
+  }
+`;
+
+const StickyEditor = styled.div`
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 1rem;
+
+  input, textarea {
+    background-color: transparent;
+    border: none;
+    outline: none;
   }
 
-  .Editor {
-    flex: 5;
-    margin-left: 5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+  textarea {
+    resize: none;
+  }
 
-    @media only screen and (max-width: 768px) {
-      margin-left: 0;
-    }
+  .mdx-editor {
+    min-height: 300px; // Adjust as needed
+  }
 
-    .Box-editor {
-      height: 100%;
-      max-width: 100%;
-      display: flex;
-      flex-direction: column;
-    }
-
-    input {
-      background-color: transparent;
-      border: none;
-      margin-top: 0.5rem;
-      outline: none;
-    }
-
-    textarea {
-      background-color: transparent;
-      border: none;
-
-      resize: none;
-      outline: none;
-    }
+  @media only screen and (max-width: 768px) {
+    position: static;
   }
 `;
 
@@ -608,4 +617,6 @@ const PublishWrapper = styled.div`
   max-width: ${({ $showPublishComponent }) =>
     $showPublishComponent ? "100%" : 0};
   overflow: hidden;
+  overflow-y: auto;
+  height: 100%;
 `;

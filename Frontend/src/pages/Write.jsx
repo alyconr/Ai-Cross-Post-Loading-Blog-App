@@ -38,7 +38,6 @@ import { debounced } from "../utils/debounce";
 import TagsInput from "../components/tags";
 import PublishComponent from "../components/PublishComponent";
 
-import { MdOutlineOpenInNew } from "react-icons/md";
 import { IoCloseCircleOutline } from "react-icons/io5";
 import { MdPostAdd } from "react-icons/md";
 import {
@@ -65,6 +64,7 @@ const Write = () => {
   const [postId, setPostId] = useState(location?.state?.pid || "");
   const [metadataPost, setMetadataPost] = useState();
   const [initialMarkdown, setInitialMarkdown] = useState("");
+  const [post, setPost] = useState("");
 
   const [image, setImage] = useState("");
   console.log(metadataPost);
@@ -126,6 +126,7 @@ const Write = () => {
       try {
         let endpoint;
         let method;
+        let metadataUrl;
 
         if (postId) {
           endpoint = `http://localhost:9000/api/v1/posts/${location.state.pid}`;
@@ -145,7 +146,13 @@ const Write = () => {
           JSON.parse(localStorage.getItem("uploadedFile"));
         console.log(metadata);
 
-        const metadataUrl = `http://localhost:9000/uploads/${metadata.metadata.name}`;
+        if (!metadata) {
+          metadataUrl = setPost(post.post.image);
+        } else {
+          metadataUrl = `http://localhost:9000/uploads/${metadata?.metadata?.name}`;
+        }
+
+        console.log(metadataUrl);
 
         const response = await axios({
           method: method,
@@ -182,8 +189,8 @@ const Write = () => {
           }
         );
       } catch (err) {
-        console.error("Error saving draft:", err);
-        toast.error("Error saving draft");
+        console.error("Error saving draft: Please upload the image again", err);
+        toast.error("Error saving draft, Please upload the image again");
       }
     }
   };
@@ -221,6 +228,7 @@ const Write = () => {
         });
 
         const data = response.data;
+        setPost(response.data);
         console.log("Fetched data:", data);
 
         if (data.post) {
@@ -255,7 +263,7 @@ const Write = () => {
   }, [draftId, postId]);
 
   const handleDeleteDraftPost = async () => {
-    if (!postId) {
+    if (postId) {
       try {
         // Delete the draftId from localStorage
         localStorage.removeItem("draftId");
@@ -274,7 +282,6 @@ const Write = () => {
         setImage("");
         setDraftId("");
         navigate("/");
-        window.location.reload();
         toast.info("Draft deleted successfully", {
           position: "bottom-right",
           autoClose: 2500,
@@ -462,6 +469,7 @@ const Write = () => {
                     python: "Python",
                     css: "CSS",
                     shell: "Shell",
+                    bash: "Bash",
                     html: "HTML",
                     json: "JSON",
                   },
@@ -474,6 +482,7 @@ const Write = () => {
                     html: "html",
                     json: "json",
                     shell: "shell",
+                    bash: "bash",
                   },
                 }),
                 toolbarPlugin({
@@ -553,7 +562,6 @@ const Wrapper = styled.div`
   height: calc(100vh - 70px); // Adjust based on the height of PreviewPublish
   overflow: hidden;
 
-
   .btn {
     padding: 0.5rem 1rem;
     border: none;
@@ -591,7 +599,8 @@ const StickyEditor = styled.div`
   gap: 1rem;
   padding-top: 1rem;
 
-  input, textarea {
+  input,
+  textarea {
     background-color: transparent;
     border: none;
     outline: none;

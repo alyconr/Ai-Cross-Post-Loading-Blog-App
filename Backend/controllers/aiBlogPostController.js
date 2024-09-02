@@ -103,49 +103,53 @@ const generateBlogPost = async (req, res) => {
 
     const prompt = ChatPromptTemplate.fromTemplate(`
         You are a professional blog writer tasked with creating a comprehensive, SEO-optimized blog post on the topic: {keyword}
+
+      Use the following information as context:
+      {context}
+
+      Consider these relevant article titles for inspiration:
+      {sourceTitles}
+
+      And these meta descriptions for SEO insights:
+      {sourceDescriptions}
+
+      Please follow these detailed instructions:
+      {instructions}
+
+      Additional Guidelines:
+      1. Start with a compelling introduction that hooks the reader and outlines what the post will cover.
+      2. Use the following markdown structure for your post:
+         # Main Title (Include the primary keyword naturally)
+         ## Main Section 1
+         ### Subsection 1.1
+         (Content with exactly 8 paragraphs...)
+         ### Subsection 1.2
+         (Content with exactly 8 paragraphs...)
+         ### Subsection 1.3
+         (Content with exactly 8 paragraphs...)
+         ## Main Section 2
+         (and so on...)
+      3. You MUST have EXACTLY 5 main sections (##) and EXACTLY 3 subsections (###) under each main section.
+      4. Each subsection MUST contain exactly 8 paragraphs of detailed, valuable content. This is non-negotiable.
+      5. Include at least one code example or practical tip in every subsection and explain it thoroughly, using proper markdown code block formatting. For example:
+         \`\`\`javascript
+         const example = "This is a code example";
+         console.log(example);
+         \`\`\`
+      6. Suggest places for images or diagrams with descriptions of what they should illustrate, formatted like this:
+         [Image suggestion: Description of the image]
+      7. Use inline citations [1], [2], etc., when referencing specific information from the sources. please don't set colons after square brackets.
+      8. Conclude with a summary of key points and a strong call-to-action for the reader.
+      9. After the conclusion, provide 3-5 meta description options for the blog post, each under 160 characters.
+      10. Throughout the post, naturally incorporate long-tail keywords related to the main topic to improve SEO.
+      11. Use bullet points, numbered lists, and short paragraphs to improve readability and scannability.
+      12. Include a "Frequently Asked Questions" section as one of the main sections to target additional keywords and provide value.
       
-        Use the following information as context:
-        {context}
+      Remember, the goal is to create an in-depth, authoritative post that provides real value to the reader while also being optimized for search engines and monetization. Make the content engaging, informative, and well-structured.
+
+      Do not include a table of contents or a reference list - these will be added automatically in post-processing.
+    `);
       
-        Consider these relevant article titles for inspiration:
-        {sourceTitles}
-      
-        And these meta descriptions for SEO insights:
-        {sourceDescriptions}
-      
-        Please follow these detailed instructions:
-        {instructions}
-      
-        Additional Guidelines:
-        1. Start with a compelling introduction that hooks the reader and outlines what the post will cover.
-        2. Use the following markdown structure for your post:
-           # Main Title (Include the primary keyword)
-           ## Main Section 1
-           ### Subsection 1.1
-           (Content with at least 8 paragraphs...)
-           ### Subsection 1.2
-           (Content with at least 8 paragraphs...)
-           ### Subsection 1.3
-           (Content with at least 8 paragraphs...)
-           ## Main Section 2
-           (and so on...)
-        3. You MUST have at least 5 main sections (##) and EXACTLY 3 subsections (###) under each main section.
-        4. Each subsection MUST contain at least 8 paragraphs of detailed, valuable content. No exceptions.
-        5. Include at least one code example in each main section, using proper markdown code block formatting. For example:
-           \`\`\`javascript
-           const example = "This is a code example";
-           console.log(example);
-           \`\`\`
-        6. Suggest places for images or diagrams with descriptions of what they should illustrate, formatted like this:
-           [Image suggestion: Description of the image]
-        7. Use inline citations [1], [2], etc., when referencing specific information from the sources.
-        8. Conclude with a summary of key points and a call-to-action for the reader.
-        9. After the conclusion, provide 3-5 meta description options for the blog post, each under 160 characters.
-      
-        Remember, the goal is to create an in-depth, authoritative post that provides real value to the reader while also being optimized for search engines. Make the content engaging, informative, and well-structured.
-      
-        Do not include a table of contents or a reference list - these will be added automatically in post-processing.
-      `);
 
     const chain = prompt.pipe(model);
 
@@ -267,43 +271,58 @@ const getInstructions = () => {
        - Do not create a table of contents manually; it will be generated automatically.
        - Each subsection MUST have EXACTLY 5 paragraphs of detailed, informative content. No exceptions.
 
-    2. Content Quality:
+    2. Content Quality and Monetization:
        - The blog post should be comprehensive, informative, and engaging.
-       - Use a professional tone while keeping the content accessible to a general audience.
+       - Use a professional yet conversational tone to keep readers engaged.
        - Include real-world examples, case studies, or practical applications in every main section.
-       - Provide at least one code example in each main section and explain it thoroughly.
+       - Provide at least one code example or actionable tip in each subsection and explain it thoroughly.
+       - Incorporate affiliate marketing opportunities naturally by recommending relevant products or services.
+       - Include a "Resource Section" with links to helpful tools or products (potential for affiliate links).
 
     3. SEO Optimization:
-       - Craft an SEO-optimized title that includes the main keyword.
-       - Use the main keyword and related terms naturally throughout the content.
+       - Craft an SEO-optimized title that includes the main keyword naturally.
+       - Use the main keyword and related long-tail keywords naturally throughout the content.
        - Include meta description suggestions that are compelling and include the main keyword.
+       - Optimize headings (H2, H3) with relevant keywords.
+       - Use internal linking to refer to other relevant content on the blog (placeholder links are fine).
+       - Include LSI (Latent Semantic Indexing) keywords throughout the content.
 
     4. Specific Content Requirements:
        - In the introduction, clearly state the purpose of the blog post and what readers will learn.
        - For each main section:
          * Begin with a brief overview of what the section will cover.
          * Ensure smooth transitions between subsections.
-         * Conclude with a summary of key points.
+         * Conclude with a summary of key points and how they relate to the overall topic.
        - Include a "Best Practices" or "Tips and Tricks" section as one of the main sections.
-       - Address common questions or misconceptions related to the topic in each main section.
+       - Address common questions or misconceptions related to the topic in a dedicated FAQ section.
 
     5. Technical Considerations:
-       - Include at least one code snippet in each main section, using proper markdown code block formatting.
+       - Include at least one code snippet or practical example in each main section, using proper markdown code block formatting.
        - Explain any technical terms or jargon that may not be familiar to all readers.
-       - If discussing tools or libraries, mention version numbers where relevant.
+       - If discussing tools or libraries, mention version numbers where relevant and provide installation instructions where applicable.
 
-    6. Visual Elements:
-       - Suggest places for images or diagrams in each main section, describing what these visual elements should illustrate.
+    6. Visual Elements and Rich Media:
+       - Suggest places for images, diagrams, or infographics in each main section, describing what these visual elements should illustrate.
        - Format image suggestions like this: [Image suggestion: Description of the image]
+       - Recommend places to embed relevant videos or podcasts to increase time on page.
 
     7. References and Citations:
        - Cite sources for specific facts, statistics, or quotes using inline citations [1], [2], etc.
+       - Include a mix of academic and industry sources to add credibility.
 
-    8. Engagement:
+    8. Engagement and Monetization Strategies:
        - Use rhetorical questions, analogies, or thought-provoking statements to keep the reader engaged.
-       - Encourage reader interaction where appropriate, such as suggesting they try out a technique or share their experiences.
+       - Encourage reader interaction by suggesting they leave comments, share their experiences, or ask questions.
+       - Include social proof elements, such as expert quotes or user testimonials, where relevant.
+       - Suggest email newsletter sign-up opportunities at strategic points in the content.
+       - Mention any relevant downloadable resources (e.g., checklists, templates) that could be used for lead generation.
 
-    Remember, the goal is to create a comprehensive, well-structured, and valuable resource for the reader while optimizing for search engines. Strictly adhere to the structure and content requirements.
+    9. Call-to-Action (CTA):
+       - Include a strong, clear CTA at the end of each main section and in the conclusion.
+       - Vary CTAs between engagement actions (comment, share), lead generation (sign up for newsletter), and potential monetization (check out this tool, enroll in this course).
+
+    Remember, the goal is to create a comprehensive, well-structured, and valuable resource for the reader while optimizing for search engines and monetization opportunities. Strictly adhere to the structure and content requirements.
+    IMPORTANT: Ensure that each subsection contains EXACTLY 8 paragraphs with its own code example. This is a strict requirement and must be followed without exception.
   `;
 };
 

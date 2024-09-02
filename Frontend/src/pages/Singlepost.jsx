@@ -381,14 +381,15 @@ const MdxContent = styled.div`
   }
 
   pre {
-    background-color: #f4f4f4;
+    background-color: #000000;
     padding: 1em;
     border-radius: 4px;
     overflow-x: auto;
   }
 
   code {
-    background-color: #f4f4f4;
+   
+    color: #09ce33;
     padding: 0.2em 0.4em;
     border-radius: 3px;
     font-family: monospace;

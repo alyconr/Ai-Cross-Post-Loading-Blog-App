@@ -12,6 +12,8 @@ const {
   updateDevToken,
   updateMediumToken,
   updateHashnodeToken,
+  updateOpenAiApiKey,
+  getOpenAiApiKey,
   getMediumToken,
   getDevToken,
   getHashnodeToken,
@@ -40,6 +42,11 @@ router
   .route("/hashnodeToken/:userId")
   .get(authorized, getHashnodeToken)
   .put(authorized, updateHashnodeToken);
+
+router
+  .route("/openAiApiKey/:userId")
+  .get(authorized, getOpenAiApiKey)
+  .put(authorized, updateOpenAiApiKey);
 
 router.route("/apikeys/:userId").get(authorized, getApiKeys);
 module.exports = router;

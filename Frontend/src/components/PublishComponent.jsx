@@ -17,13 +17,17 @@ const PublishComponent = ({
   handleCancel,
   handlePublishAndDeleteDraft,
   setCat,
-  metadataPost
+  metadataPost,
+
+
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [metadataObject, setMetadataObject] = useState("");
   
   console.log('Original metadataPost:', metadataPost);
 
+
+  
   useEffect(() => {
     if (metadataPost) {
       if (typeof metadataPost === 'string') {
@@ -83,12 +87,12 @@ const PublishComponent = ({
           </button>
         )}
         <h5>
-        {image || file
-    ? image?.metadata?.name || file?.metadata?.name || metadataObject?.name
+        {image || file 
+    ? image?.metadata?.name || file?.metadata?.name || metadataObject?.name 
     : "No uploaded image"}
         </h5>
         <hr />
-        {(file?.metadata || image?.metadata?.name  ||  metadataObject?.name) ? (
+        {(file?.metadata || image?.metadata?.name  ||  metadataObject?.name ) ? (
   <div className="actions d-flex justify-content-between gap-3">
     <button className="btn" onClick={handleShowModal}>
       Publish

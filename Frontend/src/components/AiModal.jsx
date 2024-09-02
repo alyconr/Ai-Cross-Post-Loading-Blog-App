@@ -106,12 +106,12 @@ const AiModal = ({ aiAgent, handleClose }) => {
 
   const scrollToAnchor = (e) => {
     e.preventDefault();
-    const href = e.target.getAttribute('href');
-    if (href.startsWith('#')) {
+    const href = e.target.getAttribute("href");
+    if (href.startsWith("#")) {
       const id = href.slice(1);
       const element = document.getElementById(id);
       if (element) {
-        element.scrollIntoView({behavior: 'smooth'});
+        element.scrollIntoView({ behavior: "smooth" });
       }
     }
   };
@@ -133,7 +133,7 @@ const AiModal = ({ aiAgent, handleClose }) => {
 
         {showCard && (
           <StyledModalBody>
-            {!blogPost ? (
+            {!loading ? (
               <OpenaiCard>
                 <InputGroup>
                   <p>Enter The number of web references (Max 10)</p>
@@ -196,7 +196,7 @@ const AiModal = ({ aiAgent, handleClose }) => {
                   onClick={handleGenerateBlogPost}
                   disabled={loading || !keyword || !openAiApiKeySaved}
                 >
-                  {loading ? "Generating..." : "Generate Blog"}
+                  Generate Blog
                 </StyledGenerateButton>
 
                 {error && <p className="text-danger">{error}</p>}
@@ -210,6 +210,17 @@ const AiModal = ({ aiAgent, handleClose }) => {
                 </p>
               </OpenaiCard>
             ) : (
+              <LoadingContainer>
+              <Spinner>
+                <div className="loader"></div>
+              </Spinner>
+              <LoadingMessage>
+                Please wait while your blog post is being generated. This may take a few minutes.
+              </LoadingMessage>
+            </LoadingContainer>
+            )}
+
+            {!loading && blogPost && (
               <BlogPostContainer>
                 <div className="header">
                   <h3>Generated Blog Post:</h3>
@@ -221,7 +232,7 @@ const AiModal = ({ aiAgent, handleClose }) => {
                   <ReactMarkdown
                     components={{
                       code({ node, inline, className, children, ...props }) {
-                        const match = /language-(\w+)/.exec(className || ""); 
+                        const match = /language-(\w+)/.exec(className || "");
                         return !inline && match ? (
                           <SyntaxHighlighter
                             style={solarizedlight}
@@ -396,4 +407,50 @@ const OpenaiButton = styled(Button)`
   &:hover {
     background: transparent;
   }
+`;
+
+const Spinner = styled.div`
+  margin-top: 1rem;
+  .loader {
+    width: 70px;
+    aspect-ratio: 1;
+    background: radial-gradient(farthest-side, #ffa516 90%, #0000) center/16px
+        16px,
+      radial-gradient(farthest-side, green 90%, #0000) bottom/12px 12px;
+    background-repeat: no-repeat;
+    animation: l17 1s infinite linear;
+    position: relative;
+  }
+  .loader::before {
+    content: "";
+    position: absolute;
+    width: 8px;
+    aspect-ratio: 1;
+    inset: auto 0 16px;
+    margin: auto;
+    background: #ccc;
+    border-radius: 50%;
+    transform-origin: 50% calc(100% + 10px);
+    animation: inherit;
+    animation-duration: 0.5s;
+  }
+  @keyframes l17 {
+    100% {
+      transform: rotate(1turn);
+    }
+  }
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
+
+const LoadingMessage = styled.p`
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 1rem;
+  color: #666;
 `;

@@ -11,7 +11,7 @@ const { OpenAIEmbeddings } = require("@langchain/openai");
 const { ChatOpenAI } = require("@langchain/openai");
 const { ChatPromptTemplate } = require("@langchain/core/prompts");
 const { google } = require("googleapis");
-const { Document } = require("langchain/document");
+
 const { postProcessBlogPost } = require("../Helpers/postProcessBlogPost.js");
 
 const qdrantClient = new QdrantClient({
@@ -90,7 +90,7 @@ const generateBlogPost = async (req, res) => {
 
     const model = new ChatOpenAI({
       openAIApiKey: openAiApiKey,
-      temperature: 0.7,
+      temperature: 0.5,
       modelName: "gpt-4-turbo",
     });
 
@@ -101,55 +101,92 @@ const generateBlogPost = async (req, res) => {
       .filter(Boolean)
       .join("\n");
 
-    const prompt = ChatPromptTemplate.fromTemplate(`
-        You are a professional blog writer tasked with creating a comprehensive, SEO-optimized blog post on the topic: {keyword}
-
-      Use the following information as context:
-      {context}
-
-      Consider these relevant article titles for inspiration:
-      {sourceTitles}
-
-      And these meta descriptions for SEO insights:
-      {sourceDescriptions}
-
-      Please follow these detailed instructions:
-      {instructions}
-
-      Additional Guidelines:
-      1. Start with a compelling introduction that hooks the reader and outlines what the post will cover.
-      2. Use the following markdown structure for your post:
-         # Main Title (Include the primary keyword naturally)
-         ## Main Section 1
-         ### Subsection 1.1
-         (Content with exactly 8 paragraphs...)
-         ### Subsection 1.2
-         (Content with exactly 8 paragraphs...)
-         ### Subsection 1.3
-         (Content with exactly 8 paragraphs...)
-         ## Main Section 2
-         (and so on...)
-      3. You MUST have EXACTLY 5 main sections (##) and EXACTLY 3 subsections (###) under each main section.
-      4. Each subsection MUST contain exactly 8 paragraphs of detailed, valuable content. This is non-negotiable.
-      5. Include at least one code example or practical tip in every subsection and explain it thoroughly, using proper markdown code block formatting. For example:
-         \`\`\`javascript
-         const example = "This is a code example";
-         console.log(example);
-         \`\`\`
-      6. Suggest places for images or diagrams with descriptions of what they should illustrate, formatted like this:
-         [Image suggestion: Description of the image]
-      7. Use inline citations [1], [2], etc., when referencing specific information from the sources. please don't set colons after square brackets.
-      8. Conclude with a summary of key points and a strong call-to-action for the reader.
-      9. After the conclusion, provide 3-5 meta description options for the blog post, each under 160 characters.
-      10. Throughout the post, naturally incorporate long-tail keywords related to the main topic to improve SEO.
-      11. Use bullet points, numbered lists, and short paragraphs to improve readability and scannability.
-      12. Include a "Frequently Asked Questions" section as one of the main sections to target additional keywords and provide value.
+      const getInstructions = () => {
+        return `
+          1. Structure:
+             - Main Title: 1 (Use the given keyword, prefixed with a single #)
+             - Main Sections: Exactly 5 (prefixed with ##)
+             - Subsections: Exactly 3 per main section (prefixed with ###)
+             - Paragraphs: Exactly 8 per subsection
+             - Code Examples: At least 1 per subsection
       
-      Remember, the goal is to create an in-depth, authoritative post that provides real value to the reader while also being optimized for search engines and monetization. Make the content engaging, informative, and well-structured.
-
-      Do not include a table of contents or a reference list - these will be added automatically in post-processing.
-    `);
+          2. Content Generation Steps:
+             a. Start with the main title using a single #
+             b. Create exactly 5 main sections using ##
+             c. Under each main section, create exactly 3 subsections using ###
+             d. For each subsection:
+                - Write exactly 8 paragraphs
+                - Include at least one relevant code example
+                - After each paragraph, add a comment: <!-- Paragraph X -->
+                - Ensure the code example is practical and explained thoroughly
+             e. Use markdown formatting throughout
+             f. Use clear, descriptive titles for sections and subsections
+             g. Do not add any anchor links or HTML tags to the content
       
+          3. SEO Optimization:
+             - Use the main keyword in the title and naturally throughout the content
+             - Optimize headings (##, ###) with relevant keywords
+      
+          4. Engagement:
+             - Use a professional yet conversational tone
+             - Include real-world examples or case studies in each subsection
+             - Suggest image placements with descriptions: [Image: Description]
+      
+          5. Conclusion:
+             - Add a ## Conclusion section at the end
+             - Summarize key points
+             - Include a call-to-action
+      
+          6. After the conclusion:
+             - Add a ## Meta Description Options section
+             - Provide 3-5 meta description options (under 160 characters each)
+      
+          CRITICAL: Follow the structure exactly. Each subsection MUST have 8 paragraphs and at least one code example. No exceptions. Do not add any additional headings or sections beyond what is specified here.
+        `;
+      };
+      
+      const prompt = ChatPromptTemplate.fromTemplate(`
+      You are a professional blog writer creating a comprehensive, SEO-optimized post on: {keyword}
+      
+      Context: {context}
+      Relevant Titles: {sourceTitles}
+      SEO Insights: {sourceDescriptions}
+      
+      Instructions: {instructions}
+      
+      Follow this exact structure:
+      
+      # Main Title (Use the keyword)
+      
+      ## Main Section 1
+      ### Subsection 1.1
+      (Exactly 8 paragraphs with paragraph comments, at least one code example)
+      ### Subsection 1.2
+      (Exactly 8 paragraphs with paragraph comments, at least one code example)
+      ### Subsection 1.3
+      (Exactly 8 paragraphs with paragraph comments, at least one code example)
+      
+      ## Main Section 2
+      (Continue this pattern for all 5 main sections)
+      
+      ## Conclusion
+      (Summary and call-to-action)
+      
+      ## Meta Description Options
+      (3-5 options)
+      
+      CRITICAL REMINDERS:
+      1. You MUST have EXACTLY 5 main sections (##) and 3 subsections (###) per main section.
+      2. Each subsection MUST have EXACTLY 8 paragraphs. Use comments to track: <!-- Paragraph 1 -->, <!-- Paragraph 2 -->, etc.
+      3. Each subsection MUST include at least one code example.
+      4. Explain all code examples thoroughly.
+      5. Do not skip or combine any sections or subsections.
+      6. Use clear, descriptive titles for all sections and subsections.
+      7. Do not add any additional headings or sections beyond what is specified in the structure.
+      8. Do not add any HTML tags or anchor links to the content.
+      
+      Generate the blog post now, following this structure exactly.
+      `);
 
     const chain = prompt.pipe(model);
 
@@ -161,8 +198,6 @@ const generateBlogPost = async (req, res) => {
       sourceDescriptions,
     });
 
-   
-   
     // Clean up by deleting the collection after use
     await qdrantClient.deleteCollection(collectionName);
 
@@ -258,72 +293,6 @@ const loadDocuments = async (urls) => {
     }
   }
   return documents;
-};
-
-const getInstructions = () => {
-  return `
-    1. Structure and Formatting:
-       - Use proper markdown formatting throughout the blog post.
-       - Structure the blog post with this exact hierarchy:
-         # Main Title (only one, at the top)
-         ## Main Sections (EXACTLY 5)
-         ### Subsections (EXACTLY 3 per main section)
-       - Do not create a table of contents manually; it will be generated automatically.
-       - Each subsection MUST have EXACTLY 5 paragraphs of detailed, informative content. No exceptions.
-
-    2. Content Quality and Monetization:
-       - The blog post should be comprehensive, informative, and engaging.
-       - Use a professional yet conversational tone to keep readers engaged.
-       - Include real-world examples, case studies, or practical applications in every main section.
-       - Provide at least one code example or actionable tip in each subsection and explain it thoroughly.
-       - Incorporate affiliate marketing opportunities naturally by recommending relevant products or services.
-       - Include a "Resource Section" with links to helpful tools or products (potential for affiliate links).
-
-    3. SEO Optimization:
-       - Craft an SEO-optimized title that includes the main keyword naturally.
-       - Use the main keyword and related long-tail keywords naturally throughout the content.
-       - Include meta description suggestions that are compelling and include the main keyword.
-       - Optimize headings (H2, H3) with relevant keywords.
-       - Use internal linking to refer to other relevant content on the blog (placeholder links are fine).
-       - Include LSI (Latent Semantic Indexing) keywords throughout the content.
-
-    4. Specific Content Requirements:
-       - In the introduction, clearly state the purpose of the blog post and what readers will learn.
-       - For each main section:
-         * Begin with a brief overview of what the section will cover.
-         * Ensure smooth transitions between subsections.
-         * Conclude with a summary of key points and how they relate to the overall topic.
-       - Include a "Best Practices" or "Tips and Tricks" section as one of the main sections.
-       - Address common questions or misconceptions related to the topic in a dedicated FAQ section.
-
-    5. Technical Considerations:
-       - Include at least one code snippet or practical example in each main section, using proper markdown code block formatting.
-       - Explain any technical terms or jargon that may not be familiar to all readers.
-       - If discussing tools or libraries, mention version numbers where relevant and provide installation instructions where applicable.
-
-    6. Visual Elements and Rich Media:
-       - Suggest places for images, diagrams, or infographics in each main section, describing what these visual elements should illustrate.
-       - Format image suggestions like this: [Image suggestion: Description of the image]
-       - Recommend places to embed relevant videos or podcasts to increase time on page.
-
-    7. References and Citations:
-       - Cite sources for specific facts, statistics, or quotes using inline citations [1], [2], etc.
-       - Include a mix of academic and industry sources to add credibility.
-
-    8. Engagement and Monetization Strategies:
-       - Use rhetorical questions, analogies, or thought-provoking statements to keep the reader engaged.
-       - Encourage reader interaction by suggesting they leave comments, share their experiences, or ask questions.
-       - Include social proof elements, such as expert quotes or user testimonials, where relevant.
-       - Suggest email newsletter sign-up opportunities at strategic points in the content.
-       - Mention any relevant downloadable resources (e.g., checklists, templates) that could be used for lead generation.
-
-    9. Call-to-Action (CTA):
-       - Include a strong, clear CTA at the end of each main section and in the conclusion.
-       - Vary CTAs between engagement actions (comment, share), lead generation (sign up for newsletter), and potential monetization (check out this tool, enroll in this course).
-
-    Remember, the goal is to create a comprehensive, well-structured, and valuable resource for the reader while optimizing for search engines and monetization opportunities. Strictly adhere to the structure and content requirements.
-    IMPORTANT: Ensure that each subsection contains EXACTLY 8 paragraphs with its own code example. This is a strict requirement and must be followed without exception.
-  `;
 };
 
 module.exports = {

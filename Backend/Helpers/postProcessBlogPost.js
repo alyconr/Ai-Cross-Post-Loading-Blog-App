@@ -44,7 +44,10 @@ const postProcessBlogPost = (content, documents) => {
       );
 
       // Replace original heading with a markdown-style anchor link
-      content = content.replace(heading, `<a id="${slug}"></a>\n\n${heading}`);
+      const headingRegex = new RegExp(`^${heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'm');
+      
+        content = content.replace(headingRegex, `<a id="${slug}"></a>\n\n${heading}`);
+      
     });
 
     toc += tocEntries.join("\n");
@@ -66,7 +69,7 @@ const postProcessBlogPost = (content, documents) => {
     // Add citations
     documents.forEach((doc, index) => {
       if (doc.metadata && doc.metadata.source && doc.metadata.title) {
-        const citation = `[${index + 1}]: ${doc.metadata.source} "${
+        const citation = `[${index + 1}] ${doc.metadata.source} "${
           doc.metadata.title
         }"`;
         content += `\n\n${citation}`;

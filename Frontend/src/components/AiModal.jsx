@@ -29,6 +29,7 @@ const AiModal = ({ aiAgent, handleClose }) => {
     setLoading(true);
     setError("");
     setBlogPost("");
+    
 
     try {
       const response = await axios.post(
@@ -118,150 +119,159 @@ const AiModal = ({ aiAgent, handleClose }) => {
 
   return (
     <>
-      <Modal show={aiAgent} onHide={handleClose} fullscreen={true}>
+      <Modal show={aiAgent} onHide={handleClose} fullscreen={true} >
         <Modal.Header closeButton>
           <Modal.Title className="ms-auto">
             GREAT, THIS IS YOU AI AGENT BASED ON OPEN AI MODEL
           </Modal.Title>
         </Modal.Header>
-        <CenteredDiv>
-          <StyledButton onClick={handleShowCard}>
-            <p>Let's Generate A Blog Post</p>
-            <AnimatedArrow />
-          </StyledButton>
-        </CenteredDiv>
 
-        {showCard && (
-          <StyledModalBody>
-            {!loading ? (
-              <OpenaiCard>
-                <InputGroup>
-                  <p>Enter The number of web references (Max 10)</p>
-                  <StyledInput
-                    type="number"
-                    min="1"
-                    max="10"
-                    onChange={(e) =>
-                      setNumReferences(
-                        Math.min(10, Math.max(1, parseInt(e.target.value)))
-                      )
-                    }
-                    value={numReferences}
-                  />
-                </InputGroup>
+        {!blogPost ? (
+          <>
+            <CenteredDiv>
+              <StyledButton onClick={handleShowCard}>
+                <p>Let's Generate A Blog Post</p>
+                <AnimatedArrow />
+              </StyledButton>
+            </CenteredDiv>
 
-                <InputGroup>
-                  <p>
-                    Enter Your OpenAi API key{" "}
-                    <a
-                      href="https://platform.openai.com/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      OpenAi API key
-                    </a>
-                  </p>
-                  <div className="openai-key">
-                    <PasswordInputWrapper>
+            {showCard && (
+              <StyledModalBody>
+                {!loading && !blogPost ? (
+                  <OpenaiCard>
+                    <InputGroup>
+                      <p>Enter The number of web references (Max 10)</p>
                       <StyledInput
-                        type={showPassword ? "text" : "password"}
+                        type="number"
+                        min="1"
+                        max="10"
                         onChange={(e) =>
-                          setOpenAiApiKey(e.target.value) ||
-                          setOpenAiApiKeySaved(e.target.value)
+                          setNumReferences(
+                            Math.min(10, Math.max(1, parseInt(e.target.value)))
+                          )
                         }
-                        value={openAiApiKeySaved}
+                        value={numReferences}
                       />
-                      <TogglePasswordButton onClick={togglePasswordVisibility}>
-                        {showPassword ? <FaEyeSlash /> : <FaEye />}
-                      </TogglePasswordButton>
-                    </PasswordInputWrapper>
+                    </InputGroup>
 
-                    <OpenaiButton title="Save" onClick={handleSaveOpenAiApiKey}>
-                      <img src={save} alt="save" />
-                    </OpenaiButton>
-                  </div>
-                </InputGroup>
-
-                <InputGroup>
-                  <p>Enter The topic that you want to generate</p>
-                  <StyledInput
-                    type="text"
-                    onChange={(e) => setKeyword(e.target.value)}
-                    value={keyword}
-                  />
-                </InputGroup>
-
-                <StyledGenerateButton
-                  variant="primary"
-                  onClick={handleGenerateBlogPost}
-                  disabled={loading || !keyword || !openAiApiKeySaved}
-                >
-                  Generate Blog
-                </StyledGenerateButton>
-
-                {error && <p className="text-danger">{error}</p>}
-
-                <p>
-                  Don't you know how to use our AI agents yet?{" "}
-                  <Link to={`/Dashboard/${currentUser.user.name}`}>
-                    Click here
-                  </Link>{" "}
-                  to our AiAgents FAQ's{" "}
-                </p>
-              </OpenaiCard>
-            ) : (
-              <LoadingContainer>
-              <Spinner>
-                <div className="loader"></div>
-              </Spinner>
-              <LoadingMessage>
-                Please wait while your blog post is being generated. This may take a few minutes.
-              </LoadingMessage>
-            </LoadingContainer>
-            )}
-
-            {!loading && blogPost && (
-              <BlogPostContainer>
-                <div className="header">
-                  <h3>Generated Blog Post:</h3>
-                  <Button variant="secondary" onClick={copyToClipboard}>
-                    Copy to Clipboard
-                  </Button>
-                </div>
-                <BlogPostContent>
-                  <ReactMarkdown
-                    components={{
-                      code({ node, inline, className, children, ...props }) {
-                        const match = /language-(\w+)/.exec(className || "");
-                        return !inline && match ? (
-                          <SyntaxHighlighter
-                            style={solarizedlight}
-                            language={match[1]}
-                            PreTag="div"
-                            {...props}
+                    <InputGroup>
+                      <p>
+                        Enter Your OpenAi API key{" "}
+                        <a
+                          href="https://platform.openai.com/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          OpenAi API key
+                        </a>
+                      </p>
+                      <div className="openai-key">
+                        <PasswordInputWrapper>
+                          <StyledInput
+                            type={showPassword ? "text" : "password"}
+                            onChange={(e) =>
+                              setOpenAiApiKey(e.target.value) ||
+                              setOpenAiApiKeySaved(e.target.value)
+                            }
+                            value={openAiApiKeySaved}
+                          />
+                          <TogglePasswordButton
+                            onClick={togglePasswordVisibility}
                           >
-                            {String(children).replace(/\n$/, "")}
-                          </SyntaxHighlighter>
-                        ) : (
-                          <code className={className} {...props}>
-                            {children}
-                          </code>
-                        );
-                      },
-                      a: ({ node, ...props }) => {
-                        if (props.id) {
-                          return <a id={props.id} />;
-                        }
-                        return <a {...props} onClick={scrollToAnchor} />;
-                      },
-                    }}
-                  >
-                    {blogPost}
-                  </ReactMarkdown>
-                </BlogPostContent>
-              </BlogPostContainer>
+                            {showPassword ? <FaEyeSlash /> : <FaEye />}
+                          </TogglePasswordButton>
+                        </PasswordInputWrapper>
+
+                        <OpenaiButton
+                          title="Save"
+                          onClick={handleSaveOpenAiApiKey}
+                        >
+                          <img src={save} alt="save" />
+                        </OpenaiButton>
+                      </div>
+                    </InputGroup>
+
+                    <InputGroup>
+                      <p>Enter The topic that you want to generate</p>
+                      <StyledInput
+                        type="text"
+                        onChange={(e) => setKeyword(e.target.value)}
+                        value={keyword}
+                      />
+                    </InputGroup>
+
+                    <StyledGenerateButton
+                      variant="primary"
+                      onClick={handleGenerateBlogPost}
+                      disabled={loading || !keyword || !openAiApiKeySaved}
+                    >
+                      Generate Blog
+                    </StyledGenerateButton>
+
+                    {error && <p className="text-danger">{error}</p>}
+
+                    <p>
+                      Don't you know how to use our AI agents yet?{" "}
+                      <Link to={`/Dashboard/${currentUser.user.name}`}>
+                        Click here
+                      </Link>{" "}
+                      to our AiAgents FAQ's{" "}
+                    </p>
+                  </OpenaiCard>
+                ) : (
+                  <LoadingContainer>
+                    <Spinner>
+                      <div className="loader"></div>
+                    </Spinner>
+                    <LoadingMessage>
+                      Please wait while your blog post is being generated. This
+                      may take a few minutes.
+                    </LoadingMessage>
+                  </LoadingContainer>
+                )}
+              </StyledModalBody>
             )}
-          </StyledModalBody>
+          </>
+        ) : (
+          <BlogPostContainer>
+            <div className="header">
+              <h3>Generated Blog Post:</h3>
+              <Button variant="secondary" onClick={copyToClipboard}>
+                Copy to Clipboard
+              </Button>
+            </div>
+            <BlogPostContent>
+              <ReactMarkdown
+                components={{
+                  code({ node, inline, className, children, ...props }) {
+                    const match = /language-(\w+)/.exec(className || "");
+                    return !inline && match ? (
+                      <SyntaxHighlighter
+                        style={solarizedlight}
+                        language={match[1]}
+                        PreTag="div"
+                        {...props}
+                      >
+                        {String(children).replace(/\n$/, "")}
+                      </SyntaxHighlighter>
+                    ) : (
+                      <code className={className} {...props}>
+                        {children}
+                      </code>
+                    );
+                  },
+                  a: ({ node, ...props }) => {
+                    if (props.id) {
+                      return <a id={props.id} />;
+                    }
+                    return <a {...props} onClick={scrollToAnchor} />;
+                  },
+                }}
+              >
+                {blogPost}
+              </ReactMarkdown>
+            </BlogPostContent>
+          </BlogPostContainer>
         )}
       </Modal>
     </>
@@ -300,8 +310,8 @@ const OpenaiCard = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
   max-width: 500px;
+  height: auto;
   margin: 0 auto;
   padding: 2rem;
   border-radius: 10px;
@@ -356,14 +366,12 @@ const StyledGenerateButton = styled(Button)`
 `;
 
 const BlogPostContainer = styled.div`
-  width: 100%;
-  max-width: 900px;
+  width: auto;
   padding: 1.5rem;
   border-radius: 8px;
   background-color: #fff;
   box-shadow: ${(blogPost) =>
     blogPost ? "none" : "0 2px 4px 6px rgba(0.1, 0.1, 0, 0.1)"};
-  max-height: 400px;
 
   .header {
     display: flex;
@@ -377,6 +385,9 @@ const BlogPostContent = styled.div`
   background-color: #fff;
   padding: 1.5rem;
   border-radius: 8px;
+  box-shadow: 0 2px 4px 6px rgba(0.1, 0.1, 0, 0.1);
+  width: 900px;
+  margin: 0 auto;
 `;
 
 const AnimatedArrow = styled(FaArrowAltCircleDown)`

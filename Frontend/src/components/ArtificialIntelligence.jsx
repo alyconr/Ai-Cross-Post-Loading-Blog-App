@@ -11,18 +11,18 @@ const ArtificialIntelligenceComponent = () => {
   return (
     <Container>
       <h2>Do you want to write your post with our AI AGENT?</h2>
-      <div className="onoffswitch">
+      <div className="onoffswitch-ai">
         <input
           type="checkbox"
-          name="onoffswitch"
-          className="onoffswitch-checkbox"
+          name="onoffswitch-ai"
+          className="onoffswitch-checkbox-ai"
           id="myonoffswitch"
           checked={aiAgent}
           onChange={handleToggle}
         />
-        <label className="onoffswitch-label" htmlFor="myonoffswitch">
-          <span className="onoffswitch-inner"></span>
-          <span className="onoffswitch-switch"></span>
+        <label className="onoffswitch-label-ai" htmlFor="myonoffswitch">
+          <span className="onoffswitch-inner-ai"></span>
+          <span className="onoffswitch-switch-ai"></span>
         </label>
       </div>
       <AiModal aiAgent={aiAgent} handleClose={handleClose} />
@@ -50,7 +50,7 @@ const Container = styled.div`
     transition: all 0.3s ease-in-out;
   }
 
-  .onoffswitch {
+  .onoffswitch-ai {
     position: relative;
     width: 90px;
     -webkit-user-select: none;
@@ -58,11 +58,11 @@ const Container = styled.div`
     -ms-user-select: none;
   }
 
-  .onoffswitch-checkbox {
+  .onoffswitch-checkbox-ai {
     display: none;
   }
 
-  .onoffswitch-label {
+  .onoffswitch-label-ai {
     display: block;
     overflow: hidden;
     cursor: pointer;
@@ -70,7 +70,7 @@ const Container = styled.div`
     border-radius: 20px;
   }
 
-  .onoffswitch-inner {
+  .onoffswitch-inner-ai {
     display: block;
     width: 200%;
     margin-left: -100%;
@@ -80,8 +80,8 @@ const Container = styled.div`
     transition: margin 0.3s ease-in 0s;
   }
 
-  .onoffswitch-inner:before,
-  .onoffswitch-inner:after {
+  .onoffswitch-inner-ai:before,
+  .onoffswitch-inner-ai:after {
     display: block;
     float: left;
     width: 50%;
@@ -97,7 +97,7 @@ const Container = styled.div`
     box-sizing: border-box;
   }
 
-  .onoffswitch-inner:before {
+  .onoffswitch-inner-ai:before {
     content: "YES";
     padding-left: 10px;
     background: linear-gradient(
@@ -109,7 +109,7 @@ const Container = styled.div`
     color: #ffffff;
   }
 
-  .onoffswitch-inner:after {
+  .onoffswitch-inner-ai:after {
     content: "NO";
     padding-right: 10px;
     background-color: #eeeeee;
@@ -117,7 +117,7 @@ const Container = styled.div`
     text-align: right;
   }
 
-  .onoffswitch-switch {
+  .onoffswitch-switch-ai {
     display: block;
     width: 18px;
     margin: 6px;
@@ -134,11 +134,11 @@ const Container = styled.div`
     transition: all 0.3s ease-in 0s;
   }
 
-  .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+  .onoffswitch-checkbox-ai:checked + .onoffswitch-label-ai .onoffswitch-inner-ai {
     margin-left: 0;
   }
 
-  .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+  .onoffswitch-checkbox-ai:checked + .onoffswitch-label-ai .onoffswitch-switch-ai {
     right: 0px;
   }
 

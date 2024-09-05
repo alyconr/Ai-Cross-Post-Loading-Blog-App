@@ -76,18 +76,18 @@ const ModalBodyDevTo = ({
     <div>
       <p>Do you want to publish to Dev.to?</p>
       <CrossPosts>
-        <div className="onoffswitch">
+        <div className="onoffswitch-1">
           <input
             type="checkbox"
-            name="onoffswitch"
-            className="onoffswitch-checkbox"
-            id="myonoffswitch"
+            name="onoffswitch-1"
+            className="onoffswitch-checkbox-1"
+            id="myonoffswitch-1"
             checked={publishDevTo}
             onChange={() => setPublishDevTo(!publishDevTo)}
           />
-          <label className="onoffswitch-label" htmlFor="myonoffswitch">
-            <span className="onoffswitch-inner"></span>
-            <span className="onoffswitch-switch"></span>
+          <label className="onoffswitch-label-1" htmlFor="myonoffswitch-1">
+            <span className="onoffswitch-inner-1"></span>
+            <span className="onoffswitch-switch-1"></span>
           </label>
         </div>
 
@@ -181,7 +181,7 @@ const CrossPosts = styled.div`
     transition: all 0.3s ease-in-out;
   }
 
-  .onoffswitch {
+  .onoffswitch-1 {
     position: relative;
     width: 90px;
     -webkit-user-select: none;
@@ -189,11 +189,11 @@ const CrossPosts = styled.div`
     -ms-user-select: none;
   }
 
-  .onoffswitch-checkbox {
+  .onoffswitch-checkbox-1 {
     display: none;
   }
 
-  .onoffswitch-label {
+  .onoffswitch-label-1 {
     display: block;
     overflow: hidden;
     cursor: pointer;
@@ -201,7 +201,7 @@ const CrossPosts = styled.div`
     border-radius: 20px;
   }
 
-  .onoffswitch-inner {
+  .onoffswitch-inner-1 {
     display: block;
     width: 200%;
     margin-left: -100%;
@@ -211,8 +211,8 @@ const CrossPosts = styled.div`
     transition: margin 0.3s ease-in 0s;
   }
 
-  .onoffswitch-inner:before,
-  .onoffswitch-inner:after {
+  .onoffswitch-inner-1:before,
+  .onoffswitch-inner-1:after {
     display: block;
     float: left;
     width: 50%;
@@ -228,7 +228,7 @@ const CrossPosts = styled.div`
     box-sizing: border-box;
   }
 
-  .onoffswitch-inner:before {
+  .onoffswitch-inner-1:before {
     content: "YES";
     padding-left: 10px;
     background: linear-gradient(
@@ -240,7 +240,7 @@ const CrossPosts = styled.div`
     color: #ffffff;
   }
 
-  .onoffswitch-inner:after {
+  .onoffswitch-inner-1:after {
     content: "NO";
     padding-right: 10px;
     background-color: #eeeeee;
@@ -248,7 +248,7 @@ const CrossPosts = styled.div`
     text-align: right;
   }
 
-  .onoffswitch-switch {
+  .onoffswitch-switch-1 {
     display: block;
     width: 18px;
     margin: 6px;
@@ -265,11 +265,11 @@ const CrossPosts = styled.div`
     transition: all 0.3s ease-in 0s;
   }
 
-  .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+  .onoffswitch-checkbox-1:checked + .onoffswitch-label-1 .onoffswitch-inner-1 {
     margin-left: 0;
   }
 
-  .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+  .onoffswitch-checkbox-1:checked + .onoffswitch-label-1 .onoffswitch-switch-1 {
     right: 0px;
   }
 

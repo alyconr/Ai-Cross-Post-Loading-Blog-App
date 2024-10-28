@@ -7,6 +7,7 @@ const sharp = require("sharp");
 const path = require("path");
 const fs = require("fs");
 const app = express();
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const bodyParser = require("body-parser");
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
@@ -19,34 +20,75 @@ app.use(cookieParser());
 
 app.use("/uploads", express.static("uploads"));
 
+// Configure S3 Client
+const s3Client = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
+
 // multer
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
 });
 
+// Helper function to upload to S3
+async function uploadToS3(buffer, filename, contentType) {
+  const params = {
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: `uploads/${filename}`,
+    Body: buffer,
+    ContentType: contentType,
+    ACL: 'public-read', // Make the file publicly accessible
+  };
+
+  try {
+    await s3Client.send(new PutObjectCommand(params));
+    return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/uploads/${filename}`;
+
+  } catch (error) {
+    console.error('Error uploading to S3:', error);
+    throw error;
+  }
+}
+
+
+// Modified upload endpoint with cloud storage
 app.post("/api/v1/upload", upload.single("file"), async (req, res) => {
   const file = req.file;
 
   if (!file) {
-    // If no file is provided, respond with an error
     return res.status(400).json({ error: "No file uploaded" });
   }
 
   const filename = Date.now() + path.extname(file.originalname);
-  const filepath = path.join(__dirname, "uploads", filename);
-
+  
   try {
-    // Compress and resize image
-    await sharp(file.buffer)
+    // Process image with Sharp
+    const processedImageBuffer = await sharp(file.buffer)
       .resize(1920, 1080, { fit: "inside", withoutEnlargement: true })
       .jpeg({ quality: 80 })
-      .toFile(filepath);
+      .toBuffer();
 
-    return res.status(200).json(filename);
+    // Upload to S3
+    const fileUrl = await uploadToS3(
+      processedImageBuffer,
+      filename,
+      'image/jpeg'
+    );
+  
+
+    return res.status(200).json({
+      filename,
+      url: fileUrl
+    });
+
   } catch (error) {
-    console.error("Error processing image:", error);
-    return res.status(500).json({ error: "Error processing image" });
+    console.error("Error processing or uploading image:", error);
+    return res.status(500).json({ error: "Error processing or uploading image" });
   }
 });
 
@@ -69,6 +111,7 @@ const linkedinPost = require("./routes/linkedinPost");
 const authLinkedinPost = require("./routes/authLinkedinPost");
 const authLinkedinCallback = require("./routes/authLinkedinCallback");
 const aiBlogPostGenerator = require("./routes/aiBlogPostRoutes");
+const { connectors } = require("googleapis/build/src/apis/connectors");
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/posts", postsRouter);

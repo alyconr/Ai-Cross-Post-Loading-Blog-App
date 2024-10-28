@@ -1,6 +1,7 @@
 import Card from "./card";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const RenderDevtoPosts = ({ devtoPosts }) => {
     return (
@@ -27,6 +28,10 @@ const RenderDevtoPosts = ({ devtoPosts }) => {
         )}
       </DevtoPostsContainer>
     );
+};
+
+RenderDevtoPosts.propTypes = {
+  devtoPosts: PropTypes.array.isRequired,
 };
   
 export default RenderDevtoPosts;

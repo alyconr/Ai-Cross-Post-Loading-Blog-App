@@ -1,54 +1,54 @@
-import styled from "styled-components";
-import GlobalStyles from "./../GlobalStyles";
-import { Link } from "react-router-dom";
-import { useState } from "react";
-import axios from "axios";
-import { Modal, Button } from "react-bootstrap";
+import styled from 'styled-components';
+import GlobalStyles from './../GlobalStyles';
+import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import axios from 'axios';
+import { Modal, Button } from 'react-bootstrap';
 
 const Register = () => {
   const [inputs, setInputs] = useState({
-    fullname: "",
-    username: "",
-    email: "",
-    password: "",
+    fullname: '',
+    username: '',
+    email: '',
+    password: '',
   });
 
   const [errors, setErrors] = useState({
-    fullname: "",
-    username: "",
-    email: "",
-    password: "",
+    fullname: '',
+    username: '',
+    email: '',
+    password: '',
   });
   const [showErrorModal, setShowErrorModal] = useState(false);
   const handleChange = (e) => {
     setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-    setErrors((prev) => ({ ...prev, [e.target.name]: "" }));
+    setErrors((prev) => ({ ...prev, [e.target.name]: '' }));
   };
 
   const validateInputs = () => {
     let isValid = true;
-    const newErrors = { fullname: "", username: "", email: "", password: "" };
+    const newErrors = { fullname: '', username: '', email: '', password: '' };
 
     if (!inputs.fullname.trim()) {
-      newErrors.fullname = "Full Name is required";
+      newErrors.fullname = 'Full Name is required';
       isValid = false;
     }
 
     if (!inputs.username.trim()) {
-      newErrors.username = "Username is required";
+      newErrors.username = 'Username is required';
       isValid = false;
     }
 
     if (!inputs.email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = 'Email is required';
       isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(inputs.email)) {
-      newErrors.email = "Invalid email format";
+      newErrors.email = 'Invalid email format';
       isValid = false;
     }
 
     if (!inputs.password.trim()) {
-      newErrors.password = "Password is required";
+      newErrors.password = 'Password is required';
       isValid = false;
     }
 
@@ -61,42 +61,45 @@ const Register = () => {
 
     if (validateInputs()) {
       try {
-        await axios.post("http://localhost:9000/api/v1/auth/register", inputs);
-        window.location.href = "/Login";
+        await axios.post(
+          `${import.meta.env.VITE_API_URI}/auth/register`,
+          inputs
+        );
+        window.location.href = '/Login';
       } catch (err) {
         console.log(err);
 
         if (err.response && err.response.status === 400) {
           const errorResponse = err.response.data;
 
-          console.log("errorResponse:", errorResponse);
+          console.log('errorResponse:', errorResponse);
 
           setErrors({
-            fullname: "",
-            username: "",
-            email: "",
-            password: "",
+            fullname: '',
+            username: '',
+            email: '',
+            password: '',
           });
 
-          if (errorResponse.error === "Email already exists") {
-            setErrors((prev) => ({ ...prev, email: "Email already exists" }));
+          if (errorResponse.error === 'Email already exists') {
+            setErrors((prev) => ({ ...prev, email: 'Email already exists' }));
           }
 
-          if (errorResponse.error === "Username already exists") {
+          if (errorResponse.error === 'Username already exists') {
             setErrors((prev) => ({
               ...prev,
-              username: "Username already exists",
+              username: 'Username already exists',
             }));
           }
 
           if (
             errorResponse.error ===
-            "Password must be at least 8 characters long and contain at least one number and one special character"
+            'Password must be at least 8 characters long and contain at least one number and one special character'
           ) {
             setErrors((prev) => ({
               ...prev,
               password:
-                "Password must be at least 8 characters long and contain at least one number and one special character",
+                'Password must be at least 8 characters long and contain at least one number and one special character',
             }));
 
             setShowErrorModal(true);
@@ -188,14 +191,6 @@ const ErrorMessage = styled.div`
   color: #f00;
   font-size: 14px;
   margin: 5px 0;
-  text-align: center;
-`;
-
-const ErrorPassword = styled.div`
-  color: #fff;
-  font-size: 12px;
-  margin: 5px 10px;
-
   text-align: center;
 `;
 

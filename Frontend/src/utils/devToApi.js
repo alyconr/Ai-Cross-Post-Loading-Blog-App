@@ -1,5 +1,5 @@
-import axios from "axios";
-import { toast } from "react-toastify";
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const handleCrossPostToDevTo = async (
   title,
@@ -11,7 +11,7 @@ const handleCrossPostToDevTo = async (
   devToken,
   draftDevto
 ) => {
-  const devToProxyEndPoint = "http://localhost:9000/api/v1/devto-proxy";
+  const devToProxyEndPoint = `${import.meta.env.VITE_API_URI}/devto-proxy`;
 
   const markdownContent = `# ${description}\n\n${content}`;
 
@@ -19,7 +19,9 @@ const handleCrossPostToDevTo = async (
     title: title,
     body_markdown: markdownContent,
     published: draftDevto ? true : false,
-    main_image: `http://localhost:9000/uploads/${image?.metadata?.name}`,
+    main_image: `${import.meta.env.VITE_API_UPLOAD}/uploads/${
+      image?.metadata?.name
+    }`,
     tags: [category, tags],
     devToken,
   };
@@ -28,12 +30,12 @@ const handleCrossPostToDevTo = async (
   try {
     await axios.post(devToProxyEndPoint, articleData, {
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     });
 
-    toast.success("Article posted to Dev.to successfully", {
-      position: "bottom-center",
+    toast.success('Article posted to Dev.to successfully', {
+      position: 'bottom-center',
       autoClose: 2500,
       hideProgressBar: false,
       closeOnClick: true,
@@ -42,8 +44,8 @@ const handleCrossPostToDevTo = async (
       progress: undefined,
     });
   } catch (error) {
-    console.error("Error posting article to Dev.to:", error);
-    toast.error("Error posting article to Dev.to");
+    console.error('Error posting article to Dev.to:', error);
+    toast.error('Error posting article to Dev.to');
   }
 };
 

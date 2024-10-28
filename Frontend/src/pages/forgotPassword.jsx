@@ -1,23 +1,23 @@
-import styled from "styled-components";
-import GlobalStyles from "./../GlobalStyles";
-import { Link, useNavigate } from "react-router-dom";
-import { useContext, useState } from "react";
-import { toast } from "react-toastify";
-import axios from "axios";
+import styled from 'styled-components';
+import GlobalStyles from './../GlobalStyles';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 
 const ForgotPassword = () => {
   const [inputs, setInputs] = useState({
-    email: "",
+    email: '',
   });
 
   const [errors, setErrors] = useState({
-    email: "",
+    email: '',
   });
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-    setErrors((prev) => ({ ...prev, [e.target.name]: "" }));
+    setErrors((prev) => ({ ...prev, [e.target.name]: '' }));
   };
 
   const validateInputs = () => {
@@ -32,26 +32,26 @@ const ForgotPassword = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-   
+
     if (validateInputs()) {
       try {
         await axios.post(
-          "http://localhost:9000/api/v1/auth/requestPasswordReset",
+          `${import.meta.env.VITE_API_URI}/auth/requestPasswordReset`,
           {
             email: inputs.email,
           }
         );
-        navigate("/");
+        navigate('/');
 
-        toast.success("Password reset link sent to your email", {
-          position: "bottom-center",
+        toast.success('Password reset link sent to your email', {
+          position: 'bottom-center',
           autoClose: 3500,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-          theme: "dark",
+          theme: 'dark',
         });
       } catch (err) {
         console.log(err);
@@ -81,7 +81,7 @@ const ForgotPassword = () => {
             Send Password Reset Link
           </Button>
           <Span>
-            Don't have an account?
+            Don&apos;t have an account?
             <Styledlink to="/register">Register</Styledlink>
           </Span>
           <Span>

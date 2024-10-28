@@ -1,8 +1,8 @@
-import styled from "styled-components";
-import { useEffect, useState, useRef } from "react";
-import "react-quill/dist/quill.snow.css";
-import "@mdxeditor/editor/style.css";
-import { codeMirrorPlugin } from "@mdxeditor/editor";
+import styled from 'styled-components';
+import { useEffect, useState, useRef } from 'react';
+import 'react-quill/dist/quill.snow.css';
+import '@mdxeditor/editor/style.css';
+import { codeMirrorPlugin } from '@mdxeditor/editor';
 import {
   MDXEditor,
   BlockTypeSelect,
@@ -29,46 +29,46 @@ import {
   quotePlugin,
   diffSourcePlugin,
   DiffSourceToggleWrapper,
-} from "@mdxeditor/editor";
-import { useLocation, useNavigate } from "react-router-dom";
-import axios from "axios";
-import moment from "moment";
-import { toast } from "react-toastify";
-import { debounced } from "../utils/debounce";
-import TagsInput from "../components/tags";
-import PublishComponent from "../components/PublishComponent";
+} from '@mdxeditor/editor';
+import { useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import moment from 'moment';
+import { toast } from 'react-toastify';
+import { debounced } from '../utils/debounce';
+import TagsInput from '../components/tags';
+import PublishComponent from '../components/PublishComponent';
 
-import { IoCloseCircleOutline } from "react-icons/io5";
-import { MdPostAdd } from "react-icons/md";
+import { IoCloseCircleOutline } from 'react-icons/io5';
+import { MdPostAdd } from 'react-icons/md';
 import {
   fileToBase64WithMetadata,
   base64ToFile,
-} from "../utils/uploadImagesUtils";
-import ArtificialIntelligenceComponent from "../components/ArtificialIntelligence";
+} from '../utils/uploadImagesUtils';
+import ArtificialIntelligenceComponent from '../components/ArtificialIntelligence';
 
 const Write = () => {
   const location = useLocation();
 
   const navigate = useNavigate();
-  const draftParamId = new URLSearchParams(location.search).get("draftId");
+  const draftParamId = new URLSearchParams(location.search).get('draftId');
 
-  const [title, setTitle] = useState("");
-  const [desc, setDesc] = useState(location?.state?.description || "");
-  const [cont, setCont] = useState(location?.state?.content || "");
-  const [file, setFile] = useState("");
-  const [cat, setCat] = useState(location?.state?.category || "");
+  const [title, setTitle] = useState('');
+  const [desc, setDesc] = useState(location?.state?.description || '');
+  const [cont, setCont] = useState(location?.state?.content || '');
+  const [file, setFile] = useState('');
+  const [cat, setCat] = useState(location?.state?.category || '');
   const [tags, setTags] = useState(
     Array.isArray(location?.state?.tags) ? location.state.tags : []
   );
   const [draftId, setDraftId] = useState(draftParamId);
-  const [postId, setPostId] = useState(location?.state?.pid || "");
+  const [postId] = useState(location?.state?.pid || '');
   const [metadataPost, setMetadataPost] = useState();
-  const [initialMarkdown, setInitialMarkdown] = useState("");
-  const [post, setPost] = useState("");
+  const [initialMarkdown, setInitialMarkdown] = useState('');
+  const [post, setPost] = useState('');
 
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState('');
   console.log(metadataPost);
-  console.log(file);
+  console.log(file.metadata?.name);
   console.log(image);
   const [showPublishComponent, setShowPublishComponent] = useState(true);
 
@@ -97,29 +97,29 @@ const Write = () => {
 
         if (postId) {
           setImage(fileData);
-          localStorage.setItem("uploadedImage", JSON.stringify(fileData));
+          localStorage.setItem('uploadedImage', JSON.stringify(fileData));
         } else {
           setFile(fileData);
-          localStorage.setItem("uploadedFile", JSON.stringify(fileData));
+          localStorage.setItem('uploadedFile', JSON.stringify(fileData));
         }
       } catch (error) {
-        console.error("Error processing file:", error);
-        toast.error("Error processing file. Please try again.");
+        console.error('Error processing file:', error);
+        toast.error('Error processing file. Please try again.');
       }
     }
   };
 
   useEffect(() => {
-    const savedFile = localStorage.getItem("uploadedFile");
+    const savedFile = localStorage.getItem('uploadedFile');
     if (savedFile && draftId) {
       setFile(JSON.parse(savedFile));
     } else {
-      const savedImage = localStorage.getItem("uploadedImage");
+      const savedImage = localStorage.getItem('uploadedImage');
       if (savedImage) {
         setImage(JSON.parse(savedImage));
       }
     }
-  }, []);
+  }, [draftId]);
 
   const saveDraftAndPostAutomatically = async () => {
     if ((title && desc && cont && cat && tags && file) || image) {
@@ -129,27 +129,31 @@ const Write = () => {
         let metadataUrl;
 
         if (postId) {
-          endpoint = `http://localhost:9000/api/v1/posts/${location.state.pid}`;
-          method = "put";
+          endpoint = `${import.meta.env.VITE_API_URI}/posts/${
+            location.state.pid
+          }`;
+          method = 'put';
         } else if (draftId) {
-          endpoint = `http://localhost:9000/api/v1/draftposts/${draftId}`;
-          method = "put";
+          endpoint = `${import.meta.env.VITE_API_URI}/draftposts/${draftId}`;
+          method = 'put';
         } else {
-          endpoint = "http://localhost:9000/api/v1/draftposts";
-          method = "post";
+          endpoint = `${import.meta.env.VITE_API_URI}/draftposts`;
+          method = 'post';
         }
 
         const imageUrl = file?.metadata?.name || image?.metadata?.name;
 
         const metadata =
-          JSON.parse(localStorage.getItem("uploadedImage")) ||
-          JSON.parse(localStorage.getItem("uploadedFile"));
+          JSON.parse(localStorage.getItem('uploadedImage')) ||
+          JSON.parse(localStorage.getItem('uploadedFile'));
         console.log(metadata);
 
         if (!metadata) {
           metadataUrl = setPost(post.post.image);
         } else {
-          metadataUrl = `http://localhost:9000/uploads/${metadata?.metadata?.name}`;
+          metadataUrl = `${import.meta.env.VITE_API_UPLOAD}/uploads/${
+            metadata?.metadata?.name
+          }`;
         }
 
         console.log(metadataUrl);
@@ -162,7 +166,7 @@ const Write = () => {
             description: desc,
             content: cont,
             image: !postId ? imageUrl : metadataUrl,
-            date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+            date: moment(Date.now()).format('YYYY-MM-DD HH:mm:ss'),
             category: cat,
             tags,
             metadata: metadata?.metadata,
@@ -176,21 +180,21 @@ const Write = () => {
         }
 
         toast.info(
-          postId ? "Post updated successfully" : "Draft saved successfully",
+          postId ? 'Post updated successfully' : 'Draft saved successfully',
           {
-            position: "bottom-center",
+            position: 'bottom-center',
             autoClose: 2500,
             hideProgressBar: false,
             closeOnClick: true,
             pauseOnHover: true,
             draggable: true,
             progress: undefined,
-            theme: "dark",
+            theme: 'dark',
           }
         );
       } catch (err) {
-        console.error("Error saving draft: Please upload the image again", err);
-        toast.error("Error saving draft, Please upload the image again");
+        console.error('Error saving draft: Please upload the image again', err);
+        toast.error('Error saving draft, Please upload the image again');
       }
     }
   };
@@ -207,51 +211,51 @@ const Write = () => {
     return () => {
       debounced.cancel();
     };
-  }, [title, desc, cont, image, cat, tags, postId, draftId]);
+  }, [title, desc, cont, image, cat, tags, postId, draftId,]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         let endpoint;
         if (postId) {
-          endpoint = `http://localhost:9000/api/v1/posts/${postId}`;
+          endpoint = `${import.meta.env.VITE_API_URI}/posts/${postId}`;
         } else if (draftId) {
-          endpoint = `http://localhost:9000/api/v1/draftposts/${draftId}`;
+          endpoint = `${import.meta.env.VITE_API_URI}/draftposts/${draftId}`;
         } else {
           return;
         }
 
         const response = await axios({
-          method: "get",
+          method: 'get',
           url: endpoint,
           withCredentials: true,
         });
 
         const data = response.data;
         setPost(response.data);
-        console.log("Fetched data:", data);
+        console.log('Fetched data:', data);
 
         if (data.post) {
           // Handle single post or draft
           const postData = data.post;
-          setTitle(postData?.title || "");
-          setDesc(postData?.description || "");
-          setCont(postData?.content || "");
-          setCat(postData?.category || "");
+          setTitle(postData?.title || '');
+          setDesc(postData?.description || '');
+          setCont(postData?.content || '');
+          setCat(postData?.category || '');
           setTags(Array.isArray(postData?.tags) ? postData.tags : []);
-          setImage(postData?.metadata ? JSON.parse(postData.metadata) : "");
+          setImage(postData?.metadata ? JSON.parse(postData.metadata) : '');
           setMetadataPost(
-            postData?.metadata ? JSON.parse(postData.metadata) : ""
+            postData?.metadata ? JSON.parse(postData.metadata) : ''
           );
         } else if (data.posts && data.posts.length > 0) {
           // Handle multiple drafts (though we're only using the first one)
           const draftData = data.posts[0];
-          setTitle(draftData?.title || "");
-          setDesc(draftData?.description || "");
-          setCont(draftData?.content || "");
-          setCat(draftData?.category || "");
+          setTitle(draftData?.title || '');
+          setDesc(draftData?.description || '');
+          setCont(draftData?.content || '');
+          setCat(draftData?.category || '');
           setTags(Array.isArray(draftData?.tags) ? draftData.tags : []);
-          setImage(draftData?.metadata ? JSON.parse(draftData.metadata) : "");
+          setImage(draftData?.metadata ? JSON.parse(draftData.metadata) : '');
         }
       } catch (err) {
         console.log(err);
@@ -266,31 +270,31 @@ const Write = () => {
     if (postId) {
       try {
         // Delete the draftId from localStorage
-        localStorage.removeItem("draftId");
-        localStorage.removeItem("uploadedFile");
-        localStorage.removeItem("uploadedImage");
+        localStorage.removeItem('draftId');
+        localStorage.removeItem('uploadedFile');
+        localStorage.removeItem('uploadedImage');
         // Set the state to null or an appropriate value
 
-        await axios.delete(`http://localhost:9000/api/v1/draftposts`, {
+        await axios.delete(`${import.meta.env.VITE_API_URI}/draftposts`, {
           withCredentials: true,
         });
-        setTitle("");
-        setDesc("");
-        setCont("");
-        setDesc(" ");
-        setFile("");
-        setImage("");
-        setDraftId("");
-        navigate("/");
-        toast.info("Draft deleted successfully", {
-          position: "bottom-right",
+        setTitle('');
+        setDesc('');
+        setCont('');
+        setDesc(' ');
+        setFile('');
+        setImage('');
+        setDraftId('');
+        navigate('/');
+        toast.info('Draft deleted successfully', {
+          position: 'bottom-right',
           autoClose: 2500,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-          theme: "dark",
+          theme: 'dark',
         });
       } catch (err) {
         console.log(err);
@@ -299,28 +303,28 @@ const Write = () => {
   };
 
   const handleCancel = () => {
-    navigate("/");
+    navigate('/');
   };
 
   const handlePublish = async () => {
     if (!title || !desc || !cont || !cat) {
-      toast.error("Please fill all the fields");
+      toast.error('Please fill all the fields');
       return;
     }
 
     try {
-      let fileUrl = "";
+      let fileUrl = '';
 
       if (file || image) {
-        toast.info("Uploading image...", {
-          position: "bottom-right",
+        toast.info('Uploading image...', {
+          position: 'bottom-right',
           autoClose: 2500,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-          theme: "dark",
+          theme: 'dark',
         });
 
         let fileObject;
@@ -328,14 +332,14 @@ const Write = () => {
         if (file && file.base64String) {
           fileObject = base64ToFile(
             file.base64String,
-            file.metadata?.name || "image.jpg",
-            file.metadata?.type || "image/jpeg"
+            file.metadata?.name || 'image.jpg',
+            file.metadata?.type || 'image/jpeg'
           );
         } else if (image && image.base64String) {
           fileObject = base64ToFile(
             image.base64String,
-            image.metadata?.name || "image.jpg",
-            image.metadata?.type || "image/jpeg"
+            image.metadata?.name || 'image.jpg',
+            image.metadata?.type || 'image/jpeg'
           );
         } else if (image instanceof File) {
           fileObject = image;
@@ -343,20 +347,21 @@ const Write = () => {
 
         if (fileObject) {
           const formData = new FormData();
-          formData.set("file", fileObject);
+          formData.set('file', fileObject);
 
           const res = await axios.post(
-            "http://localhost:9000/api/v1/upload",
+            `${import.meta.env.VITE_API_UPLOAD}/upload`,
             formData
           );
-          const filename = res.data;
+          const filename = res.data.url;
+          console.log(filename);
 
-          fileUrl = `http://localhost:9000/uploads/${filename}`;
+          fileUrl = `${filename}`;
         }
       }
 
-      const metadata = localStorage.getItem("uploadedImage")
-        ? JSON.parse(localStorage.getItem("uploadedImage"))
+      const metadata = localStorage.getItem('uploadedImage')
+        ? JSON.parse(localStorage.getItem('uploadedImage'))
         : null;
 
       const postData = {
@@ -364,7 +369,7 @@ const Write = () => {
         description: desc,
         content: cont,
         image: fileUrl,
-        date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+        date: moment(Date.now()).format('YYYY-MM-DD HH:mm:ss'),
         category: cat,
         tags,
         metadata,
@@ -372,35 +377,33 @@ const Write = () => {
 
       if (location.state?.pid) {
         await axios({
-          method: "put",
-          url: `http://localhost:9000/api/v1/posts/${location.state.pid}`,
+          method: 'put',
+          url: `${import.meta.env.VITE_API_URI}/posts/${location.state.pid}`,
           data: postData,
           withCredentials: true,
         });
       } else {
         await axios({
-          method: "post",
-          url: "http://localhost:9000/api/v1/posts",
+          method: 'post',
+          url: `${import.meta.env.VITE_API_URI}/posts`,
           data: postData,
           withCredentials: true,
         });
       }
 
-      toast.success("Post published successfully", {
-        position: "bottom-right",
+      toast.success('Post published successfully', {
+        position: 'bottom-right',
         autoClose: 2500,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        theme: "dark",
+        theme: 'dark',
       });
-
-      navigate("/");
     } catch (err) {
       console.error(err);
-      toast.error("Error uploading image or publishing post");
+      toast.error('Error uploading image or publishing post');
     }
   };
 
@@ -451,7 +454,7 @@ const Write = () => {
                 thematicBreakPlugin(),
                 linkDialogPlugin(),
                 codeBlockPlugin({
-                  defaultCodeBlockLanguage: "javascript",
+                  defaultCodeBlockLanguage: 'javascript',
                 }),
                 imagePlugin(),
                 tablePlugin(),
@@ -459,48 +462,48 @@ const Write = () => {
                 quotePlugin(),
                 diffSourcePlugin({
                   diffMarkdown: initialMarkdown,
-                  viewMode: "rich-text",
+                  viewMode: 'rich-text',
                 }),
                 codeBlockPlugin({
-                  defaultCodeBlockLanguage: "js",
-                  defaultCodeBlockTheme: "dark",
+                  defaultCodeBlockLanguage: 'js',
+                  defaultCodeBlockTheme: 'dark',
                   codeBlockLanguages: {
-                    javascript: "JavaScript",
-                    python: "Python",
-                    php: "PHP",
-                    css: "CSS",
-                    shell: "Shell",
-                    bash: "Bash",
-                    html: "HTML",
-                    json: "JSON",
-                    nginx: "Nginx",
-                    dockerfile: "Dockerfile",
-                    yaml: "Yaml",
-                    csharp: "C#",
-                    makefile: "Makefile",
+                    javascript: 'JavaScript',
+                    python: 'Python',
+                    php: 'PHP',
+                    css: 'CSS',
+                    shell: 'Shell',
+                    bash: 'Bash',
+                    html: 'HTML',
+                    json: 'JSON',
+                    nginx: 'Nginx',
+                    dockerfile: 'Dockerfile',
+                    yaml: 'Yaml',
+                    csharp: 'C#',
+                    makefile: 'Makefile',
                   },
                 }),
                 codeMirrorPlugin({
                   codeBlockLanguages: {
-                    javascript: "javascript",
-                    python: "python",
-                    php: "php",
-                    css: "css",
-                    html: "html",
-                    json: "json",
-                    shell: "shell",
-                    bash: "bash",
-                    nginx: "nginx",
-                    Dockerfile: "Dockerfile",
-                    yaml: "yaml",
-                    csharp: "csharp",
-                    makefile: "makefile",
+                    javascript: 'javascript',
+                    python: 'python',
+                    php: 'php',
+                    css: 'css',
+                    html: 'html',
+                    json: 'json',
+                    shell: 'shell',
+                    bash: 'bash',
+                    nginx: 'nginx',
+                    Dockerfile: 'Dockerfile',
+                    yaml: 'yaml',
+                    csharp: 'csharp',
+                    makefile: 'makefile',
                   },
                 }),
                 toolbarPlugin({
                   toolbarContents: () => (
                     <>
-                      {" "}
+                      {' '}
                       <DiffSourceToggleWrapper>
                         <UndoRedo />
                         <BlockTypeSelect />
@@ -636,7 +639,7 @@ const PublishWrapper = styled.div`
   transition: all 0.3s ease-in-out;
   opacity: ${({ $showPublishComponent }) => ($showPublishComponent ? 1 : 0)};
   max-width: ${({ $showPublishComponent }) =>
-    $showPublishComponent ? "100%" : 0};
+    $showPublishComponent ? '100%' : 0};
   overflow: hidden;
   overflow-y: auto;
   height: 100%;

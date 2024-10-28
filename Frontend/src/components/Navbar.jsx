@@ -1,36 +1,31 @@
-import React, { useState, useContext } from "react";
-import styled from "styled-components";
-import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/authContext";
-import Dropdown from "react-bootstrap/Dropdown";
-import { CgProfile } from "react-icons/cg";
-import { RiLogoutCircleRLine } from "react-icons/ri";
-import { IoSettingsOutline } from "react-icons/io5";
-import logo from "../assets/logo.png";
-import axios from "axios";
-import { Button, Modal } from "react-bootstrap";
-import users from "../assets/users.png";
-import user from "../assets/user100.png";
-import { PiFileMagnifyingGlass } from "react-icons/pi";
-import { FaLaptopCode } from "react-icons/fa";
-import { GrCloudComputer } from "react-icons/gr";
-import { GoInfinity } from "react-icons/go";
-import { MdSecurity } from "react-icons/md";
-import { FaLinux } from "react-icons/fa";
-import { FaNetworkWired } from "react-icons/fa6";
-import { GiArtificialIntelligence } from "react-icons/gi";
-import { LuBrainCircuit } from "react-icons/lu";
-import { BsDatabaseGear } from "react-icons/bs";
-import { GoHubot } from "react-icons/go";
-import { CiCircleMore } from "react-icons/ci";
-import { MdOutlinePostAdd } from "react-icons/md";
-import { MdOutlineDashboard } from "react-icons/md";
-import write from "../assets/write.png";
+import { useState, useContext } from 'react';
+import styled from 'styled-components';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/authContext';
+import Dropdown from 'react-bootstrap/Dropdown';
+import { RiLogoutCircleRLine } from 'react-icons/ri';
+import logo from '../assets/logo.png';
+import { Button, Modal } from 'react-bootstrap';
+import users from '../assets/users.png';
+import user from '../assets/user100.png';
+import { FaLaptopCode } from 'react-icons/fa';
+import { GrCloudComputer } from 'react-icons/gr';
+import { GoInfinity } from 'react-icons/go';
+import { MdSecurity } from 'react-icons/md';
+import { FaLinux } from 'react-icons/fa';
+import { FaNetworkWired } from 'react-icons/fa6';
+import { GiArtificialIntelligence } from 'react-icons/gi';
+import { LuBrainCircuit } from 'react-icons/lu';
+import { BsDatabaseGear } from 'react-icons/bs';
+import { GoHubot } from 'react-icons/go';
+import { CiCircleMore } from 'react-icons/ci';
+
+import { MdOutlineDashboard } from 'react-icons/md';
+import write from '../assets/write.png';
 const Navbar = () => {
   const { currentUser, logout } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [draftId, setDraftId] = useState("");
-  const [draftPost, setDraftPost] = useState({});
+
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
@@ -47,7 +42,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate("/");
+    navigate('/');
   };
 
   return (
@@ -177,7 +172,7 @@ const Navbar = () => {
                   </Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
-              <Write to={"/write"}>
+              <Write to={'/write'}>
                 Write <img className="write-img" src={write} alt="" />
               </Write>
               <ImageProfile>

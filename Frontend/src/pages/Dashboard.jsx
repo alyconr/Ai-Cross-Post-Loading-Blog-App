@@ -1,28 +1,28 @@
-import React, { useContext, useState, useEffect } from "react";
-import styled from "styled-components";
-import Sidebar from "../components/Sidebar";
-import Card from "../components/card";
-import axios from "axios";
+import { useContext, useState, useEffect } from 'react';
+import styled from 'styled-components';
+import Sidebar from '../components/Sidebar';
+import Card from '../components/card';
+import axios from 'axios';
 
-import { AuthContext } from "../context/authContext";
+import { AuthContext } from '../context/authContext';
 
-import Profile from "./Profile";
-import Settings from "../components/settings";
-import Bookmarks from "./Bookmarks";
-import Home from "./Home";
-import ApiKeys from "./ApiKeys";
-import RenderDrafts from "../components/RenderDrafts";
-import RenderFollowers from "../components/RenderFollowers";
-import RenderFollowings from "../components/RenderFollowings";
-import RenderBookmarks from "../components/RenderBookmarks";
-import RenderMediumPosts from "../components/RenderMediumPosts";
-import RenderDevtoPosts from "../components/RenderDevtoPosts";
-import RenderHashNodePosts from "../components/RenderHashnodePosts";
-import RenderLocalPosts from "../components/LocalPosts";
-import AiFaqs from "../components/AiFaqs";
+import Profile from './Profile';
+import Settings from '../components/settings';
+import Bookmarks from './Bookmarks';
+import Home from './Home';
+import ApiKeys from './ApiKeys';
+import RenderDrafts from '../components/RenderDrafts';
+import RenderFollowers from '../components/RenderFollowers';
+import RenderFollowings from '../components/RenderFollowings';
+import RenderBookmarks from '../components/RenderBookmarks';
+import RenderMediumPosts from '../components/RenderMediumPosts';
+import RenderDevtoPosts from '../components/RenderDevtoPosts';
+import RenderHashNodePosts from '../components/RenderHashnodePosts';
+import RenderLocalPosts from '../components/LocalPosts';
+import AiFaqs from '../components/AiFaqs';
 const Dashboard = () => {
   const [menuOpen, setMenuOpen] = useState(true);
-  const [activeComponent, setActiveComponent] = useState("dashboard");
+  const [activeComponent, setActiveComponent] = useState('dashboard');
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [bookmarks, setBookmarks] = useState([]);
@@ -58,27 +58,35 @@ const Dashboard = () => {
           drafts,
         ] = await Promise.all([
           axios.get(
-            `http://localhost:9000/api/v1/followers/${currentUser?.user.id}`
+            `${import.meta.env.VITE_API_URI}/followers/${currentUser?.user.id}`
           ),
           axios.get(
-            `http://localhost:9000/api/v1/followings/${currentUser?.user.id}`
+            `${import.meta.env.VITE_API_URI}/followings/${currentUser?.user.id}`
           ),
           axios.get(
-            `http://localhost:9000/api/v1/bookmarks/${currentUser?.user.id}`
+            `${import.meta.env.VITE_API_URI}/bookmarks/${currentUser?.user.id}`
           ),
           axios.get(
-            `http://localhost:9000/api/v1/medium-proxy/${currentUser?.user.id}`
+            `${import.meta.env.VITE_API_URI}/medium-proxy/${
+              currentUser?.user.id
+            }`
           ),
           axios.get(
-            `http://localhost:9000/api/v1/devto-proxy/${currentUser?.user.id}`
+            `${import.meta.env.VITE_API_URI}/devto-proxy/${
+              currentUser?.user.id
+            }`
           ),
           axios.get(
-            `http://localhost:9000/api/v1/hashnode-proxy/${currentUser?.user.id}`
+            `${import.meta.env.VITE_API_URI}/hashnode-proxy/${
+              currentUser?.user.id
+            }`
           ),
           axios.get(
-            `http://localhost:9000/api/v1/user/posts/${currentUser?.user?.username}`
+            `${import.meta.env.VITE_API_URI}/user/posts/${
+              currentUser?.user?.username
+            }`
           ),
-          axios.get(`http://localhost:9000/api/v1/draftposts`),
+          axios.get(`${import.meta.env.VITE_API_URI}/draftposts`),
         ]);
 
         setFollowers(followersRes.data);
@@ -97,14 +105,14 @@ const Dashboard = () => {
     if (currentUser?.user.id) {
       fetchData();
     }
-  }, [currentUser?.user.id]);
+  }, [currentUser?.user.id, currentUser?.user?.username]);
 
   const handleClickFollowers = async () => {
     setShowFollowers(true);
 
     try {
       const res = await axios.get(
-        `http://localhost:9000/api/v1/followers/${currentUser?.user.id}`
+        `${import.meta.env.VITE_API_URI}/followers/${currentUser?.user.id}`
       );
 
       setFollowers(res.data);
@@ -117,7 +125,7 @@ const Dashboard = () => {
     setShowFollowings(true);
     try {
       const res = await axios.get(
-        `http://localhost:9000/api/v1/followings/${currentUser?.user.id}`
+        `${import.meta.env.VITE_API_URI}/followings/${currentUser?.user.id}`
       );
 
       setFollowing(res.data);
@@ -130,7 +138,7 @@ const Dashboard = () => {
     setShowBookmarks(true);
     try {
       const res = await axios.get(
-        `http://localhost:9000/api/v1/bookmarks/${currentUser?.user.id}`
+        `${import.meta.env.VITE_API_URI}/bookmarks/${currentUser?.user.id}`
       );
 
       setBookmarks(res.data);
@@ -143,7 +151,7 @@ const Dashboard = () => {
     setShowMediumPosts(true);
     try {
       const res = await axios.get(
-        `http://localhost:9000/api/v1/medium-proxy/${currentUser?.user.id}`
+        `${import.meta.env.VITE_API_URI}/medium-proxy/${currentUser?.user.id}`
       );
 
       setMediumPosts(Array.isArray(res.data) ? res.data : [res.data]);
@@ -156,7 +164,7 @@ const Dashboard = () => {
     setShowDevtoPosts(true);
     try {
       const res = await axios.get(
-        `http://localhost:9000/api/v1/devto-proxy/${currentUser?.user.id}`
+        `${import.meta.env.VITE_API_URI}/devto-proxy/${currentUser?.user.id}`
       );
 
       setDevtoPosts(Array.isArray(res.data) ? res.data : [res.data]);
@@ -169,7 +177,7 @@ const Dashboard = () => {
     setShowHashNodePosts(true);
     try {
       const res = await axios.get(
-        `http://localhost:9000/api/v1/hashnode-proxy/${currentUser?.user.id}`
+        `${import.meta.env.VITE_API_URI}/hashnode-proxy/${currentUser?.user.id}`
       );
 
       setHashNodePosts(Array.isArray(res.data) ? res.data : [res.data]);
@@ -182,7 +190,9 @@ const Dashboard = () => {
     setShowLocalPosts(true);
     try {
       const res = await axios.get(
-        `http://localhost:9000/api/v1/user/posts/${currentUser?.user?.username}`
+        `${import.meta.env.VITE_API_URI}/user/posts/${
+          currentUser?.user?.username
+        }`
       );
 
       setLocalPosts(res.data.posts);
@@ -194,7 +204,7 @@ const Dashboard = () => {
   const handleDraftPosts = async () => {
     setShowDrafts(true);
     try {
-      const res = await axios.get(`http://localhost:9000/api/v1/draftposts`);
+      const res = await axios.get(`${import.meta.env.VITE_API_URI}/draftposts`);
 
       setDrafts(res.data.posts);
     } catch (error) {
@@ -204,7 +214,7 @@ const Dashboard = () => {
 
   const handleSetActiveComponent = (component) => {
     setActiveComponent(component);
-    if (component === "dashboard") {
+    if (component === 'dashboard') {
       setShowFollowers(false);
       setShowFollowings(false);
       setShowBookmarks(false);
@@ -247,19 +257,19 @@ const Dashboard = () => {
 
   const renderContent = () => {
     switch (activeComponent) {
-      case "profile":
+      case 'profile':
         return <Profile />;
-      case "localPosts":
+      case 'localPosts':
         return <Home />;
-      case "readingList":
+      case 'readingList':
         return <Bookmarks />;
-      case "apikeys":
+      case 'apikeys':
         return <ApiKeys />;
-      case "settings":
+      case 'settings':
         return <Settings />;
-      case "AiAgents":
+      case 'AiAgents':
         return <AiFaqs />;
-      case "dashboard":
+      case 'dashboard':
       default:
         return (
           <>

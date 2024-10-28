@@ -1,36 +1,35 @@
-import styled from "styled-components";
-import { BsFillTrashFill } from "@react-icons/all-files/bs/BsFillTrashFill";
-import { FcEditImage } from "@react-icons/all-files/fc/FcEditImage";
-import { FaUsers } from "react-icons/fa";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import MenuLeft from "../components/Menuside";
-import { useEffect, useState } from "react";
-import axios from "axios";
-import moment from "moment";
-import { useContext } from "react";
-import { AuthContext } from "../context/authContext";
-import follower from "../assets/follower.png";
-import dompurify from "dompurify";
-import { toast } from "react-toastify";
-import ApplauseButton from "../components/ClapCounter";
-import Comments from "../components/comments";
-import { FaCommentDots } from "react-icons/fa";
-import { Offcanvas } from "react-bootstrap";
-import { MdBookmarkAdd } from "react-icons/md";
-import { marked } from "marked";
-import DOMPurify from "dompurify";
+import styled from 'styled-components';
+import { BsFillTrashFill } from '@react-icons/all-files/bs/BsFillTrashFill';
+import { FcEditImage } from '@react-icons/all-files/fc/FcEditImage';
+import { FaUsers } from 'react-icons/fa';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import MenuLeft from '../components/Menuside';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import moment from 'moment';
+import { useContext } from 'react';
+import { AuthContext } from '../context/authContext';
+import follower from '../assets/follower.png';
+import { toast } from 'react-toastify';
+import ApplauseButton from '../components/ClapCounter';
+import Comments from '../components/comments';
+import { FaCommentDots } from 'react-icons/fa';
+import { Offcanvas } from 'react-bootstrap';
+import { MdBookmarkAdd } from 'react-icons/md';
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 
-import Share from "../components/share";
+import Share from '../components/share';
 const Singlepost = () => {
   const [post, setPost] = useState({});
-  const [userImage, setUserImage] = useState("");
+  const [userImage, setUserImage] = useState('');
   const location = useLocation();
   const { currentUser } = useContext(AuthContext);
 
   const [show, setShow] = useState(false);
   const [showBookmark, setShowBookmark] = useState(false);
-  const [bookmarks, setBookmarks] = useState("");
-  const postId = location.pathname.split("/")[2];
+  const [, setBookmarks] = useState('');
+  const postId = location.pathname.split('/')[2];
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -41,14 +40,14 @@ const Singlepost = () => {
 
   const renderContent = (content) => {
     if (!content) {
-      return { __html: "" };
+      return { __html: '' };
     }
 
     if (
-      typeof content === "string" &&
-      (content.includes("```") ||
-        content.includes("#") ||
-        content.includes("*"))
+      typeof content === 'string' &&
+      (content.includes('```') ||
+        content.includes('#') ||
+        content.includes('*'))
     ) {
       // If it's markdown, parse it to HTML
       const rawMarkup = marked(content);
@@ -65,19 +64,19 @@ const Singlepost = () => {
     const getPost = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:9000/api/v1/posts/${postId}`
+          `${import.meta.env.VITE_API_URI}/posts/${postId}`
         );
         setPost(res.data.post);
         console.log(res.data.post);
 
         const userRes = await axios.get(
-          `http://localhost:9000/api/v1/user/${res.data.post.username}`,
+          `${import.meta.env.VITE_API_URI}/user/${res.data.post.username}`,
           {
             withCredentials: true,
-            credentials: "include",
+            credentials: 'include',
           }
         );
-        setUserImage(userRes.data[0]?.userImage || "");
+        setUserImage(userRes.data[0]?.userImage || '');
       } catch (err) {
         console.log(err);
       }
@@ -88,54 +87,48 @@ const Singlepost = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:9000/api/v1/posts/${postId}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URI}/posts/${postId}`, {
         withCredentials: true,
       });
-      navigate("/");
-      toast.info("Post deleted successfully", {
-        position: "bottom-right",
+      navigate('/');
+      toast.info('Post deleted successfully', {
+        position: 'bottom-right',
         autoClose: 2500,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        theme: "dark",
+        theme: 'dark',
       });
     } catch (err) {
       console.log(err);
     }
   };
 
-  const createMarkup = (html) => {
-    return {
-      __html: dompurify.sanitize(html), // this will sanitize the html code to prevent XSS attacks
-    };
-  };
-
   const handleBookmark = async () => {
     try {
       await axios.post(
-        "http://localhost:9000/api/v1/bookmarks",
+        `${import.meta.env.VITE_API_URI}/bookmarks`,
         {
           usersId: currentUser?.user?.id,
           postsId: postId,
         },
         {
           withCredentials: true,
-          credentials: "include",
+          credentials: 'include',
         }
       );
       setShowBookmark(true);
-      toast.info("Post bookmarked successfully", {
-        position: "bottom-right",
+      toast.info('Post bookmarked successfully', {
+        position: 'bottom-right',
         autoClose: 2500,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        theme: "dark",
+        theme: 'dark',
       });
     } catch (err) {
       console.log(err);
@@ -146,10 +139,9 @@ const Singlepost = () => {
     const getBookmarks = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:9000/api/v1/bookmarks/${currentUser?.user?.id}`
+          `${import.meta.env.VITE_API_URI}/bookmarks/${currentUser?.user?.id}`
         );
         setBookmarks(res.data);
-        console.log(res.data);
 
         // Check if any bookmark has the same postId
         const isBookmarked = res.data.some(
@@ -162,12 +154,12 @@ const Singlepost = () => {
       }
     };
     getBookmarks();
-  }, [postId]);
+  }, [currentUser?.user?.id, postId]);
 
   const deleteBookmark = async () => {
     try {
       await axios.delete(
-        `http://localhost:9000/api/v1/bookmarks/${currentUser?.user?.id}`,
+        `${import.meta.env.VITE_API_URI}/bookmarks/${currentUser?.user?.id}`,
         {
           data: {
             usersId: currentUser?.user?.id,
@@ -176,15 +168,15 @@ const Singlepost = () => {
         }
       );
       setShowBookmark(false);
-      toast.info("Post unbookmarked successfully", {
-        position: "bottom-right",
+      toast.info('Post unbookmarked successfully', {
+        position: 'bottom-right',
         autoClose: 2500,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        theme: "dark",
+        theme: 'dark',
       });
     } catch (err) {
       console.log(err);
@@ -199,13 +191,15 @@ const Singlepost = () => {
           {userImage && (
             <img
               className="userImg"
-              src={`http://localhost:9000/uploads/${post.userImage}`}
+              src={`${import.meta.env.VITE_API_UPLOAD}/uploads/${
+                post.userImage
+              }`}
               alt={userImage}
             />
           )}
           <div className="info">
             <PostLink to={`/profile/${post.username}`}>
-              {" "}
+              {' '}
               <span>{post.fullname}</span>
             </PostLink>
 
@@ -220,13 +214,13 @@ const Singlepost = () => {
               </Link>
               <Link
                 to={`/singlepost/${postId}/title=${encodeURIComponent(
-                  post.title.replace(/ /g, "-")
+                  post.title.replace(/ /g, '-')
                 )}`}
               >
                 <button title="Delete" className="message">
                   <BsFillTrashFill
                     onClick={handleDelete}
-                    color={"#6A072D"}
+                    color={'#6A072D'}
                     size={30}
                   />
                 </button>
@@ -241,7 +235,7 @@ const Singlepost = () => {
             title=" View Comments"
             className="message"
           >
-            {" "}
+            {' '}
             <FaCommentDots className="comment" size={30} />
           </button>
           {post.fullname !== currentUser?.user?.fullname && !showBookmark ? (
@@ -258,7 +252,7 @@ const Singlepost = () => {
               className="message "
               title="Bookmark"
             >
-              {" "}
+              {' '}
               <MdBookmarkAdd className="bookmark" size={35} color="#0D0D0E" />
             </button>
           ) : null}
@@ -267,10 +261,7 @@ const Singlepost = () => {
         </div>
         <h1>{post.title}</h1>
         <h3>{post.description}</h3>
-        <MdxContent
-          dangerouslySetInnerHTML={renderContent(post.content)}
-       
-        />
+        <MdxContent dangerouslySetInnerHTML={renderContent(post.content)} />
         <FooterAction>
           <ApplauseButton />
           <button
@@ -278,7 +269,7 @@ const Singlepost = () => {
             title=" View Comments"
             className="message"
           >
-            {" "}
+            {' '}
             <FaCommentDots className="comment" size={30} />
           </button>
           {post.fullname !== currentUser?.user?.fullname && !showBookmark ? (
@@ -295,7 +286,7 @@ const Singlepost = () => {
               className="message "
               title="Bookmark"
             >
-              {" "}
+              {' '}
               <MdBookmarkAdd className="bookmark" size={35} color="#0D0D0E" />
             </button>
           ) : null}
@@ -325,8 +316,8 @@ const Singlepost = () => {
                     />
                   )}
                   <h4 className="text-dark ">
-                    {currentUser.user.fullname}{" "}
-                    <p className="text-danger">What are your thoughts?</p>{" "}
+                    {currentUser.user.fullname}{' '}
+                    <p className="text-danger">What are your thoughts?</p>{' '}
                   </h4>
                 </div>
               ) : (
@@ -352,9 +343,14 @@ export default Singlepost;
 const MdxContent = styled.div`
   max-width: 100%;
   overflow: hidden;
-  
+
   /* Styles for markdown elements */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     margin-top: 1.5em;
     margin-bottom: 0.5em;
   }
@@ -364,7 +360,8 @@ const MdxContent = styled.div`
     line-height: 1.6;
   }
 
-  ul, ol {
+  ul,
+  ol {
     margin-bottom: 1em;
     padding-left: 2em;
   }
@@ -388,7 +385,6 @@ const MdxContent = styled.div`
   }
 
   code {
-   
     color: #09ce33;
     padding: 0.2em 0.4em;
     border-radius: 3px;

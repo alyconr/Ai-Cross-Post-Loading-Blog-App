@@ -1,22 +1,23 @@
-import React, { useState, useEffect } from "react";
-import HandsOutline from "../assets/hands-outline.png";
-import Hands from "../assets/hands.png";
-import users from "../assets/users.png";
-import SparkSvg from "./SparkSvg";
-import styled from "styled-components";
-import { useSpring, animated } from "react-spring";
-import axios from "axios";
-import { Modal, Button } from "react-bootstrap";
-import { FaHandsClapping } from "react-icons/fa6";
-import { useContext } from "react";
-import { AuthContext } from "../context/authContext";
+import { useState, useEffect } from 'react';
+import HandsOutline from '../assets/hands-outline.png';
+import Hands from '../assets/hands.png';
+import users from '../assets/users.png';
+import SparkSvg from './SparkSvg';
+import styled from 'styled-components';
+import { useSpring, animated } from 'react-spring';
+import axios from 'axios';
+import { Modal, Button } from 'react-bootstrap';
+import { FaHandsClapping } from 'react-icons/fa6';
+import { useContext } from 'react';
+import { AuthContext } from '../context/authContext';
+import PropTypes from 'prop-types';
 
 const APPLAUSE_MAX = 500;
 
 const ClapsCommentsOnComments = ({ id }) => {
   const [showSpark, setShowSpark] = useState(false);
   const [showBubble, setShowBubble] = useState(false);
-  const [localClaps, setLocalClaps] = useState(0);
+  const [localClaps] = useState(0);
   const [totalClaps, setTotalClaps] = useState(0);
   const [lgShow, setLgShow] = useState(false);
   const [usersClaps, setUserClaps] = useState({});
@@ -33,7 +34,7 @@ const ClapsCommentsOnComments = ({ id }) => {
           setTotalClaps(response.data.total_claps);
         }
       } catch (error) {
-        console.error("Error fetching total claps:", error);
+        console.error('Error fetching total claps:', error);
       }
     };
     fetchClaps();
@@ -41,13 +42,13 @@ const ClapsCommentsOnComments = ({ id }) => {
 
   const sparkAnimation = useSpring({
     opacity: showSpark ? 1 : 0,
-    transform: showSpark ? "scale(1)" : "scale(0)",
+    transform: showSpark ? 'scale(1)' : 'scale(0)',
     onRest: () => setShowSpark(false), // Hide the spark after the animation is complete
   });
 
   const bubbleAnimation = useSpring({
     opacity: showBubble ? 1 : 0,
-    transform: showBubble ? "translateY(0)" : "translateY(-50px)",
+    transform: showBubble ? 'translateY(0)' : 'translateY(-50px)',
   });
 
   const handleClick = async () => {
@@ -61,7 +62,7 @@ const ClapsCommentsOnComments = ({ id }) => {
         },
         {
           withCredentials: true,
-          credentials: "include",
+          credentials: 'include',
         }
       );
 
@@ -78,7 +79,7 @@ const ClapsCommentsOnComments = ({ id }) => {
       setShowSpark(true);
       setShowBubble(true);
     } catch (error) {
-      console.error("Error posting claps:", error);
+      console.error('Error posting claps:', error);
     }
   };
 
@@ -99,7 +100,7 @@ const ClapsCommentsOnComments = ({ id }) => {
       setLgShow(true);
       console.log(response.data);
     } catch (error) {
-      console.error("Error fetching total claps:", error);
+      console.error('Error fetching total claps:', error);
     }
   };
 
@@ -134,8 +135,8 @@ const ClapsCommentsOnComments = ({ id }) => {
             <animated.div
               className="spark"
               style={{
-                position: "absolute",
-                margin: "-18px 0 0 -18px",
+                position: 'absolute',
+                margin: '-18px 0 0 -18px',
               }}
             >
               <SparkSvg />
@@ -178,7 +179,7 @@ const ClapsCommentsOnComments = ({ id }) => {
                     )}
                     <div> {user.fullname} </div>
                     <div>
-                      <FaHandsClapping /> {user.total_claps}{" "}
+                      <FaHandsClapping /> {user.total_claps}{' '}
                     </div>
                   </UserClaps>
                 </div>
@@ -188,6 +189,10 @@ const ClapsCommentsOnComments = ({ id }) => {
       </>
     </Container>
   );
+};
+
+ClapsCommentsOnComments.propTypes = {
+  id: PropTypes.number.isRequired,
 };
 
 export default ClapsCommentsOnComments;

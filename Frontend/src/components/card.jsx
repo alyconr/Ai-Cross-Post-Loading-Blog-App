@@ -1,5 +1,8 @@
-import React from "react";
-import styled from "styled-components";
+import styled from 'styled-components';
+
+import PropTypes from 'prop-types';
+
+
 
 const CardContainer = styled.div`
   background-color: white;
@@ -23,4 +26,9 @@ const Card = ({ title, children, count }) => (
   </CardContainer>
 );
 
+Card.propTypes = {
+  title: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+  count: PropTypes.number,
+};
 export default Card;

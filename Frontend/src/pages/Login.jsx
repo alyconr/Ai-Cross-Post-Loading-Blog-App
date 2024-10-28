@@ -1,19 +1,19 @@
-import styled from "styled-components";
-import GlobalStyles from "./../GlobalStyles";
-import { Link, useNavigate } from "react-router-dom";
-import { useContext, useState } from "react";
-import { AuthContext } from "../context/authContext";
-import { toast } from "react-toastify";
-import { MdVisibilityOff } from "react-icons/md";
+import styled from 'styled-components';
+import GlobalStyles from './../GlobalStyles';
+import { Link, useNavigate } from 'react-router-dom';
+import { useContext, useState } from 'react';
+import { AuthContext } from '../context/authContext';
+import { toast } from 'react-toastify';
+import { MdVisibilityOff } from 'react-icons/md';
 const Login = () => {
   const [inputs, setInputs] = useState({
-    email: "",
-    password: "",
+    email: '',
+    password: '',
   });
 
   const [errors, setErrors] = useState({
-    email: "",
-    password: "",
+    email: '',
+    password: '',
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -24,7 +24,7 @@ const Login = () => {
 
   const handleChange = (e) => {
     setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-    setErrors((prev) => ({ ...prev, [e.target.name]: "" }));
+    setErrors((prev) => ({ ...prev, [e.target.name]: '' }));
   };
 
   const toggelShowPassword = () => {
@@ -33,15 +33,15 @@ const Login = () => {
 
   const validateInputs = () => {
     let isValid = true;
-    const newErrors = { email: "", password: "" };
+    const newErrors = { email: '', password: '' };
 
     if (!inputs.email.trim()) {
-      newErrors.email = "email is required";
+      newErrors.email = 'email is required';
       isValid = false;
     }
 
     if (!inputs.password.trim()) {
-      newErrors.password = "Password is required";
+      newErrors.password = 'Password is required';
       isValid = false;
     }
 
@@ -56,26 +56,26 @@ const Login = () => {
     if (validateInputs()) {
       try {
         await login(inputs);
-        navigate("/");
-        toast.success("Login successful", {
-          position: "bottom-center",
+        navigate('/');
+        toast.success('Login successful', {
+          position: 'bottom-center',
           autoClose: 2500,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-          theme: "dark",
+          theme: 'dark',
         });
       } catch (err) {
         console.log(err);
 
         if (err.response && err.response.status === 401) {
-          setErrors((prev) => ({ ...prev, password: "Incorrect password" }));
+          setErrors((prev) => ({ ...prev, password: 'Incorrect password' }));
         }
 
         if (err.response && err.response.status === 404) {
-          setErrors((prev) => ({ ...prev, email: "User not found" }));
+          setErrors((prev) => ({ ...prev, email: 'User not found' }));
         }
       }
     }
@@ -98,7 +98,7 @@ const Login = () => {
           />
           <Inputpassword>
             <Input
-              type={showPassword ? "text" : "password"}
+              type={showPassword ? 'text' : 'password'}
               placeholder="Password"
               name="password"
               onChange={handleChange}
@@ -109,7 +109,7 @@ const Login = () => {
             <MdVisibilityOff
               size={40}
               color="gray"
-              style={{ cursor: "pointer", paddingRight: "10px" }}
+              style={{ cursor: 'pointer', paddingRight: '10px' }}
               onClick={toggelShowPassword}
             />
           </Inputpassword>
@@ -118,7 +118,7 @@ const Login = () => {
             Login
           </Button>
           <Span>
-            Don't have an account?
+            Don&apos;t have an account?
             <Styledlink to="/register">Register</Styledlink>
           </Span>
           <Span>

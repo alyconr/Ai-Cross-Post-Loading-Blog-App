@@ -1,7 +1,7 @@
 import Card from "./card";
 import styled from "styled-components";
-
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const RenderBookmarks = ({ bookmarks }) => (
   <BookmarksContainer>
@@ -32,6 +32,17 @@ const RenderBookmarks = ({ bookmarks }) => (
     )}
   </BookmarksContainer>
 );
+
+RenderBookmarks.propTypes = {
+  bookmarks: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      title: PropTypes.string.isRequired,
+      image: PropTypes.string.isRequired,
+      author_fullname: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+};
 
 export default RenderBookmarks;
 

@@ -1,7 +1,8 @@
-import styled from "styled-components";
-import { MdOutlineOpenInNew } from "react-icons/md";
-import { IoCloseCircleOutline } from "react-icons/io5";
-import { Link } from "react-router-dom";
+import styled from 'styled-components';
+import { MdOutlineOpenInNew } from 'react-icons/md';
+import { IoCloseCircleOutline } from 'react-icons/io5';
+import { Link } from 'react-router-dom';
+import propTypes from 'prop-types';
 
 const Sidebar = ({ menuOpen, setMenuOpen, setActiveComponent }) => {
   const handleToggle = (event) => {
@@ -24,25 +25,25 @@ const Sidebar = ({ menuOpen, setMenuOpen, setActiveComponent }) => {
       </ToggleButton>
 
       <MenuItems $isOpen={menuOpen}>
-        <MenuItem as={Link} onClick={() => handleMenuItemClick("dashboard")}>
+        <MenuItem as={Link} onClick={() => handleMenuItemClick('dashboard')}>
           Dashboard
         </MenuItem>
-        <MenuItem as={Link} onClick={() => handleMenuItemClick("profile")}>
+        <MenuItem as={Link} onClick={() => handleMenuItemClick('profile')}>
           Profile Account
         </MenuItem>
-        <MenuItem as={Link} onClick={() => handleMenuItemClick("localPosts")}>
+        <MenuItem as={Link} onClick={() => handleMenuItemClick('localPosts')}>
           Your Local Posts
         </MenuItem>
-        <MenuItem as={Link} onClick={() => handleMenuItemClick("readingList")}>
+        <MenuItem as={Link} onClick={() => handleMenuItemClick('readingList')}>
           Reading List
         </MenuItem>
-        <MenuItem as={Link} onClick={() => handleMenuItemClick("apikeys")}>
+        <MenuItem as={Link} onClick={() => handleMenuItemClick('apikeys')}>
           Api Keys
         </MenuItem>
-        <MenuItem as={Link} onClick={() => handleMenuItemClick("AiAgents")}>
+        <MenuItem as={Link} onClick={() => handleMenuItemClick('AiAgents')}>
           AiAgents FAQs
         </MenuItem>
-        <MenuItem as={Link} onClick={() => handleMenuItemClick("settings")}>
+        <MenuItem as={Link} onClick={() => handleMenuItemClick('settings')}>
           Settings
         </MenuItem>
       </MenuItems>
@@ -50,9 +51,15 @@ const Sidebar = ({ menuOpen, setMenuOpen, setActiveComponent }) => {
   );
 };
 
+Sidebar.propTypes = {
+  menuOpen: propTypes.bool.isRequired,
+  setMenuOpen: propTypes.func.isRequired,
+  setActiveComponent: propTypes.func.isRequired,
+};
+
 export default Sidebar;
 const SidebarContainer = styled.div`
-  width: ${({ $isOpen }) => ($isOpen ? "250px" : "50px")};
+  width: ${({ $isOpen }) => ($isOpen ? '250px' : '50px')};
   transition: width 0.3s;
   background-color: #343a40;
   color: white;
@@ -71,7 +78,7 @@ const ToggleButton = styled.div`
 `;
 
 const MenuItems = styled.div`
-  display: ${({ $isOpen }) => ($isOpen ? "block" : "none")};
+  display: ${({ $isOpen }) => ($isOpen ? 'block' : 'none')};
   padding: 10px;
   text-decoration: none;
 `;

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 const useFetch = (url) => {
   const [data, setData] = useState(null);
@@ -12,7 +12,7 @@ const useFetch = (url) => {
         .get(url)
         .then((response) => {
           if (response.status !== 200) {
-            throw Error("could not fetch the data");
+            throw Error('could not fetch the data');
           }
           setData(response.data.posts);
           setLoading(false);

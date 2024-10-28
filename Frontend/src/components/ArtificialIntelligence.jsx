@@ -1,12 +1,12 @@
-import styled from "styled-components";
-import AiModal from "./AiModal";
-import { useState } from "react";
+import styled from 'styled-components';
+import AiModal from './AiModal';
+import { useState } from 'react';
 const ArtificialIntelligenceComponent = () => {
   const handleClose = () => setAiAgent(false);
-  
-    const handleToggle = () => setAiAgent(!aiAgent);
-    
-    const [aiAgent, setAiAgent] = useState(false);
+
+  const handleToggle = () => setAiAgent(!aiAgent);
+
+  const [aiAgent, setAiAgent] = useState(false);
 
   return (
     <Container>
@@ -98,7 +98,7 @@ const Container = styled.div`
   }
 
   .onoffswitch-inner-ai:before {
-    content: "YES";
+    content: 'YES';
     padding-left: 10px;
     background: linear-gradient(
       109.6deg,
@@ -110,7 +110,7 @@ const Container = styled.div`
   }
 
   .onoffswitch-inner-ai:after {
-    content: "NO";
+    content: 'NO';
     padding-right: 10px;
     background-color: #eeeeee;
     color: #999999;
@@ -134,11 +134,15 @@ const Container = styled.div`
     transition: all 0.3s ease-in 0s;
   }
 
-  .onoffswitch-checkbox-ai:checked + .onoffswitch-label-ai .onoffswitch-inner-ai {
+  .onoffswitch-checkbox-ai:checked
+    + .onoffswitch-label-ai
+    .onoffswitch-inner-ai {
     margin-left: 0;
   }
 
-  .onoffswitch-checkbox-ai:checked + .onoffswitch-label-ai .onoffswitch-switch-ai {
+  .onoffswitch-checkbox-ai:checked
+    + .onoffswitch-label-ai
+    .onoffswitch-switch-ai {
     right: 0px;
   }
 

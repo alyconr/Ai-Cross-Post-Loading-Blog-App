@@ -1,9 +1,10 @@
 import styled from "styled-components";
-import React, { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { toast } from "react-toastify";
 import { AuthContext } from "../context/authContext";
 import axios from "axios";
 import save from "../assets/save.png";
+import ProptTypes from "prop-types";
 
 const ModalBodyDevTo = ({
   publishDevTo,
@@ -158,6 +159,17 @@ const ModalBodyDevTo = ({
       </CrossPosts>
     </div>
   );
+};
+
+ModalBodyDevTo.propTypes = {
+  publishDevTo: ProptTypes.bool,
+  setPublishDevTo: ProptTypes.func,
+  isCrossPostDevTo: ProptTypes.bool,
+  setIsCrossPostDevTo: ProptTypes.func,
+  devToken: ProptTypes.string,
+  setDevToken: ProptTypes.func,
+  draftDevto: ProptTypes.bool,
+  setDraftDevto: ProptTypes.func,
 };
 
 export default ModalBodyDevTo;

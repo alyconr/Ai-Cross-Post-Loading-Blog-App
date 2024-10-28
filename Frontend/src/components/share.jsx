@@ -1,22 +1,22 @@
-import { useEffect, useState } from "react";
-import { useContext } from "react";
-import { useLocation } from "react-router-dom";
-import { AuthContext } from "../context/authContext";
-import Modal from "react-bootstrap/Modal";
-import { CiShare1 } from "react-icons/ci";
-import { FaLinkedin } from "react-icons/fa";
-import { FaSquareXTwitter } from "react-icons/fa6";
-import { IoLogoWhatsapp } from "react-icons/io";
-import { FaTelegram } from "react-icons/fa6";
+import { useState } from 'react';
+import { useContext } from 'react';
+
+import { AuthContext } from '../context/authContext';
+import Modal from 'react-bootstrap/Modal';
+import { CiShare1 } from 'react-icons/ci';
+import { FaLinkedin } from 'react-icons/fa';
+import { FaSquareXTwitter } from 'react-icons/fa6';
+import { IoLogoWhatsapp } from 'react-icons/io';
+import { FaTelegram } from 'react-icons/fa6';
+import PropTypes from 'prop-types';
 const Share = ({ post }) => {
   const { currentUser } = useContext(AuthContext);
-
 
   const url = window.location.href;
 
   const [smShow, setSmShow] = useState(false);
 
-  const images = "http://localhost:9000/uploads/${post.image}";
+  const images = `${import.meta.env.VITE_API_UPLOAD}/uploads/${post.image}`;
 
   return (
     <>
@@ -87,4 +87,7 @@ const Share = ({ post }) => {
   );
 };
 
+Share.propTypes = {
+  post: PropTypes.object.isRequired,
+};
 export default Share;

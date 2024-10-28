@@ -1,9 +1,10 @@
 import styled from "styled-components";
-import React, { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { toast } from "react-toastify";
 import { AuthContext } from "../context/authContext";
 import axios from "axios";
 import save from "../assets/save.png";
+import propTypes from "prop-types";
 
 const ModalBodyHashnode = ({
   publishHashnodeTo,
@@ -192,6 +193,20 @@ const ModalBodyHashnode = ({
       </CrossPosts>
     </div>
   );
+};
+
+ModalBodyHashnode.propTypes = {
+  publishHashnodeTo: propTypes.bool.isRequired,
+  setPublishHashnodeTo: propTypes.func.isRequired,
+  isCrossPostHashnodeTo: propTypes.bool.isRequired,
+  setIsCrossPostHashnodeTo: propTypes.func.isRequired,
+  hashnodeToken: propTypes.string.isRequired,
+  setHashnodeToken: propTypes.func.isRequired,
+  hashnodePublicationId: propTypes.string.isRequired,
+  setHashnodePublicationId: propTypes.func.isRequired,
+  draftHashnode: propTypes.bool.isRequired,
+  setDraftHashnode: propTypes.func.isRequired,
+
 };
 
 export default ModalBodyHashnode;

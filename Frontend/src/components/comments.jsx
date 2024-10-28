@@ -1,43 +1,44 @@
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
-import styled from "styled-components";
-import { useEffect, useState } from "react";
-import axios from "axios";
-import moment from "moment";
-import dompurify from "dompurify";
-import { Link, useLocation } from "react-router-dom";
-import follower from "../assets/follower.png";
-import { AuthContext } from "../context/authContext";
-import { useContext } from "react";
-import { BsFillTrashFill } from "@react-icons/all-files/bs/BsFillTrashFill";
-import { FcEditImage } from "@react-icons/all-files/fc/FcEditImage";
-import { FaCommentMedical } from "react-icons/fa6";
-import { BiSolidCommentAdd } from "react-icons/bi";
-import { MdOutlinePostAdd } from "react-icons/md";
-import { MdCancelPresentation } from "react-icons/md";
-import ClapsOnComments from "./clapsOnCommentsCounter";
-import CommentOnComments from "./commentOnComments";
-import { toast } from "react-toastify";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import styled from 'styled-components';
+import { useEffect, useState, useCallback } from 'react';
+import axios from 'axios';
+import moment from 'moment';
+import dompurify from 'dompurify';
+import { Link, useLocation } from 'react-router-dom';
+import follower from '../assets/follower.png';
+import { AuthContext } from '../context/authContext';
+import { useContext } from 'react';
+import { BsFillTrashFill } from '@react-icons/all-files/bs/BsFillTrashFill';
+import { FcEditImage } from '@react-icons/all-files/fc/FcEditImage';
+import { FaCommentMedical } from 'react-icons/fa6';
+import { BiSolidCommentAdd } from 'react-icons/bi';
+import { MdOutlinePostAdd } from 'react-icons/md';
+import { MdCancelPresentation } from 'react-icons/md';
+import ClapsOnComments from './clapsOnCommentsCounter';
+import CommentOnComments from './commentOnComments';
+import { toast } from 'react-toastify';
+import PropTypes from 'prop-types';
 
 const Comments = ({ post, setPost }) => {
-  const [newComment, setNewComment] = useState("");
-  const [newCommentOnComment, setNewCommentOnComment] = useState("");
+  const [newComment, setNewComment] = useState('');
+  const [newCommentOnComment, setNewCommentOnComment] = useState('');
   const [commentList, setCommentList] = useState([]);
   const [postCommentTrigger, setPostCommentTrigger] = useState(false);
   const [editCommentId, setEditCommentId] = useState(null); // Track the comment being edited
-  const [cont, setCont] = useState([]);
+  const [setCont] = useState([]);
   const location = useLocation();
-  const urlId = location.pathname.split("/")[2];
+  const urlId = location.pathname.split('/')[2];
   const { currentUser } = useContext(AuthContext);
   const [openTextEditor, setOpenTextEditor] = useState(false);
 
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async () => {
     try {
       const res = await axios.get(
         `http://localhost:9000/api/v1/comments/${urlId}`,
         {
           withCredentials: true,
-          credentials: "include",
+          credentials: 'include',
         }
       );
       setCont(res.data);
@@ -45,22 +46,22 @@ const Comments = ({ post, setPost }) => {
     } catch (err) {
       console.log(err);
     }
-  };
+  }, [urlId, setCont]);
 
   useEffect(() => {
     fetchComments();
-  }, [urlId]);
+  }, [urlId, fetchComments]);
 
   useEffect(() => {
     if (postCommentTrigger) {
       fetchComments();
       setPostCommentTrigger(false);
     }
-  }, [postCommentTrigger]);
+  }, [postCommentTrigger, fetchComments]);
 
   const handleSubmit = async () => {
-    if (newComment.trim() === "") {
-      toast.error("Comment cannot be empty");
+    if (newComment.trim() === '') {
+      toast.error('Comment cannot be empty');
       return;
     }
     try {
@@ -69,11 +70,11 @@ const Comments = ({ post, setPost }) => {
         {
           postID: urlId,
           comment: newComment,
-          date: moment().format("YYYY-MM-DD HH:mm:ss"),
+          date: moment().format('YYYY-MM-DD HH:mm:ss'),
         },
         {
           withCredentials: true,
-          credentials: "include",
+          credentials: 'include',
         }
       );
 
@@ -82,7 +83,7 @@ const Comments = ({ post, setPost }) => {
         fullname: response.data.fullname,
       };
       setCommentList([...commentList, newCommentData]);
-      setNewComment("");
+      setNewComment('');
       setPostCommentTrigger(true);
     } catch (err) {
       console.log(err);
@@ -99,7 +100,7 @@ const Comments = ({ post, setPost }) => {
     try {
       await axios.delete(`http://localhost:9000/api/v1/comments/postId/${id}`, {
         withCredentials: true,
-        credentials: "include",
+        credentials: 'include',
       });
 
       setCommentList(commentList.filter((item) => item.id !== id));
@@ -116,7 +117,7 @@ const Comments = ({ post, setPost }) => {
 
   const handleCancelEdit = () => {
     setEditCommentId(null);
-    setNewComment("");
+    setNewComment('');
   };
 
   const handleUpdate = async () => {
@@ -128,7 +129,7 @@ const Comments = ({ post, setPost }) => {
         },
         {
           withCredentials: true,
-          credentials: "include",
+          credentials: 'include',
         }
       );
 
@@ -158,24 +159,24 @@ const Comments = ({ post, setPost }) => {
         onChange={setNewComment}
         modules={{
           toolbar: [
-            ["bold", "italic", "underline", "strike"],
-            ["link", "image"],
-            ["clean"],
+            ['bold', 'italic', 'underline', 'strike'],
+            ['link', 'image'],
+            ['clean'],
             [{ color: [] }],
             [{ align: [] }],
-            ["code-block"],
+            ['code-block'],
           ],
         }}
         formats={[
-          "bold",
-          "italic",
-          "underline",
-          "strike",
-          "code-block",
-          "link",
-          "image",
-          "color",
-          "align",
+          'bold',
+          'italic',
+          'underline',
+          'strike',
+          'code-block',
+          'link',
+          'image',
+          'color',
+          'align',
         ]}
       />
       <Action>
@@ -220,7 +221,7 @@ const Comments = ({ post, setPost }) => {
               </div>
               {editCommentId === comment.id ? (
                 <div>
-                  {" "}
+                  {' '}
                   <h6 className="ms-5 p-2 bg-primary text-white rounded">
                     Update your comment in the box editor above
                   </h6>
@@ -228,7 +229,7 @@ const Comments = ({ post, setPost }) => {
               ) : (
                 <div
                   dangerouslySetInnerHTML={createMarkup(comment.comment)}
-                  style={{ maxWidth: "100%", overflow: "hidden" }}
+                  style={{ maxWidth: '100%', overflow: 'hidden' }}
                   className="comment"
                 />
               )}
@@ -244,7 +245,7 @@ const Comments = ({ post, setPost }) => {
                     className="message"
                     onClick={handleClickonComment}
                   >
-                    <BiSolidCommentAdd size={35} color={"#33FFCE"} />
+                    <BiSolidCommentAdd size={35} color={'#33FFCE'} />
                   </button>
 
                   {editCommentId !== comment.id && (
@@ -261,7 +262,7 @@ const Comments = ({ post, setPost }) => {
                         className="message"
                         onClick={() => handleDelete(comment.id)}
                       >
-                        <BsFillTrashFill color={"#6A072D"} size={30} />
+                        <BsFillTrashFill color={'#6A072D'} size={30} />
                       </button>
                     </div>
                   )}
@@ -276,23 +277,23 @@ const Comments = ({ post, setPost }) => {
                     onChange={setNewCommentOnComment}
                     modules={{
                       toolbar: [
-                        ["bold", "italic", "underline", "strike"],
-                        ["link"],
-                        ["clean"],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['link'],
+                        ['clean'],
                         [{ color: [] }],
                         [{ align: [] }],
-                        ["code-block"],
+                        ['code-block'],
                       ],
                     }}
                     formats={[
-                      "bold",
-                      "italic",
-                      "underline",
-                      "strike",
-                      "code-block",
-                      "link",
-                      "color",
-                      "align",
+                      'bold',
+                      'italic',
+                      'underline',
+                      'strike',
+                      'code-block',
+                      'link',
+                      'color',
+                      'align',
                     ]}
                   />
 
@@ -314,6 +315,10 @@ const Comments = ({ post, setPost }) => {
   );
 };
 
+Comments.propTypes = {
+  post: PropTypes.object.isRequired,
+  setPost: PropTypes.func.isRequired,
+};
 export default Comments;
 
 const Container = styled.div`

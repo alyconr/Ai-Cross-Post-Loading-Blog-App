@@ -4,34 +4,35 @@ import {
   Outlet,
   useLocation,
   Navigate,
-} from "react-router-dom";
-import { AuthContext } from "./context/authContext";
-import { useContext } from "react";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import Register from "./pages/Register";
-import Login from "./pages/Login";
-import Home from "./pages/Home";
-import Write from "./pages/Write";
-import Singlepost from "./pages/Singlepost";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
-import styled from "styled-components";
-import GlobalStyles from "./GlobalStyles";
-import Hero from "./components/Hero";
-import Profile from "./pages/Profile";
-import Userposts from "./pages/Userposts";
-import ResetPassword from "./pages/ResetPassword";
-import ForgotPassword from "./pages/forgotPassword";
-import Settings from "./components/settings";
-import Bookmarks from "./pages/Bookmarks";
-import Dashboard from "./pages/Dashboard";
+} from 'react-router-dom';
+import { AuthContext } from './context/authContext';
+import { useContext } from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Register from './pages/Register';
+import Login from './pages/Login';
+import Home from './pages/Home';
+import Write from './pages/Write';
+import Singlepost from './pages/Singlepost';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import styled from 'styled-components';
+import GlobalStyles from './GlobalStyles';
+import Hero from './components/Hero';
+import Profile from './pages/Profile';
+import Userposts from './pages/Userposts';
+import ResetPassword from './pages/ResetPassword';
+import ForgotPassword from './pages/forgotPassword';
+import Settings from './components/settings';
+import Bookmarks from './pages/Bookmarks';
+import Dashboard from './pages/Dashboard';
+import PropTypes from 'prop-types';
 
 const Layout = () => {
   const location = useLocation();
-  const isHome = location.pathname === "/";
+  const isHome = location.pathname === '/';
   const category = useLocation().search;
-  const isDashboard = location.pathname === "/Dashboard/:username";
+  const isDashboard = location.pathname === '/Dashboard/:username';
 
   return (
     <>
@@ -50,61 +51,64 @@ const PrivateRoute = ({ element }) => {
 
   return currentUser ? element : <Navigate to="/login" />;
 };
+PrivateRoute.propTypes = {
+  element: PropTypes.element.isRequired,
+};
 
 const Router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <Layout />,
     children: [
       {
-        path: "/",
+        path: '/',
         element: <Home />,
       },
       {
-        path: "/write",
+        path: '/write',
         element: <PrivateRoute element={<Write />} />,
       },
       {
-        path: "/singlepost/:id/:title",
+        path: '/singlepost/:id/:title',
         element: <Singlepost />,
       },
       {
-        path: "/profile/:username",
+        path: '/profile/:username',
         element: <PrivateRoute element={<Profile />} />,
       },
       {
-        path: "/settings/:username",
+        path: '/settings/:username',
         element: <PrivateRoute element={<Settings />} />,
       },
       {
-        path: "/profile/:username/posts",
+        path: '/profile/:username/posts',
         element: <PrivateRoute element={<Userposts />} />,
       },
       {
-        path: "/profile/:username/bookmarks",
+        path: '/profile/:username/bookmarks',
         element: <PrivateRoute element={<Bookmarks />} />,
       },
       {
-        path: "/Dashboard/:username",
+        path: '/Dashboard/:username',
         element: <PrivateRoute element={<Dashboard />} />,
       },
       {
-        path: "/login",
+        path: '/login',
         element: <Login />,
       },
     ],
   },
   {
-    path: "/register",
+    path: '/register',
     element: <Register />,
   },
 
   {
-    path: "/forgot-password",
+    path: '/forgot-password',
     element: <ForgotPassword />,
   },
   {
-    path: "/reset-password",
+    path: '/reset-password',
     element: <ResetPassword />,
   },
 ]);

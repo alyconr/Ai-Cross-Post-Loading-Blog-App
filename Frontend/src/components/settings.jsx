@@ -1,57 +1,57 @@
-import styled from "styled-components";
-import { CiLinkedin } from "react-icons/ci";
-import { FaGithub } from "react-icons/fa6";
-import { useState, useEffect, useContext } from "react";
-import axios from "axios";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { AuthContext } from "../context/authContext";
-import { toast } from "react-toastify";
-import useFetch from "../utils/useFetch";
+import styled from 'styled-components';
+import { CiLinkedin } from 'react-icons/ci';
+import { FaGithub } from 'react-icons/fa6';
+import { useState, useEffect, useContext } from 'react';
+import axios from 'axios';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { AuthContext } from '../context/authContext';
+import { toast } from 'react-toastify';
+import useFetch from '../utils/useFetch';
 
 const Settings = () => {
   const [user, setUser] = useState({});
-  const [name, setName] = useState("");
-  const [username, setuserName] = useState("");
-  const [password, setPassword] = useState("");
-  const [bio, setBio] = useState("");
-  const [file, setFile] = useState("");
-  const [company, setCompany] = useState("");
-  const [place, setPlace] = useState("");
-  const [social1, setSocial1] = useState("");
-  const [social2, setSocial2] = useState("");
-  const [errors, setErrors] = useState({ password: "" });
-  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [name, setName] = useState('');
+  const [username] = useState('');
+  const [password, setPassword] = useState('');
+  const [bio, setBio] = useState('');
+  const [file, setFile] = useState('');
+  const [company, setCompany] = useState('');
+  const [place, setPlace] = useState('');
+  const [social1, setSocial1] = useState('');
+  const [social2, setSocial2] = useState('');
+  const [setErrors] = useState({ password: '' });
+  const [setShowErrorModal] = useState(false);
 
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
-  const userName = location.pathname.split("/")[2];
+  const userName = location.pathname.split('/')[2];
 
-  const { data: posts } = useFetch(
-    `http://localhost:9000/api/v1/user/posts/${userName}`
-  );
+  useFetch(`${import.meta.env.VITE_API_URI}/user/posts/${userName}`);
 
   useEffect(() => {
     const getUser = async () => {
       try {
         const endpoint =
           userName !== currentUser?.user.username
-            ? `http://localhost:9000/api/v1/user/${userName}`
-            : `http://localhost:9000/api/v1/user/${currentUser?.user.username}`;
+            ? `${import.meta.env.VITE_API_URI}/user/${userName}`
+            : `${import.meta.env.VITE_API_URI}/user/${
+                currentUser?.user.username
+              }`;
 
         const res = await axios.get(endpoint, {
           withCredentials: true,
-          credentials: "include",
+          credentials: 'include',
         });
         setUser(res.data[0]);
-        setName(res.data[0]?.fullname || "");
-        setPassword(res.data[0]?.password || "");
-        setBio(res.data[0]?.bio || "");
+        setName(res.data[0]?.fullname || '');
+        setPassword(res.data[0]?.password || '');
+        setBio(res.data[0]?.bio || '');
         setFile(res.data[0].image || null);
-        setCompany(res.data[0]?.company || "");
-        setPlace(res.data[0]?.location || "");
-        setSocial1(res.data[0]?.social1 || "");
-        setSocial2(res.data[0]?.social2 || "");
+        setCompany(res.data[0]?.company || '');
+        setPlace(res.data[0]?.location || '');
+        setSocial1(res.data[0]?.social1 || '');
+        setSocial2(res.data[0]?.social2 || '');
       } catch (error) {
         console.error(error);
       }
@@ -60,23 +60,23 @@ const Settings = () => {
   }, [userName, currentUser]);
 
   const handleSave = async () => {
-    let imgUrl = "";
+    let imgUrl = '';
     try {
       const formData = new FormData();
 
       if (file) {
-        formData.append("file", file);
+        formData.append('file', file);
 
         const response = await axios.post(
-          "http://localhost:9000/api/v1/upload",
+          '${import.meta.env.VITE_API_URI}/upload',
           formData
         );
         imgUrl = response.data;
-        formData.append("image", imgUrl); // Append the image URL to the formData
+        formData.append('image', imgUrl); // Append the image URL to the formData
       }
 
-      const res = await axios.put(
-        `http://localhost:9000/api/v1/user/${currentUser?.user.username}`,
+      await axios.put(
+        `${import.meta.env.VITE_API_URI}/user/${currentUser?.user.username}`,
         {
           fullname: name,
           username,
@@ -90,20 +90,20 @@ const Settings = () => {
         },
         {
           withCredentials: true,
-          credentials: "include",
+          credentials: 'include',
         }
       );
 
       navigate(`/profile/${currentUser?.user.username}`);
-      toast.success("Profile updated successfully", {
-        position: "top-center",
+      toast.success('Profile updated successfully', {
+        position: 'top-center',
         autoClose: 2500,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        theme: "dark",
+        theme: 'dark',
       });
     } catch (error) {
       console.error(error);
@@ -122,10 +122,10 @@ const Settings = () => {
   const handleDeleteAccount = async () => {
     try {
       await axios.delete(
-        `http://localhost:9000/api/v1/user/${currentUser?.user.username}`,
+        `${import.meta.env.VITE_API_URI}/user/${currentUser?.user.username}`,
         {
           withCredentials: true,
-          credentials: "include",
+          credentials: 'include',
         }
       );
     } catch (error) {
@@ -170,7 +170,7 @@ const Settings = () => {
           onChange={(e) => setBio(e.target.value)}
         ></textarea>
         <input
-          style={{ display: "none" }}
+          style={{ display: 'none' }}
           type="file"
           name=""
           id="file"
@@ -333,7 +333,7 @@ const EditProfile = styled.div`
     display: block;
   }
 
-  button[class="danger"] {
+  button[class='danger'] {
     background: linear-gradient(
       90deg,
       rgba(0, 6, 36, 1) 0%,

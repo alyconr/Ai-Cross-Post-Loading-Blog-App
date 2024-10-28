@@ -1,9 +1,11 @@
 import styled from "styled-components";
-import React, { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { toast } from "react-toastify";
 import { AuthContext } from "../context/authContext";
 import axios from "axios";
 import save from "../assets/save.png";
+import  propTypes  from "react-bootstrap/esm/Image";
+
 
 const ModalBodyMedium = ({
   publishMediumTo,
@@ -19,7 +21,7 @@ const ModalBodyMedium = ({
 
   const { currentUser } = useContext(AuthContext);
 
-  const handleUpdateMediumToken = async (e) => {
+  const handleUpdateMediumToken = async () => {
     try {
       const response = await axios.put(
         `http://localhost:9000/api/v1/user/mediumToken/${currentUser?.user.id}`,
@@ -161,6 +163,20 @@ const ModalBodyMedium = ({
     </div>
   );
 };
+
+
+ModalBodyMedium.propTypes = { 
+  publishMediumTo: propTypes.bool,
+  setPublishMediumTo: propTypes.func,
+  isCrossPostMediumTo: propTypes.bool,
+  setIsCrossPostMediumTo: propTypes.func,
+  mediumToken: propTypes.string,
+  setMediumToken: propTypes.func,
+  draftMedium: propTypes.bool,
+  setDraftMedium: propTypes.func,
+};
+
+
 export default ModalBodyMedium;
 
 const CrossPosts = styled.div`

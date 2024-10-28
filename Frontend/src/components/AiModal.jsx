@@ -1,39 +1,39 @@
-import { useContext, useEffect, useState } from "react";
-import Button from "react-bootstrap/Button";
-import Modal from "react-bootstrap/Modal";
-import { Link } from "react-router-dom";
-import { AuthContext } from "../context/authContext";
-import axios from "axios";
-import ReactMarkdown from "react-markdown";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { solarizedlight } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { toast } from "react-toastify";
-import { FaArrowAltCircleDown } from "react-icons/fa";
-import styled, { keyframes } from "styled-components";
-import save from "../assets/save.png";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useContext, useEffect, useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import { Link } from 'react-router-dom';
+import { AuthContext } from '../context/authContext';
+import axios from 'axios';
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { solarizedlight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { toast } from 'react-toastify';
+import { FaArrowAltCircleDown } from 'react-icons/fa';
+import styled, { keyframes } from 'styled-components';
+import save from '../assets/save.png';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import PropTypes from 'prop-types';
 
 const AiModal = ({ aiAgent, handleClose }) => {
   const { currentUser } = useContext(AuthContext);
   const [numReferences, setNumReferences] = useState(1);
-  const [openAiApiKey, setOpenAiApiKey] = useState("");
-  const [openAiApiKeySaved, setOpenAiApiKeySaved] = useState("");
-  const [keyword, setKeyword] = useState("");
-  const [blogPost, setBlogPost] = useState("");
+  const [openAiApiKey, setOpenAiApiKey] = useState('');
+  const [openAiApiKeySaved, setOpenAiApiKeySaved] = useState('');
+  const [keyword, setKeyword] = useState('');
+  const [blogPost, setBlogPost] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [showCard, setShowCard] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleGenerateBlogPost = async () => {
     setLoading(true);
-    setError("");
-    setBlogPost("");
-    
+    setError('');
+    setBlogPost('');
 
     try {
       const response = await axios.post(
-        "http://localhost:9000/api/v1/generateBlogPost/generate",
+        'http://localhost:9000/api/v1/generateBlogPost/generate',
         {
           numReferences,
           openAiApiKey: openAiApiKeySaved || openAiApiKey,
@@ -58,10 +58,10 @@ const AiModal = ({ aiAgent, handleClose }) => {
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(blogPost);
-      toast.success("Blog post copied to clipboard!");
+      toast.success('Blog post copied to clipboard!');
     } catch (error) {
-      console.error("Error copying to clipboard:", error);
-      toast.error("Failed to copy blog post to clipboard.");
+      console.error('Error copying to clipboard:', error);
+      toast.error('Failed to copy blog post to clipboard.');
     }
   };
 
@@ -74,16 +74,16 @@ const AiModal = ({ aiAgent, handleClose }) => {
         },
         {
           withCredentials: true,
-          credentials: "include",
+          credentials: 'include',
         }
       );
 
       setOpenAiApiKeySaved(response.data.openAiApiKey);
 
-      toast.success("OpenAi API key saved successfully!");
+      toast.success('OpenAi API key saved successfully!');
     } catch (error) {
-      console.error("Error saving OpenAi API key:", error);
-      toast.error("Failed to save OpenAi API key.");
+      console.error('Error saving OpenAi API key:', error);
+      toast.error('Failed to save OpenAi API key.');
     }
   };
 
@@ -94,12 +94,12 @@ const AiModal = ({ aiAgent, handleClose }) => {
           `http://localhost:9000/api/v1/user/openAiApiKey/${currentUser?.user.id}`,
           {
             withCredentials: true,
-            credentials: "include",
+            credentials: 'include',
           }
         );
         setOpenAiApiKeySaved(response.data.openAiApiKey);
       } catch (error) {
-        console.error("Error getting OpenAi API key:", error);
+        console.error('Error getting OpenAi API key:', error);
       }
     };
     getOpenAiApiKey();
@@ -107,19 +107,19 @@ const AiModal = ({ aiAgent, handleClose }) => {
 
   const scrollToAnchor = (e) => {
     e.preventDefault();
-    const href = e.target.getAttribute("href");
-    if (href.startsWith("#")) {
+    const href = e.target.getAttribute('href');
+    if (href.startsWith('#')) {
       const id = href.slice(1);
       const element = document.getElementById(id);
       if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
+        element.scrollIntoView({ behavior: 'smooth' });
       }
     }
   };
 
   return (
     <>
-      <Modal show={aiAgent} onHide={handleClose} fullscreen={true} >
+      <Modal show={aiAgent} onHide={handleClose} fullscreen={true}>
         <Modal.Header closeButton>
           <Modal.Title className="ms-auto">
             GREAT, THIS IS YOU AI AGENT BASED ON OPEN AI MODEL
@@ -130,7 +130,7 @@ const AiModal = ({ aiAgent, handleClose }) => {
           <>
             <CenteredDiv>
               <StyledButton onClick={handleShowCard}>
-                <p>Let's Generate A Blog Post</p>
+                <p>Let&apos;s Generate A Blog Post</p>
                 <AnimatedArrow />
               </StyledButton>
             </CenteredDiv>
@@ -156,7 +156,7 @@ const AiModal = ({ aiAgent, handleClose }) => {
 
                     <InputGroup>
                       <p>
-                        Enter Your OpenAi API key{" "}
+                        Enter Your OpenAi API key{' '}
                         <a
                           href="https://platform.openai.com/"
                           target="_blank"
@@ -168,7 +168,7 @@ const AiModal = ({ aiAgent, handleClose }) => {
                       <div className="openai-key">
                         <PasswordInputWrapper>
                           <StyledInput
-                            type={showPassword ? "text" : "password"}
+                            type={showPassword ? 'text' : 'password'}
                             onChange={(e) =>
                               setOpenAiApiKey(e.target.value) ||
                               setOpenAiApiKeySaved(e.target.value)
@@ -211,11 +211,11 @@ const AiModal = ({ aiAgent, handleClose }) => {
                     {error && <p className="text-danger">{error}</p>}
 
                     <p>
-                      Don't you know how to use our AI agents yet?{" "}
+                      Don&apos;t you know how to use our AI agents yet?{' '}
                       <Link to={`/Dashboard/${currentUser.user.name}`}>
                         Click here
-                      </Link>{" "}
-                      to our AiAgents FAQ's{" "}
+                      </Link>{' '}
+                      to our AiAgents FAQ&apos;s{' '}
                     </p>
                   </OpenaiCard>
                 ) : (
@@ -243,8 +243,8 @@ const AiModal = ({ aiAgent, handleClose }) => {
             <BlogPostContent>
               <ReactMarkdown
                 components={{
-                  code({ node, inline, className, children, ...props }) {
-                    const match = /language-(\w+)/.exec(className || "");
+                  code({ inline, className, children, ...props }) {
+                    const match = /language-(\w+)/.exec(className || '');
                     return !inline && match ? (
                       <SyntaxHighlighter
                         style={solarizedlight}
@@ -252,7 +252,7 @@ const AiModal = ({ aiAgent, handleClose }) => {
                         PreTag="div"
                         {...props}
                       >
-                        {String(children).replace(/\n$/, "")}
+                        {String(children).replace(/\n$/, '')}
                       </SyntaxHighlighter>
                     ) : (
                       <code className={className} {...props}>
@@ -260,7 +260,7 @@ const AiModal = ({ aiAgent, handleClose }) => {
                       </code>
                     );
                   },
-                  a: ({ node, ...props }) => {
+                  a: ({ ...props }) => {
                     if (props.id) {
                       return <a id={props.id} />;
                     }
@@ -276,6 +276,12 @@ const AiModal = ({ aiAgent, handleClose }) => {
       </Modal>
     </>
   );
+};
+
+AiModal.propTypes = {
+  id: PropTypes.string.isRequired,
+  aiAgent: PropTypes.bool.isRequired,
+  handleClose: PropTypes.func.isRequired,
 };
 
 export default AiModal;
@@ -371,7 +377,7 @@ const BlogPostContainer = styled.div`
   border-radius: 8px;
   background-color: #fff;
   box-shadow: ${(blogPost) =>
-    blogPost ? "none" : "0 2px 4px 6px rgba(0.1, 0.1, 0, 0.1)"};
+    blogPost ? 'none' : '0 2px 4px 6px rgba(0.1, 0.1, 0, 0.1)'};
 
   .header {
     display: flex;
@@ -433,7 +439,7 @@ const Spinner = styled.div`
     position: relative;
   }
   .loader::before {
-    content: "";
+    content: '';
     position: absolute;
     width: 8px;
     aspect-ratio: 1;

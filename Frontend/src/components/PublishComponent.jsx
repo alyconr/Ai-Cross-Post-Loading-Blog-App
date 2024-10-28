@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
 import CustomModal from "../components/Modal";
+import PropTypes from 'prop-types'
 
 const PublishComponent = ({
   title,
@@ -11,7 +12,6 @@ const PublishComponent = ({
   file,
   image,
   postId,
-  draftId,
   handleFileChange,
   handleDeleteDraftPost,
   handleCancel,
@@ -51,7 +51,7 @@ const PublishComponent = ({
     }
     
     
-  } , [metadataPost]);
+  } , [metadataPost, metadataObject]);
   
   
   const handleShowModal = () => setShowModal(true);
@@ -246,6 +246,25 @@ const PublishComponent = ({
     </Preview>
   );
 };
+
+PublishComponent.propTypes = {
+  title: PropTypes.string,
+  cont: PropTypes.string,
+  desc: PropTypes.string,
+  image: PropTypes.string,
+  cat: PropTypes.string,
+  postId: PropTypes.string,
+  tags: PropTypes.array,
+  file: PropTypes.string,
+  handlePublishAndDeleteDraft: PropTypes.func,
+  handleFileChange: PropTypes.func,
+  handleDeleteDraftPost: PropTypes.func,
+  handleCancel: PropTypes.func,
+  setCat: PropTypes.func,
+  metadataPost: PropTypes.string
+
+};
+
 
 export default PublishComponent;
 

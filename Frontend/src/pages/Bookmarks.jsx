@@ -1,10 +1,10 @@
-import styled from "styled-components";
-import { Link, useLocation } from "react-router-dom";
-import useFetch from "../utils/useFetch";
-import React, { useState, useEffect } from "react";
-import { useContext } from "react";
-import axios from "axios";
-import { AuthContext } from "../context/authContext";
+import styled from 'styled-components';
+import { Link, useLocation } from 'react-router-dom';
+
+import { useState, useEffect } from 'react';
+import { useContext } from 'react';
+import axios from 'axios';
+import { AuthContext } from '../context/authContext';
 
 const Bookmarks = () => {
   const category = useLocation().search;
@@ -20,7 +20,7 @@ const Bookmarks = () => {
     const getBookmarks = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:9000/api/v1/bookmarks/${currentUserId} `
+          `${import.meta.env.VITE_API_URI}/bookmarks/${currentUserId} `
         );
         setBookmarks(res.data);
         console.log(res.data);
@@ -51,7 +51,7 @@ const Bookmarks = () => {
                 <div className="Content">
                   <PostLink
                     to={`/singlepost/${post.id}/title=${encodeURIComponent(
-                      post.title.replace(/ /g, "-")
+                      post.title.replace(/ /g, '-')
                     )}`}
                   >
                     <h2>{post.title}</h2>
@@ -61,7 +61,7 @@ const Bookmarks = () => {
                     <Link
                       className="read-more"
                       to={`/singlepost/${post.id}/title=${encodeURIComponent(
-                        post.title.replace(/ /g, "-")
+                        post.title.replace(/ /g, '-')
                       )}`}
                     >
                       Read More

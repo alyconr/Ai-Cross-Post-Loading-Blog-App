@@ -2,6 +2,8 @@ import Card from "./card";
 import styled from "styled-components";
 import followerUser from "../assets/follower.png";
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
+
 
 const RenderFollowers = ({ followers }) => (
   <FollowersContainer>
@@ -32,6 +34,9 @@ const RenderFollowers = ({ followers }) => (
   </FollowersContainer>
 );
 
+RenderFollowers.propTypes = {
+  followers: PropTypes.array.isRequired,
+};
 export default RenderFollowers;
 
 const FollowersContainer = styled.div`

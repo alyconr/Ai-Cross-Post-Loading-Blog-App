@@ -1,6 +1,8 @@
 import Card from "./card";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
+import PropTypes from 'prop-types';
+
 const RenderMediumPosts = ({ mediumPosts }) => {
     return (
       <MediumPostsContainer>
@@ -26,6 +28,11 @@ const RenderMediumPosts = ({ mediumPosts }) => {
       </MediumPostsContainer>
     );
 };
+
+
+RenderMediumPosts.propTypes = {
+    mediumPosts: PropTypes.array.isRequired,
+  };
   
 
 export default RenderMediumPosts;

@@ -1,27 +1,27 @@
-import styled from "styled-components";
-import GlobalStyles from "./../GlobalStyles";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useState } from "react";
-import { toast } from "react-toastify";
-import axios from "axios";
-import { Button, Modal } from "react-bootstrap";
-import { MdVisibilityOff } from "react-icons/md";
+import styled from 'styled-components';
+import GlobalStyles from './../GlobalStyles';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { toast } from 'react-toastify';
+import axios from 'axios';
+import { Button, Modal } from 'react-bootstrap';
+import { MdVisibilityOff } from 'react-icons/md';
 
 const ResetPassword = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const token = location.search.split("=")[1];
+  const token = location.search.split('=')[1];
 
   const [inputs, setInputs] = useState({
-    email: "",
-    password: "",
+    email: '',
+    password: '',
     token: token,
   });
 
   const [errors, setErrors] = useState({
-    email: "",
-    password: "",
-    token: "",
+    email: '',
+    password: '',
+    token: '',
   });
 
   const [showPasswordErrorModal, setShowPasswordErrorModal] = useState(false);
@@ -36,7 +36,7 @@ const ResetPassword = () => {
 
   const handleChange = (e) => {
     setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-    setErrors((prev) => ({ ...prev, [e.target.name]: "" }));
+    setErrors((prev) => ({ ...prev, [e.target.name]: '' }));
   };
 
   const toggelShowPassword = () => {
@@ -45,20 +45,20 @@ const ResetPassword = () => {
 
   const validateInputs = () => {
     let isValid = true;
-    const newErrors = { email: "", password: "", token: "" };
+    const newErrors = { email: '', password: '', token: '' };
 
     if (!inputs.email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = 'Email is required';
       isValid = false;
     }
 
     if (!inputs.password.trim()) {
-      newErrors.password = "Password is required";
+      newErrors.password = 'Password is required';
       isValid = false;
     }
 
     if (!inputs.token.trim()) {
-      newErrors.token = "Token is required";
+      newErrors.token = 'Token is required';
       isValid = false;
     }
 
@@ -73,36 +73,36 @@ const ResetPassword = () => {
     if (validateInputs()) {
       try {
         await axios.post(
-          "http://localhost:9000/api/v1/auth/resetPassword",
+          `${import.meta.env.VITE_API_URI}/auth/resetPassword`,
           inputs,
           {
             withCredentials: true,
-            credentials: "include",
+            credentials: 'include',
           }
         );
-        toast.success("Password reset successfully", {
-          position: "bottom-center",
+        toast.success('Password reset successfully', {
+          position: 'bottom-center',
           autoClose: 2500,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-          theme: "dark",
+          theme: 'dark',
         });
 
-        navigate("/login");
+        navigate('/login');
       } catch (err) {
         console.log(err);
 
         if (
           err.response &&
           err.response.status === 400 &&
-          err.response.data.error === "Invalid or expired reset token"
+          err.response.data.error === 'Invalid or expired reset token'
         ) {
           setErrors((prev) => ({
             ...prev,
-            token: "Invalid or expired reset token",
+            token: 'Invalid or expired reset token',
           }));
         }
 
@@ -118,12 +118,12 @@ const ResetPassword = () => {
           err.response &&
           err.response.status === 401 &&
           err.response.data.error ===
-            "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+            'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character'
         ) {
           setErrors((prev) => ({
             ...prev,
             password:
-              "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+              'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character',
           }));
           handleShow();
         }
@@ -147,7 +147,7 @@ const ResetPassword = () => {
           />
           <Inputpassword>
             <Input
-              type={showPassword ? "text" : "password"}
+              type={showPassword ? 'text' : 'password'}
               placeholder="Password"
               name="password"
               onChange={handleChange}
@@ -157,7 +157,7 @@ const ResetPassword = () => {
             <MdVisibilityOff
               size={40}
               color="gray"
-              style={{ cursor: "pointer", paddingRight: "10px" }}
+              style={{ cursor: 'pointer', paddingRight: '10px' }}
               onClick={toggelShowPassword}
             />
           </Inputpassword>
@@ -166,7 +166,7 @@ const ResetPassword = () => {
             Reset
           </ButtonSubmit>
           <Span>
-            Don't have an account?
+            Don&apos;t have an account?
             <Styledlink to="/register">Register</Styledlink>
           </Span>
           <Span>

@@ -7,6 +7,7 @@ import handleCrossPostToMedium from "../utils/mediumToApi";
 import handleCrossPostToHashnode from "../utils/hashnodeToApi";
 import ModalBodyMedium from "./ModalBodyMedium";
 import ModalBodyHashnode from "./ModalBodyHashnode";
+import PropTypes from "prop-types";
 
 const CustomModal = ({
   handlePublishAndDeleteDraft,
@@ -146,6 +147,18 @@ const CustomModal = ({
       </Modal.Footer>
     </Modal>
   );
+};
+
+CustomModal.propTypes = {
+  handlePublishAndDeleteDraft: PropTypes.func.isRequired,
+  setShowModal: PropTypes.func.isRequired,
+  showModal: PropTypes.bool.isRequired,
+  title: PropTypes.string.isRequired,
+  cont: PropTypes.string.isRequired,
+  image: PropTypes.string.isRequired,
+  desc: PropTypes.string.isRequired,
+  category: PropTypes.string.isRequired,
+  tags: PropTypes.string.isRequired,
 };
 
 export default CustomModal;

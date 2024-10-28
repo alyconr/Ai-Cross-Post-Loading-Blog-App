@@ -1,7 +1,8 @@
-import styled from "styled-components";
-import { Link, useLocation } from "react-router-dom";
-import useFetch from "../utils/useFetch";
-import React, { useEffect } from "react";
+import styled from 'styled-components';
+import { Link, useLocation } from 'react-router-dom';
+import useFetch from '../utils/useFetch';
+import { useEffect } from 'react';
+import.meta.env.REACT_APP_API_URI;
 
 const Home = () => {
   const category = useLocation().search;
@@ -13,8 +14,8 @@ const Home = () => {
     error,
   } = useFetch(
     shouldFetchAllPosts
-      ? "http://localhost:9000/api/v1/posts"
-      : `http://localhost:9000/api/v1/posts${category}`
+      ? `${import.meta.env.VITE_API_URI}/posts`
+      : `${import.meta.env.VITE_API_URI}/posts${category}`
   );
 
   useEffect(() => {}, []);
@@ -35,7 +36,7 @@ const Home = () => {
                 <div className="Content">
                   <PostLink
                     to={`/singlepost/${post.id}/title=${encodeURIComponent(
-                      post.title.replace(/ /g, "-")
+                      post.title.replace(/ /g, '-')
                     )}`}
                   >
                     <h1>{post.title}</h1>
@@ -43,7 +44,7 @@ const Home = () => {
                   <h3>{post.description}</h3>
                   <Link
                     to={`/singlepost/${post.id}/title=${encodeURIComponent(
-                      post.title.replace(/ /g, "-")
+                      post.title.replace(/ /g, '-')
                     )}`}
                   >
                     <Button>Read More</Button>
@@ -89,7 +90,7 @@ const Loader = styled.div`
   }
 
   .loader::before {
-    content: "Loading Posts...";
+    content: 'Loading Posts...';
     line-height: 1em;
     color: #0000;
     background: inherit;

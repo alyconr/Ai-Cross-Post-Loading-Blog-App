@@ -1,39 +1,39 @@
-import styled from "styled-components";
-import { FaRegBuilding } from "react-icons/fa";
-import { MdOutlinePlace } from "react-icons/md";
-import { CiLinkedin } from "react-icons/ci";
-import { MdOutlinePostAdd } from "react-icons/md";
-import { FaGithub } from "react-icons/fa6";
-import { useState, useEffect, useContext } from "react";
-import axios from "axios";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { AuthContext } from "../context/authContext";
-import { toast } from "react-toastify";
-import useFetch from "../utils/useFetch";
-import { FaMagnifyingGlass } from "react-icons/fa6";
-import { Modal, Button } from "react-bootstrap";
-import { SlUserFollowing } from "react-icons/sl";
-import { SlUserUnfollow } from "react-icons/sl";
-import { MdOutlineGroups2 } from "react-icons/md";
-import followerUser from "../assets/follower.png";
-import { BsBookmarkHeartFill } from "react-icons/bs";
+import styled from 'styled-components';
+import { FaRegBuilding } from 'react-icons/fa';
+import { MdOutlinePlace } from 'react-icons/md';
+import { CiLinkedin } from 'react-icons/ci';
+import { MdOutlinePostAdd } from 'react-icons/md';
+import { FaGithub } from 'react-icons/fa6';
+import { useState, useEffect, useContext } from 'react';
+import axios from 'axios';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { AuthContext } from '../context/authContext';
+import { toast } from 'react-toastify';
+import useFetch from '../utils/useFetch';
+import { FaMagnifyingGlass } from 'react-icons/fa6';
+import { Modal, Button } from 'react-bootstrap';
+import { SlUserFollowing } from 'react-icons/sl';
+import { SlUserUnfollow } from 'react-icons/sl';
+import { MdOutlineGroups2 } from 'react-icons/md';
+import followerUser from '../assets/follower.png';
+import { BsBookmarkHeartFill } from 'react-icons/bs';
 
 // Import Modal and Button from react-bootstrap
 
 const Profile = () => {
   const [user, setUser] = useState({});
   const [isEditMode, setIsEditMode] = useState(false);
-  const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [bio, setBio] = useState("");
-  const [file, setFile] = useState("");
+  const [name, setName] = useState('');
+  const [username] = useState('');
+  const [password, setPassword] = useState('');
+  const [bio, setBio] = useState('');
+  const [file, setFile] = useState('');
 
-  const [company, setCompany] = useState("");
-  const [place, setPlace] = useState("");
-  const [social1, setSocial1] = useState("");
-  const [social2, setSocial2] = useState("");
-  const [errors, setErrors] = useState({ password: "" });
+  const [company, setCompany] = useState('');
+  const [place, setPlace] = useState('');
+  const [social1, setSocial1] = useState('');
+  const [social2, setSocial2] = useState('');
+  const [errors, setErrors] = useState({ password: '' });
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [follow, setFollow] = useState(false);
   const [followers, setFollowers] = useState([]);
@@ -45,10 +45,10 @@ const Profile = () => {
   const navigate = useNavigate();
 
   const location = useLocation();
-  const userName = location.pathname.split("/")[2];
+  const userName = location.pathname.split('/')[2];
 
   const { data: posts } = useFetch(
-    `http://localhost:9000/api/v1/user/posts/${userName}`
+    `${import.meta.env.VITE_API_URI}/user/posts/${userName}`
   );
 
   useEffect(() => {
@@ -57,22 +57,24 @@ const Profile = () => {
         try {
           const endpoint =
             userName !== currentUser?.user.username
-              ? `http://localhost:9000/api/v1/user/${userName}`
-              : `http://localhost:9000/api/v1/user/${currentUser?.user.username}`;
+              ? `${import.meta.env.VITE_API_URI}/user/${userName}`
+              : `${import.meta.env.VITE_API_URI}/user/${
+                  currentUser?.user.username
+                }`;
 
           const res = await axios.get(endpoint, {
             withCredentials: true,
-            credentials: "include",
+            credentials: 'include',
           });
           setUser(res.data[0]);
-          setName(res.data[0]?.fullname || "");
-          setPassword(res.data[0]?.password || "");
-          setBio(res.data[0]?.bio || "");
+          setName(res.data[0]?.fullname || '');
+          setPassword(res.data[0]?.password || '');
+          setBio(res.data[0]?.bio || '');
           setFile(res.data[0].image || null);
-          setCompany(res.data[0]?.company || "");
-          setPlace(res.data[0]?.location || "");
-          setSocial1(res.data[0]?.social1 || "");
-          setSocial2(res.data[0]?.social2 || "");
+          setCompany(res.data[0]?.company || '');
+          setPlace(res.data[0]?.location || '');
+          setSocial1(res.data[0]?.social1 || '');
+          setSocial2(res.data[0]?.social2 || '');
         } catch (error) {
           console.error(error);
         }
@@ -88,23 +90,23 @@ const Profile = () => {
   const handleCloseErrorModal = () => setShowErrorModal(false);
 
   const handleSave = async () => {
-    let imgUrl = "";
+    let imgUrl = '';
     try {
       const formData = new FormData();
 
       if (file) {
-        formData.append("file", file);
+        formData.append('file', file);
 
         const response = await axios.post(
-          "http://localhost:9000/api/v1/upload",
+          `${import.meta.env.VITE_API_URI}/upload`,
           formData
         );
         imgUrl = response.data;
-        formData.append("image", imgUrl); // Append the image URL to the formData
+        formData.append('image', imgUrl); // Append the image URL to the formData
       }
 
       await axios.put(
-        `http://localhost:9000/api/v1/user/${currentUser?.user.username}`,
+        `${import.meta.env.VITE_API_URI}/user/${currentUser?.user.username}`,
         {
           fullname: name,
           username,
@@ -118,21 +120,21 @@ const Profile = () => {
         },
         {
           withCredentials: true,
-          credentials: "include",
+          credentials: 'include',
         }
       );
 
       setIsEditMode(false);
       navigate(`/profile/${currentUser?.user.username}`);
-      toast.success("Profile updated successfully", {
-        position: "top-center",
+      toast.success('Profile updated successfully', {
+        position: 'top-center',
         autoClose: 2500,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        theme: "dark",
+        theme: 'dark',
       });
     } catch (error) {
       console.error(error);
@@ -151,14 +153,14 @@ const Profile = () => {
   const handleFollow = async () => {
     try {
       await axios.post(
-        `http://localhost:9000/api/v1/followers/${currentUser?.user.id}`,
+        `${import.meta.env.VITE_API_URI}/followers/${currentUser?.user.id}`,
         {
           following_id: user.id,
           followers_count: 1,
         },
         {
           withCredentials: true,
-          credentials: "include",
+          credentials: 'include',
         }
       );
       setFollow(!follow);
@@ -171,7 +173,7 @@ const Profile = () => {
     const fetchFollowers = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:9000/api/v1/followers/${user.id}`
+          `${import.meta.env.VITE_API_URI}/followers/${user.id}`
         );
 
         setFollowers(res.data);
@@ -193,13 +195,13 @@ const Profile = () => {
     };
 
     fetchFollowers();
-  }, [user.id]);
+  }, [currentUser?.user.id, user.id]);
 
   useEffect(() => {
     const fetchFollowings = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:9000/api/v1/followings/${user.id}`
+          `${import.meta.env.VITE_API_URI}/followings/${user.id}`
         );
 
         setFollowing(res.data);
@@ -222,13 +224,13 @@ const Profile = () => {
     };
 
     fetchFollowings();
-  }, [user.id]);
+  }, [currentUser?.user.id, user.id]);
 
   useEffect(() => {
     const fetchBookmarks = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:9000/api/v1/bookmarks/${currentUser?.user.id}`
+          `${import.meta.env.VITE_API_URI}/bookmarks/${currentUser?.user.id}`
         );
 
         setBookmarks(res.data);
@@ -244,13 +246,15 @@ const Profile = () => {
   const handleUnFollow = async () => {
     try {
       await axios.delete(
-        `http://localhost:9000/api/v1/followers/unfollow/${currentUser?.user.id}`,
+        `${import.meta.env.VITE_API_URI}/followers/unfollow/${
+          currentUser?.user.id
+        }`,
         {
           data: {
             following_id: user.id,
           },
           withCredentials: true,
-          credentials: "include",
+          credentials: 'include',
         }
       );
       setFollow(false);
@@ -282,9 +286,9 @@ const Profile = () => {
 
             <UserInfo>
               <div>
-                <MdOutlinePostAdd size={30} color="#6A072D" />{" "}
+                <MdOutlinePostAdd size={30} color="#6A072D" />{' '}
                 <p className="m-0 d-inline ps-2  fw-bold fs-5">
-                  {posts?.length} Posts{" "}
+                  {posts?.length} Posts{' '}
                 </p>
                 <Link to={`/profile/${user.username}/posts`}>
                   <FaMagnifyingGlass color="#2E2E3B" />
@@ -293,7 +297,7 @@ const Profile = () => {
               <div>
                 <BsBookmarkHeartFill size={30} color="#6A072D" />
                 <p className="m-0 d-inline ps-2  fw-bold fs-5">
-                  {bookmarks?.length > 0 ? bookmarks?.length : 0} Bookmarks{" "}
+                  {bookmarks?.length > 0 ? bookmarks?.length : 0} Bookmarks{' '}
                 </p>
                 <Link to={`/profile/${user.username}/bookmarks`}>
                   <FaMagnifyingGlass color="#2E2E3B" />
@@ -303,7 +307,7 @@ const Profile = () => {
 
             <UserInfo>
               <div>
-                <MdOutlineGroups2 size={30} color="#6A072D" />{" "}
+                <MdOutlineGroups2 size={30} color="#6A072D" />{' '}
                 <p className="m-0 d-inline ps-2  fw-bold fs-5">
                   {followers?.length > 0 ? followers?.length : 0} Followers
                 </p>
@@ -315,7 +319,7 @@ const Profile = () => {
                 </Button>
               </div>
               <div>
-                <SlUserFollowing size={25} color="#6A072D" />{" "}
+                <SlUserFollowing size={25} color="#6A072D" />{' '}
                 <p className="m-0 d-inline ps-2  fw-bold fs-5">
                   {following?.length > 0 ? following?.length : 0} Followings
                 </p>
@@ -333,17 +337,17 @@ const Profile = () => {
             <div>
               {user.company && (
                 <h3>
-                  <FaRegBuilding /> {user.company}{" "}
+                  <FaRegBuilding /> {user.company}{' '}
                 </h3>
               )}
               {user.location && (
                 <h3>
-                  <MdOutlinePlace /> {user.location}{" "}
+                  <MdOutlinePlace /> {user.location}{' '}
                 </h3>
               )}
               {user.social1 && (
                 <h3>
-                  <FaGithub />{" "}
+                  <FaGithub />{' '}
                   <Link className="link" to={user.social1}>
                     {user.social1}
                   </Link>
@@ -351,7 +355,7 @@ const Profile = () => {
               )}
               {user.social2 && (
                 <h3>
-                  <CiLinkedin />{" "}
+                  <CiLinkedin />{' '}
                   <Link className="link" to={user.social1}>
                     {user.social2}
                   </Link>
@@ -498,7 +502,7 @@ const Profile = () => {
                 onChange={(e) => setBio(e.target.value)}
               ></textarea>
               <input
-                style={{ display: "none" }}
+                style={{ display: 'none' }}
                 type="file"
                 name=""
                 id="file"

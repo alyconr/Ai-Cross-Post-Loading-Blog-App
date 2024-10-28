@@ -1,4 +1,4 @@
-import { createGlobalStyle } from "styled-components";
+import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyles = createGlobalStyle`
 
@@ -12,8 +12,8 @@ body {
     font-family: 'Poppins', sans-serif;
     background: ${({ isLoginPage }) =>
       isLoginPage
-        ? "linear-gradient(90deg, rgba(63,94,251,1) 0%, rgba(70,251,252,1) 100%)"
-        : "#fff"};
+        ? 'linear-gradient(90deg, rgba(63,94,251,1) 0%, rgba(70,251,252,1) 100%)'
+        : '#fff'};
     color: #333;
 
 }

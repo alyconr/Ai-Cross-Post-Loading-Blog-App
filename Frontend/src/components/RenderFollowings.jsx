@@ -2,12 +2,14 @@ import Card from "./card";
 import styled from "styled-components";
 import followerUser from "../assets/follower.png";
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const RenderFollowings = ({ following }) => (
     <FollowersContainer>
       {Array.isArray(following) && following.length > 0 ? (
         following.map((followings) => (
-          <Card>
+          <Card 
+            key={followings.id}>
             <FollowerItem key={followings.id}>
               {followings.userImage ? (
                 <UserImage
@@ -31,6 +33,10 @@ const RenderFollowings = ({ following }) => (
       )}
     </FollowersContainer>
 );
+
+RenderFollowings.propTypes = {
+  following: PropTypes.array.isRequired,
+};
 
 export default RenderFollowings;
   

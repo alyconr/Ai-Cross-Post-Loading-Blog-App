@@ -1,42 +1,40 @@
-import styled from "styled-components";
-import { FaHandsClapping } from "react-icons/fa6";
-import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import dompurify from "dompurify";
-import avatar from "../assets/user.png";
-import { AuthContext } from "../context/authContext";
-import { useContext } from "react";
-import axios from "axios";
-import moment from "moment";
-import ClapsCommentsOnComments from "./clapsCommentsOnCommnets";
-import { BsFillTrashFill } from "@react-icons/all-files/bs/BsFillTrashFill";
-import { FcEditImage } from "@react-icons/all-files/fc/FcEditImage";
-import { FaCommentMedical } from "react-icons/fa6";
-import { MdOutlinePostAdd } from "react-icons/md";
-import { MdCancelPresentation } from "react-icons/md";
-import { toast } from "react-toastify";
+import styled from 'styled-components';
+import { useCallback, useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import dompurify from 'dompurify';
+import { AuthContext } from '../context/authContext';
+import { useContext } from 'react';
+import axios from 'axios';
+import moment from 'moment';
+import ClapsCommentsOnComments from './clapsCommentsOnCommnets';
+import { BsFillTrashFill } from '@react-icons/all-files/bs/BsFillTrashFill';
+import { FcEditImage } from '@react-icons/all-files/fc/FcEditImage';
+import { FaCommentMedical } from 'react-icons/fa6';
+import { MdOutlinePostAdd } from 'react-icons/md';
+import { MdCancelPresentation } from 'react-icons/md';
+import { toast } from 'react-toastify';
+import PropTypes from 'prop-types';
+
 const CommentOnComments = ({
   id,
   newCommentOnComment,
   setNewCommentOnComment,
-  post,
-  setPost,
 }) => {
   const [commentList, setCommentList] = useState([]);
-  const [cont, setCont] = useState([]);
+  const [setCont] = useState([]);
   const [postCommentTrigger, setPostCommentTrigger] = useState(false);
   const [editCommentId, setEditCommentId] = useState(null); // Track the comment being edited
   const location = useLocation();
-  const urlId = location.pathname.split("/")[2];
+  const urlId = location.pathname.split('/')[2];
   const { currentUser } = useContext(AuthContext);
 
-  const fetchCommentOnComments = async () => {
+  const fetchCommentOnComments = useCallback(async () => {
     try {
       const res = await axios.get(
         `http://localhost:9000/api/v1/commentsoncomment/${id}`,
         {
           withCredentials: true,
-          credentials: "include",
+          credentials: 'include',
         }
       );
       setCont(res.data);
@@ -44,18 +42,18 @@ const CommentOnComments = ({
     } catch (err) {
       console.log(err);
     }
-  };
+  }, [id, setCont]);
 
   useEffect(() => {
     fetchCommentOnComments();
-  }, [id]);
+  }, [id, fetchCommentOnComments]);
 
   useEffect(() => {
     if (postCommentTrigger) {
       fetchCommentOnComments();
       setPostCommentTrigger(false);
     }
-  }, [postCommentTrigger]);
+  }, [postCommentTrigger, fetchCommentOnComments]);
 
   const createMarkup = (html) => {
     return {
@@ -64,8 +62,8 @@ const CommentOnComments = ({
   };
 
   const handlePostComment = async () => {
-    if (newCommentOnComment.trim() === "") {
-      toast.error("Comment cannot be empty");
+    if (newCommentOnComment.trim() === '') {
+      toast.error('Comment cannot be empty');
       return;
     }
 
@@ -76,11 +74,11 @@ const CommentOnComments = ({
           onComment_id: id,
           postId: urlId,
           comment: newCommentOnComment,
-          date: moment().format("YYYY-MM-DD HH:mm:ss"),
+          date: moment().format('YYYY-MM-DD HH:mm:ss'),
         },
         {
           withCredentials: true,
-          credentials: "include",
+          credentials: 'include',
         }
       );
       const newCommentData = {
@@ -88,7 +86,7 @@ const CommentOnComments = ({
         fullname: response.data.fullname,
       };
       setCommentList([...commentList, newCommentData]);
-      setNewCommentOnComment("");
+      setNewCommentOnComment('');
       setPostCommentTrigger(true);
     } catch (err) {
       console.log(err);
@@ -101,7 +99,7 @@ const CommentOnComments = ({
         `http://localhost:9000/api/v1/commentsoncomment/${id}`,
         {
           withCredentials: true,
-          credentials: "include",
+          credentials: 'include',
         }
       );
       setCommentList(commentList.filter((item) => item.id !== id));
@@ -118,7 +116,7 @@ const CommentOnComments = ({
 
   const handleCancelEdit = () => {
     setEditCommentId(null);
-    setNewCommentOnComment("");
+    setNewCommentOnComment('');
   };
 
   const handleUpdate = async () => {
@@ -130,7 +128,7 @@ const CommentOnComments = ({
         },
         {
           withCredentials: true,
-          credentials: "include",
+          credentials: 'include',
         }
       );
       const updatedComments = commentList.map((comment) =>
@@ -167,7 +165,7 @@ const CommentOnComments = ({
             className="message"
             onClick={handlePostComment}
           >
-            {" "}
+            {' '}
             <FaCommentMedical size={35} color="#007bff" />
           </button>
         ) : (
@@ -190,7 +188,7 @@ const CommentOnComments = ({
             </div>
             <div
               dangerouslySetInnerHTML={createMarkup(comment.comment)}
-              style={{ maxWidth: "100%", overflow: "hidden" }}
+              style={{ maxWidth: '100%', overflow: 'hidden' }}
               className="comment"
             />
             <ActionComment>
@@ -213,7 +211,7 @@ const CommentOnComments = ({
                     className="message"
                     onClick={() => handleDelete(comment.id)}
                   >
-                    <BsFillTrashFill color={"#6A072D"} size={30} />
+                    <BsFillTrashFill color={'#6A072D'} size={30} />
                   </button>
                 </div>
               </div>
@@ -225,6 +223,13 @@ const CommentOnComments = ({
   );
 };
 
+CommentOnComments.propTypes = {
+  id: PropTypes.number.isRequired,
+  newCommentOnComment: PropTypes.func.isRequired,
+  setNewCommentOnComment: PropTypes.func.isRequired,
+  post: PropTypes.object.isRequired,
+  setPost: PropTypes.func.isRequired,
+};
 export default CommentOnComments;
 
 const Container = styled.div`

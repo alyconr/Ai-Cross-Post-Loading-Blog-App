@@ -44,7 +44,7 @@ export const imageToBase64 = (image) => {
 
 // Convert base64 string to file object
 export const base64ToFile = (base64String, fileName, fileType) => {
-  const arr = base64String.split(",");
+  const arr = base64String.split(',');
   const mime = fileType || arr[0].match(/:(.*?);/)[1];
   const bstr = atob(arr[1]);
   let n = bstr.length;

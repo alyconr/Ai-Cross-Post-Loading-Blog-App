@@ -3,6 +3,10 @@ import { BsPostcardHeartFill } from "react-icons/bs";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
+
+
+
 const MenuLeft = ({ category }) => {
   const [posts, setPosts] = useState([]);
 
@@ -62,6 +66,11 @@ const MenuLeft = ({ category }) => {
         ))}
     </Wrapper>
   );
+};
+
+
+MenuLeft.propTypes = {
+  category: PropTypes.string.isRequired,
 };
 
 export default MenuLeft;

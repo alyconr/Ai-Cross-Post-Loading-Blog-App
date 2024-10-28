@@ -1,4 +1,5 @@
-import styled from "styled-components";
+import styled from 'styled-components';
+import propTypes from 'prop-types';
 
 const TagsInput = ({ tags, setTags }) => {
   const removeTags = (indexToRemove) => {
@@ -6,11 +7,11 @@ const TagsInput = ({ tags, setTags }) => {
   };
 
   const addTags = (event) => {
-    if (event.target.value !== "" && event.key === "Enter") {
+    if (event.target.value !== '' && event.key === 'Enter') {
       const newTags = [...tags, event.target.value];
       setTags(newTags);
 
-      event.target.value = "";
+      event.target.value = '';
 
       console.log(newTags); // Log the updated tags
     }
@@ -36,6 +37,11 @@ const TagsInput = ({ tags, setTags }) => {
   );
 };
 
+TagsInput.propTypes = {
+  tags: propTypes.array.isRequired,
+  setTags: propTypes.func.isRequired,
+};
+
 export default TagsInput;
 
 const Container = styled.div`
@@ -48,7 +54,7 @@ const TagsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  margin-top:0.5rem;
+  margin-top: 0.5rem;
 `;
 
 const Tag = styled.div`

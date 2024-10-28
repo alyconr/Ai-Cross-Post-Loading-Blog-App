@@ -1,6 +1,7 @@
-import Card from "./card";
-import styled from "styled-components";
-import { Link } from "react-router-dom";
+import Card from './card';
+import styled from 'styled-components';
+import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 const RenderLocalPosts = ({ localPosts }) => {
   return (
@@ -22,24 +23,18 @@ const RenderLocalPosts = ({ localPosts }) => {
   );
 };
 
+RenderLocalPosts.propTypes = {
+  localPosts: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      title: PropTypes.string.isRequired,
+      image: PropTypes.string,
+      description: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+};
+
 export default RenderLocalPosts;
-
-const Button = styled.button`
-  background: radial-gradient(
-    circle at 12.3% 19.3%,
-    rgb(85, 88, 218) 0%,
-    rgb(95, 209, 249) 100.2%
-  );
-  border: none;
-  cursor: pointer;
-  border-radius: 10px;
-  padding: 10px 20px;
-
-  a {
-    color: white;
-    text-decoration: none;
-  }
-`;
 
 const LocalPostsContainer = styled.div`
   display: flex;

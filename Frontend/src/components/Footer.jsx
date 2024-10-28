@@ -1,11 +1,11 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 const Footer = () => {
   return (
     <Footers>
       <img src="../../logo.png" alt="logo" />
       <span>
-        Made with ❤️ by <a href="https://github.com/alyconr">Alyconr</a>{" "}
+        Made with ❤️ by <a href="https://github.com/alyconr">Alyconr</a>{' '}
       </span>
       <div>
         <svg

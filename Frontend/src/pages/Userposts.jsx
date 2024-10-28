@@ -1,17 +1,17 @@
-import styled from "styled-components";
-import { Link, useLocation } from "react-router-dom";
-import useFetch from "../utils/useFetch";
+import styled from 'styled-components';
+import { Link, useLocation } from 'react-router-dom';
+import useFetch from '../utils/useFetch';
 
 const Userposts = () => {
   const location = useLocation();
 
-  const username = location.pathname.split("/")[2];
+  const username = location.pathname.split('/')[2];
 
   const {
     data: posts,
     loading,
     error,
-  } = useFetch(`http://localhost:9000/api/v1/user/posts/${username}`);
+  } = useFetch(`${import.meta.env.VITE_API_URI}/user/posts/${username}`);
 
   return (
     <Wrapper>
@@ -29,7 +29,7 @@ const Userposts = () => {
                 <div className="Content">
                   <PostLink
                     to={`/singlepost/${post.id}/title=${encodeURIComponent(
-                      post.title.replace(/ /g, "-")
+                      post.title.replace(/ /g, '-')
                     )}`}
                   >
                     <h1>{post.title}</h1>
@@ -37,10 +37,10 @@ const Userposts = () => {
                   <h3>{post.description}</h3>
                   <Link
                     to={`/singlepost/${post.id}/title=${encodeURIComponent(
-                      post.title.replace(/ /g, "-")
+                      post.title.replace(/ /g, '-')
                     )}`}
                   >
-                    {" "}
+                    {' '}
                     <Button>Read More</Button>
                   </Link>
                 </div>
@@ -86,7 +86,7 @@ const Loader = styled.div`
   }
 
   .loader::before {
-    content: "Loading Posts...";
+    content: 'Loading Posts...';
     line-height: 1em;
     color: #0000;
     background: inherit;

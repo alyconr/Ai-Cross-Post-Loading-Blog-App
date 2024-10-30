@@ -68,10 +68,11 @@ const Settings = () => {
         formData.append('file', file);
 
         const response = await axios.post(
-          '${import.meta.env.VITE_API_URI}/upload',
+        `${import.meta.env.VITE_API_URI}/upload}` ,
           formData
         );
-        imgUrl = response.data;
+        imgUrl = response.data.url;
+       
         formData.append('image', imgUrl); // Append the image URL to the formData
       }
 
@@ -139,7 +140,7 @@ const Settings = () => {
         {user.userImage && (
           <img
             className="userImg"
-            src={`../upload/${user.userImage}`}
+            src={user.userImage}
             alt={user.image}
           />
         )}

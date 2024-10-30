@@ -101,7 +101,7 @@ const Profile = () => {
           `${import.meta.env.VITE_API_URI}/upload`,
           formData
         );
-        imgUrl = response.data;
+        imgUrl = response.data.url;
         formData.append('image', imgUrl); // Append the image URL to the formData
       }
 
@@ -271,7 +271,7 @@ const Profile = () => {
             {user.userImage && (
               <img
                 className="userImg"
-                src={`../upload/${user.userImage}`}
+                src={user.userImage}
                 alt={user.image}
               />
             )}

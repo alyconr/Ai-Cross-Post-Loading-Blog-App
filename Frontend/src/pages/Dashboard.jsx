@@ -3,14 +3,13 @@ import styled from 'styled-components';
 import Sidebar from '../components/Sidebar';
 import Card from '../components/card';
 import axios from 'axios';
-
+import ApiKeys from './ApiKeys';
 import { AuthContext } from '../context/authContext';
 
 import Profile from './Profile';
 import Settings from '../components/settings';
 import Bookmarks from './Bookmarks';
 import Home from './Home';
-import ApiKeys from './ApiKeys';
 import RenderDrafts from '../components/RenderDrafts';
 import RenderFollowers from '../components/RenderFollowers';
 import RenderFollowings from '../components/RenderFollowings';
@@ -37,26 +36,33 @@ const Dashboard = () => {
   const [showHashNodePosts, setShowHashNodePosts] = useState(false);
   const [showLocalPosts, setShowLocalPosts] = useState(false);
   const [localPosts, setLocalPosts] = useState([]);
+  const [apiKeys, setApiKeys] = useState([]);
 
   const [drafts, setDrafts] = useState([]);
   const [showDrafts, setShowDrafts] = useState(false);
   const { currentUser } = useContext(AuthContext);
 
-  console.log(drafts);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const axiosConfig = {
+          withCredentials: true,
+        };
         const [
+          apiKeysRes,
           followersRes,
           followingRes,
-          bookmarksRes,
-          mediumRes,
-          devtoRes,
-          hashNodeRes,
+          bookmarksRes,          
           localPostsRes,
           drafts,
         ] = await Promise.all([
+          axios.get(
+            `${import.meta.env.VITE_API_URI}/user/apikeys/${
+              currentUser?.user.id
+            }`,
+            axiosConfig
+          ),
+
           axios.get(
             `${import.meta.env.VITE_API_URI}/followers/${currentUser?.user.id}`
           ),
@@ -66,37 +72,55 @@ const Dashboard = () => {
           axios.get(
             `${import.meta.env.VITE_API_URI}/bookmarks/${currentUser?.user.id}`
           ),
-          axios.get(
-            `${import.meta.env.VITE_API_URI}/medium-proxy/${
-              currentUser?.user.id
-            }`
-          ),
-          axios.get(
-            `${import.meta.env.VITE_API_URI}/devto-proxy/${
-              currentUser?.user.id
-            }`
-          ),
-          axios.get(
-            `${import.meta.env.VITE_API_URI}/hashnode-proxy/${
-              currentUser?.user.id
-            }`
-          ),
+
           axios.get(
             `${import.meta.env.VITE_API_URI}/user/posts/${
-              currentUser?.user?.username
+              currentUser?.user.username
             }`
           ),
           axios.get(`${import.meta.env.VITE_API_URI}/draftposts`),
         ]);
 
+        setApiKeys(apiKeysRes.data);
         setFollowers(followersRes.data);
         setFollowing(followingRes.data);
         setBookmarks(bookmarksRes.data);
-        setMediumPosts(mediumRes.data);
-        setDevtoPosts(devtoRes.data);
-        setHashNodePosts(hashNodeRes.data);
         setLocalPosts(localPostsRes.data.posts);
         setDrafts(drafts.data.posts);
+
+        // Only fetch from blog platforms if API keys exist
+        if (apiKeys.data && apiKeys.data.length > 0) {
+          const [mediumRes, devtoRes, hashNodeRes] = await Promise.all([
+            apiKeys.data[0].MediumToken
+              ? axios.get(
+                  `${import.meta.env.VITE_API_URI}/medium-proxy/${
+                    currentUser?.user.id
+                  }`,
+                  axiosConfig
+                )
+              : Promise.resolve({ data: [] }),
+            apiKeys.data[0].DevToToken
+              ? axios.get(
+                  `${import.meta.env.VITE_API_URI}/devto-proxy/${
+                    currentUser?.user.id
+                  }`,
+                  axiosConfig
+                )
+              : Promise.resolve({ data: [] }),
+            apiKeys.data[0].HashNodeToken
+              ? axios.get(
+                  `${import.meta.env.VITE_API_URI}/hashnode-proxy/${
+                    currentUser?.user.id
+                  }`,
+                  axiosConfig
+                )
+              : Promise.resolve({ data: [] }),
+          ]);
+
+          setMediumPosts(mediumRes.data);
+          setDevtoPosts(devtoRes.data);
+          setHashNodePosts(hashNodeRes.data);
+        }
       } catch (error) {
         console.error(error);
       }

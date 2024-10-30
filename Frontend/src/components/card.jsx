@@ -27,8 +27,8 @@ const Card = ({ title, children, count }) => (
 );
 
 Card.propTypes = {
-  title: PropTypes.string.isRequired,
-  children: PropTypes.node.isRequired,
+  title: PropTypes.string,
+  children: PropTypes.node,
   count: PropTypes.number,
 };
 export default Card;

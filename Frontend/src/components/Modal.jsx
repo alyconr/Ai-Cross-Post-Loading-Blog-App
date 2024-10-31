@@ -34,8 +34,12 @@ const CustomModal = ({
   const [hashnodeToken, setHashnodeToken] = useState("");
   const [hashnodePublicationId, setHashnodePublicationId] = useState("");
 
+
+
+
   const handleClose = () => setShowModal(false);
   const handlePostDevTo = async () => {
+    
     await handleCrossPostToDevTo(
       title,
       cont,
@@ -48,6 +52,7 @@ const CustomModal = ({
     );
   };
   const handlePostMediumTo = async () => {
+    
     await handleCrossPostToMedium(
       title,
       cont,
@@ -61,10 +66,12 @@ const CustomModal = ({
   };
 
   const handlePostHashnodeTo = async () => {
+    
     await handleCrossPostToHashnode(
       title,
       cont,
       desc,
+      image,
       tags,
       hashnodeToken,
       hashnodePublicationId,
@@ -150,15 +157,27 @@ const CustomModal = ({
 };
 
 CustomModal.propTypes = {
-  handlePublishAndDeleteDraft: PropTypes.func.isRequired,
-  setShowModal: PropTypes.func.isRequired,
-  showModal: PropTypes.bool.isRequired,
-  title: PropTypes.string.isRequired,
-  cont: PropTypes.string.isRequired,
-  image: PropTypes.string.isRequired,
-  desc: PropTypes.string.isRequired,
-  category: PropTypes.string.isRequired,
-  tags: PropTypes.string.isRequired,
+  handlePublishAndDeleteDraft: PropTypes.func,
+  setShowModal: PropTypes.func,
+  showModal: PropTypes.bool,
+  title: PropTypes.string,
+  cont: PropTypes.string,
+  // Update image prop type to match the actual data structure
+  image: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.shape({
+      base64String: PropTypes.string,
+      metadata: PropTypes.shape({
+        name: PropTypes.string,
+        type: PropTypes.string,
+        size: PropTypes.number
+      })
+    })
+  ]),
+  desc: PropTypes.string,
+  category: PropTypes.string,
+  tags: PropTypes.arrayOf(PropTypes.string),
+  publishMediumTo: PropTypes.func,
 };
 
 export default CustomModal;

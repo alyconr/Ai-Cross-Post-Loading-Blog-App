@@ -25,7 +25,7 @@ const ArtificialIntelligenceComponent = () => {
           <span className="onoffswitch-switch-ai"></span>
         </label>
       </div>
-      <AiModal aiAgent={aiAgent} handleClose={handleClose} />
+      <AiModal aiAgent={aiAgent} handleClose={handleClose} id="aiModal" />
     </Container>
   );
 };

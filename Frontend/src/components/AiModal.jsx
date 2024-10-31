@@ -25,7 +25,7 @@ const AiModal = ({ aiAgent, handleClose }) => {
   const [error, setError] = useState('');
   const [showCard, setShowCard] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
+ 
   const handleGenerateBlogPost = async () => {
     setLoading(true);
     setError('');
@@ -33,7 +33,7 @@ const AiModal = ({ aiAgent, handleClose }) => {
 
     try {
       const response = await axios.post(
-        'http://localhost:9000/api/v1/generateBlogPost/generate',
+        `${import.meta.env.VITE_API_URI}/generateBlogPost/generate`,
         {
           numReferences,
           openAiApiKey: openAiApiKeySaved || openAiApiKey,
@@ -47,6 +47,17 @@ const AiModal = ({ aiAgent, handleClose }) => {
       setLoading(false);
     }
   };
+
+const handleSubmit = (e) => {
+    e.preventDefault();
+    handleGenerateBlogPost();
+  };
+
+  const handleApiKeySubmit =  async (e) => {
+    e.preventDefault();
+    await handleSaveOpenAiApiKey();
+  };
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -68,7 +79,7 @@ const AiModal = ({ aiAgent, handleClose }) => {
   const handleSaveOpenAiApiKey = async () => {
     try {
       const response = await axios.put(
-        `http://localhost:9000/api/v1/user/openAiApiKey/${currentUser?.user.id}`,
+        `${import.meta.env.VITE_API_URI}/user/openAiApiKey/${currentUser?.user.id}`,
         {
           openAiApiKey,
         },
@@ -91,7 +102,7 @@ const AiModal = ({ aiAgent, handleClose }) => {
     const getOpenAiApiKey = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:9000/api/v1/user/openAiApiKey/${currentUser?.user.id}`,
+          `${import.meta.env.VITE_API_URI}/user/openAiApiKey/${currentUser?.user.id}`,
           {
             withCredentials: true,
             credentials: 'include',
@@ -139,6 +150,7 @@ const AiModal = ({ aiAgent, handleClose }) => {
               <StyledModalBody>
                 {!loading && !blogPost ? (
                   <OpenaiCard>
+                    <StyledForm onSubmit={handleSubmit}>
                     <InputGroup>
                       <p>Enter The number of web references (Max 10)</p>
                       <StyledInput
@@ -150,7 +162,7 @@ const AiModal = ({ aiAgent, handleClose }) => {
                             Math.min(10, Math.max(1, parseInt(e.target.value)))
                           )
                         }
-                        value={numReferences}
+                        value={numReferences || ''}
                       />
                     </InputGroup>
 
@@ -168,15 +180,19 @@ const AiModal = ({ aiAgent, handleClose }) => {
                       <div className="openai-key">
                         <PasswordInputWrapper>
                           <StyledInput
-                            type={showPassword ? 'text' : 'password'}
-                            onChange={(e) =>
-                              setOpenAiApiKey(e.target.value) ||
-                              setOpenAiApiKeySaved(e.target.value)
+                            type={showPassword || !openAiApiKeySaved ? 'text' : 'password'}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              setOpenAiApiKey(value);
+                              setOpenAiApiKeySaved( value );
                             }
-                            value={openAiApiKeySaved}
+                             
+                            }
+                            value={openAiApiKeySaved || openAiApiKey || ''}
                           />
                           <TogglePasswordButton
                             onClick={togglePasswordVisibility}
+                            type="button"
                           >
                             {showPassword ? <FaEyeSlash /> : <FaEye />}
                           </TogglePasswordButton>
@@ -184,7 +200,7 @@ const AiModal = ({ aiAgent, handleClose }) => {
 
                         <OpenaiButton
                           title="Save"
-                          onClick={handleSaveOpenAiApiKey}
+                          onClick={handleApiKeySubmit}
                         >
                           <img src={save} alt="save" />
                         </OpenaiButton>
@@ -204,11 +220,14 @@ const AiModal = ({ aiAgent, handleClose }) => {
                       variant="primary"
                       onClick={handleGenerateBlogPost}
                       disabled={loading || !keyword || !openAiApiKeySaved}
+                      type="submit"
                     >
                       Generate Blog
                     </StyledGenerateButton>
 
                     {error && <p className="text-danger">{error}</p>}
+
+                    </StyledForm>
 
                     <p>
                       Don&apos;t you know how to use our AI agents yet?{' '}
@@ -285,6 +304,15 @@ AiModal.propTypes = {
 };
 
 export default AiModal;
+
+
+const StyledForm = styled.form`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
 
 const moveArrow = keyframes`
   0% {

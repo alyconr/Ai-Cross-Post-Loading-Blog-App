@@ -28,7 +28,7 @@ const ClapsOnComments = ({ id }) => {
     const fetchClaps = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:9000/api/v1/clapsoncomments/${id}`
+          `${import.meta.env.VITE_API_URI}/clapsoncomments/${id}`
         );
 
         if (response.data && response.data.total_claps) {
@@ -56,7 +56,7 @@ const ClapsOnComments = ({ id }) => {
     try {
       // Send a POST request to update applause_count in the database
       await axios.post(
-        `http://localhost:9000/api/v1/clapsoncomments/${id}`,
+        `${import.meta.env.VITE_API_URI}/clapsoncomments/${id}`,
         {
           applauseComment_count: localClaps + 1, // Incremented local claps value
           comment_id: id, // Include the post_id in the request body
@@ -69,7 +69,7 @@ const ClapsOnComments = ({ id }) => {
 
       // Fetch updated total claps
       const response = await axios.get(
-        `http://localhost:9000/api/v1/clapsoncomments/${id}`
+        `${import.meta.env.VITE_API_URI}/clapsoncomments/${id}`
       );
 
       if (response.data && response.data.total_claps) {
@@ -95,7 +95,7 @@ const ClapsOnComments = ({ id }) => {
   const handleUserClap = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:9000/api/v1/clapsoncomments/users/${id}`
+        `${import.meta.env.VITE_API_URI}/clapsoncomments/users/${id}`
       );
       setUserClaps(response.data);
       setLgShow(true);

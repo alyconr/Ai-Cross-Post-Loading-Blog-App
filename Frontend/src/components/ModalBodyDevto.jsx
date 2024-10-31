@@ -23,7 +23,7 @@ const ModalBodyDevTo = ({
   const handleUpdateDevToToken = async () => {
     try {
       const response = await axios.put(
-        `http://localhost:9000/api/v1/user/devToken/${currentUser?.user.id}`,
+        `${import.meta.env.VITE_API_URI}/user/devToken/${currentUser?.user.id}`,
         {
           devToToken: devToApiKey,
         },
@@ -56,7 +56,7 @@ const ModalBodyDevTo = ({
     const getDevToToken = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:9000/api/v1/user/devToken/${currentUser?.user.id}`,
+          `${import.meta.env.VITE_API_URI}/user/devToken/${currentUser?.user.id}`,
           {
             withCredentials: true,
             credentials: "include",

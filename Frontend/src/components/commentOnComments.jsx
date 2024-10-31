@@ -31,7 +31,7 @@ const CommentOnComments = ({
   const fetchCommentOnComments = useCallback(async () => {
     try {
       const res = await axios.get(
-        `http://localhost:9000/api/v1/commentsoncomment/${id}`,
+        `${import.meta.env.VITE_API_URI}/commentsoncomment/${id}`,
         {
           withCredentials: true,
           credentials: 'include',

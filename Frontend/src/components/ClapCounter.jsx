@@ -30,7 +30,7 @@ const ApplauseButton = () => {
     const fetchClaps = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:9000/api/v1/claps/${urlId}`
+          `${import.meta.env.VITE_API_URI}/claps/${urlId}`
         );
 
         if (response.data && response.data.total_claps) {
@@ -59,7 +59,7 @@ const ApplauseButton = () => {
     try {
       // Send a POST request to update applause_count in the database
       await axios.post(
-        `http://localhost:9000/api/v1/claps/${urlId}`,
+        `${import.meta.env.VITE_API_URI}/claps/${urlId}`,
         {
           applause_count: localClaps + 1, // Incremented local claps value
           post_id: urlId, // Include the post_id in the request body
@@ -72,7 +72,7 @@ const ApplauseButton = () => {
 
       // Fetch updated total claps
       const response = await axios.get(
-        `http://localhost:9000/api/v1/claps/${urlId}`
+        `${import.meta.env.VITE_API_URI}/claps/${urlId}`
       );
       if (response.data && response.data.total_claps) {
         setTotalClaps(response.data.total_claps);
@@ -96,7 +96,7 @@ const ApplauseButton = () => {
   const handleUserClap = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:9000/api/v1/claps/users/${urlId}`
+        `${import.meta.env.VITE_API_URI}/claps/users/${urlId}`
       );
       setUserClaps(response.data);
       setLgShow(true);

@@ -1,11 +1,10 @@
-import styled from "styled-components";
-import { useState, useEffect, useContext } from "react";
-import { toast } from "react-toastify";
-import { AuthContext } from "../context/authContext";
-import axios from "axios";
-import save from "../assets/save.png";
-import  propTypes  from "react-bootstrap/esm/Image";
-
+import styled from 'styled-components';
+import { useState, useEffect, useContext } from 'react';
+import { toast } from 'react-toastify';
+import { AuthContext } from '../context/authContext';
+import axios from 'axios';
+import save from '../assets/save.png';
+import PropTypes from 'prop-types';
 
 const ModalBodyMedium = ({
   publishMediumTo,
@@ -17,20 +16,20 @@ const ModalBodyMedium = ({
   draftMedium,
   setDraftMedium,
 }) => {
-  const [mediumToApiToken, setMedumToApiToken] = useState("");
+  const [mediumToApiToken, setMedumToApiToken] = useState('');
 
   const { currentUser } = useContext(AuthContext);
 
   const handleUpdateMediumToken = async () => {
     try {
       const response = await axios.put(
-        `http://localhost:9000/api/v1/user/mediumToken/${currentUser?.user.id}`,
+        `${import.meta.env.VITE_API_URI}/user/mediumToken/${currentUser?.user.id}`,
         {
           mediumToken: mediumToApiToken,
         },
         {
           withCredentials: true,
-          credentials: "include",
+          credentials: 'include',
         }
       );
 
@@ -38,15 +37,15 @@ const ModalBodyMedium = ({
       setIsCrossPostMediumTo(false);
       setMediumToken(response.data.mediumToken);
 
-      toast.success("Medium Token Updated Successfully", {
-        position: "bottom-center",
+      toast.success('Medium Token Updated Successfully', {
+        position: 'bottom-center',
         autoClose: 2500,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        theme: "dark",
+        theme: 'dark',
       });
     } catch (error) {
       console.log(error);
@@ -60,7 +59,7 @@ const ModalBodyMedium = ({
           `http://localhost:9000/api/v1/user/mediumToken/${currentUser?.user.id}`,
           {
             withCredentials: true,
-            credentials: "include",
+            credentials: 'include',
           }
         );
         console.log(response.data);
@@ -105,7 +104,7 @@ const ModalBodyMedium = ({
                   type="checkbox"
                   role="switch"
                   title={
-                    mediumToken ? "Update Medium Api Key" : "Save Medium Token"
+                    mediumToken ? 'Update Medium Api Key' : 'Save Medium Token'
                   }
                   id="flexSwitchCheckDisabled"
                   className="form-check-input message bg-success "
@@ -122,7 +121,7 @@ const ModalBodyMedium = ({
                     <input
                       type="text"
                       placeholder={
-                        mediumToken ? mediumToken : "Enter Medium Token"
+                        mediumToken ? mediumToken : 'Enter Medium Token'
                       }
                       value={mediumToApiToken}
                       onChange={(e) => setMedumToApiToken(e.target.value)}
@@ -164,18 +163,16 @@ const ModalBodyMedium = ({
   );
 };
 
-
-ModalBodyMedium.propTypes = { 
-  publishMediumTo: propTypes.bool,
-  setPublishMediumTo: propTypes.func,
-  isCrossPostMediumTo: propTypes.bool,
-  setIsCrossPostMediumTo: propTypes.func,
-  mediumToken: propTypes.string,
-  setMediumToken: propTypes.func,
-  draftMedium: propTypes.bool,
-  setDraftMedium: propTypes.func,
+ModalBodyMedium.propTypes = {
+  isCrossPostMediumTo: PropTypes.bool,
+  setIsCrossPostMediumTo: PropTypes.func,
+  publishMediumTo: PropTypes.bool,
+  setPublishMediumTo: PropTypes.func,
+  mediumToken: PropTypes.string,
+  setMediumToken: PropTypes.func,
+  draftMedium: PropTypes.bool,
+  setDraftMedium: PropTypes.func,
 };
-
 
 export default ModalBodyMedium;
 
@@ -247,14 +244,14 @@ const CrossPosts = styled.div`
   }
 
   .onoffswitch1-inner:before {
-    content: "YES";
+    content: 'YES';
     padding-left: 10px;
     background: linear-gradient(to top, #00c6fb 0%, #005bea 100%);
     color: #ffffff;
   }
 
   .onoffswitch1-inner:after {
-    content: "NO";
+    content: 'NO';
     padding-right: 10px;
     background-color: #eeeeee;
     color: #999999;

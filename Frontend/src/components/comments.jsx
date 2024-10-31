@@ -35,7 +35,7 @@ const Comments = ({ post, setPost }) => {
   const fetchComments = useCallback(async () => {
     try {
       const res = await axios.get(
-        `http://localhost:9000/api/v1/comments/${urlId}`,
+        `${import.meta.env.VITE_API_URI}/comments/${urlId}`,
         {
           withCredentials: true,
           credentials: 'include',

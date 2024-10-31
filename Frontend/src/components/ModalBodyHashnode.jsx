@@ -28,7 +28,7 @@ const ModalBodyHashnode = ({
   const handleUpdateHashnodeToken = async () => {
     try {
       const response = await axios.put(
-        `http://localhost:9000/api/v1/user/hashnodeToken/${currentUser?.user.id}`,
+        `${import.meta.env.VITE_API_URI}/user/hashnodeToken/${currentUser?.user.id}`,
         {
           hashnodeToken: hashnodeToApiToken,
           hashnodePublicationId: hashnodePublicationIdToApi,
@@ -63,7 +63,7 @@ const ModalBodyHashnode = ({
     const getHashnodeToken = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:9000/api/v1/user/hashnodeToken/${currentUser?.user.id}`,
+          `${import.meta.env.VITE_API_URI}/user/hashnodeToken/${currentUser?.user.id}`,
           {
             withCredentials: true,
             credentials: "include",
@@ -196,16 +196,16 @@ const ModalBodyHashnode = ({
 };
 
 ModalBodyHashnode.propTypes = {
-  publishHashnodeTo: propTypes.bool.isRequired,
-  setPublishHashnodeTo: propTypes.func.isRequired,
-  isCrossPostHashnodeTo: propTypes.bool.isRequired,
-  setIsCrossPostHashnodeTo: propTypes.func.isRequired,
-  hashnodeToken: propTypes.string.isRequired,
-  setHashnodeToken: propTypes.func.isRequired,
-  hashnodePublicationId: propTypes.string.isRequired,
-  setHashnodePublicationId: propTypes.func.isRequired,
-  draftHashnode: propTypes.bool.isRequired,
-  setDraftHashnode: propTypes.func.isRequired,
+  publishHashnodeTo: propTypes.bool,
+  setPublishHashnodeTo: propTypes.func,
+  isCrossPostHashnodeTo: propTypes.bool,
+  setIsCrossPostHashnodeTo: propTypes.func,
+  hashnodeToken: propTypes.string,
+  setHashnodeToken: propTypes.func,
+  hashnodePublicationId: propTypes.string,
+  setHashnodePublicationId: propTypes.func,
+  draftHashnode: propTypes.bool,
+  setDraftHashnode: propTypes.func,
 
 };
 

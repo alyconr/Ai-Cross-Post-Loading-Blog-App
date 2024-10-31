@@ -1,7 +1,7 @@
-import styled from "styled-components";
-import { useEffect, useState } from "react";
-import CustomModal from "../components/Modal";
-import PropTypes from 'prop-types'
+import styled from 'styled-components';
+import { useEffect, useState } from 'react';
+import CustomModal from '../components/Modal';
+import PropTypes from 'prop-types';
 
 const PublishComponent = ({
   title,
@@ -10,6 +10,7 @@ const PublishComponent = ({
   cat,
   tags,
   file,
+  fileAwsS3,
   image,
   postId,
   handleFileChange,
@@ -18,57 +19,51 @@ const PublishComponent = ({
   handlePublishAndDeleteDraft,
   setCat,
   metadataPost,
-
-
 }) => {
   const [showModal, setShowModal] = useState(false);
-  const [metadataObject, setMetadataObject] = useState("");
-  
+  const [metadataObject, setMetadataObject] = useState('');
+
   console.log('Original metadataPost:', metadataPost);
 
-
-  
+  console.log(fileAwsS3);
+  console.log(image);
+  console.log(file);
   useEffect(() => {
     if (metadataPost) {
       if (typeof metadataPost === 'string') {
         try {
           setMetadataObject(JSON.parse(metadataPost));
-          console.log('The metadataPost is already an object:', metadataObject)
-          
+          console.log('The metadataPost is already an object:', metadataObject);
         } catch (error) {
           console.error('Failed to parse metadataPost string:', error);
           // Handle the error appropriately
         }
       } else if (typeof metadataPost === 'object' && metadataPost !== null) {
         setMetadataObject(metadataPost);
-        console.log('The metadataPost is already an object:', metadataObject)
-      
+        console.log('The metadataPost is already an object:', metadataObject);
       } else {
         console.log('metadataPost is neither a string nor an object');
       }
     } else {
       console.log('metadataPost is null or undefined');
     }
-    
-    
-  } , [metadataPost, metadataObject]);
-  
-  
+  }, [metadataPost, metadataObject]);
+
   const handleShowModal = () => setShowModal(true);
   return (
-    <Preview >
+    <Preview>
       <div className="box-1">
         <h1>Publish</h1>
         <span>
-          {" "}
+          {' '}
           <b>Status: </b> Draft
         </span>
         <span>
-          {" "}
+          {' '}
           <b>Visibility: </b>Public
         </span>
         <input
-          style={{ display: "none" }}
+          style={{ display: 'none' }}
           type="file"
           name="file"
           id="file"
@@ -87,27 +82,27 @@ const PublishComponent = ({
           </button>
         )}
         <h5>
-        {image || file 
-    ? image?.metadata?.name || file?.metadata?.name || metadataObject?.name 
-    : "No uploaded image"}
+          {image || file || fileAwsS3
+            ? `Image: ${fileAwsS3}`
+            : 'No image selected'}
         </h5>
         <hr />
-        {(file?.metadata || image?.metadata?.name  ||  metadataObject?.name ) ? (
-  <div className="actions d-flex justify-content-between gap-3">
-    <button className="btn" onClick={handleShowModal}>
-      Publish
-    </button>
-  </div>
-) : (
-  <p>Please select an image before publishing your post</p>
-)}
+        {file?.metadata || image?.metadata?.name || metadataObject?.name || fileAwsS3? (
+          <div className="actions d-flex justify-content-between gap-3">
+            <button className="btn" onClick={handleShowModal}>
+              Publish
+            </button>
+          </div>
+        ) : (
+          <p>Please select an image before publishing your post</p>
+        )}
       </div>
       <div className="box-2">
         <h1>Category</h1>
         <Category>
           <input
             type="radio"
-            checked={cat === "Web-Development"}
+            checked={cat === 'Web-Development'}
             name="cat"
             value="Web-Development"
             id="Web-Development"
@@ -119,7 +114,7 @@ const PublishComponent = ({
           <input
             type="radio"
             name="cat"
-            checked={cat === "Cloud-Computing"}
+            checked={cat === 'Cloud-Computing'}
             value="Cloud-Computing"
             id="Cloud-Computing"
             onChange={(e) => setCat(e.target.value)}
@@ -130,7 +125,7 @@ const PublishComponent = ({
           <input
             type="radio"
             name="cat"
-            checked={cat === "DevOps"}
+            checked={cat === 'DevOps'}
             value="DevOps"
             id="DevOps"
             onChange={(e) => setCat(e.target.value)}
@@ -138,11 +133,11 @@ const PublishComponent = ({
           <label htmlFor="DevOps"> DevOps </label>
         </Category>
         <Category>
-          {" "}
+          {' '}
           <input
             type="radio"
             name="cat"
-            checked={cat === "Security"}
+            checked={cat === 'Security'}
             value="Security"
             id="Security"
             onChange={(e) => setCat(e.target.value)}
@@ -153,7 +148,7 @@ const PublishComponent = ({
           <input
             type="radio"
             name="cat"
-            checked={cat === "Linux"}
+            checked={cat === 'Linux'}
             value="Linux"
             id="Linux"
             onChange={(e) => setCat(e.target.value)}
@@ -164,7 +159,7 @@ const PublishComponent = ({
           <input
             type="radio"
             name="cat"
-            checked={cat === "Networking"}
+            checked={cat === 'Networking'}
             value="Networking"
             id="Networking"
             onChange={(e) => setCat(e.target.value)}
@@ -176,21 +171,21 @@ const PublishComponent = ({
           <input
             type="radio"
             name="cat"
-            checked={cat === "Artificial-Intelligence"}
+            checked={cat === 'Artificial-Intelligence'}
             value="Artificial-Intelligence"
             id="Artificial-Intelligence"
             onChange={(e) => setCat(e.target.value)}
           />
           <label htmlFor="Artificial-Intelligence">
-            {" "}
-            Artificial-Intelligence{" "}
+            {' '}
+            Artificial-Intelligence{' '}
           </label>
         </Category>
         <Category>
           <input
             type="radio"
             name="cat"
-            checked={cat === "Machine-Learning"}
+            checked={cat === 'Machine-Learning'}
             value="Machine-Learning"
             id="Machine-Learning"
             onChange={(e) => setCat(e.target.value)}
@@ -201,7 +196,7 @@ const PublishComponent = ({
           <input
             type="radio"
             name="cat"
-            checked={cat === "Data-Science"}
+            checked={cat === 'Data-Science'}
             value="Data-Science"
             id="Data-Science"
             onChange={(e) => setCat(e.target.value)}
@@ -212,7 +207,7 @@ const PublishComponent = ({
           <input
             type="radio"
             name="cat"
-            checked={cat === "Internet-Of-Things"}
+            checked={cat === 'Internet-Of-Things'}
             value="Internet-Of-Things"
             id="Internet-Of-Things"
             onChange={(e) => setCat(e.target.value)}
@@ -223,7 +218,7 @@ const PublishComponent = ({
           <input
             type="radio"
             name="cat"
-            checked={cat === "Others"}
+            checked={cat === 'Others'}
             value="Others"
             id="Others"
             onChange={(e) => setCat(e.target.value)}
@@ -239,7 +234,7 @@ const PublishComponent = ({
         title={title}
         cont={cont}
         desc={desc}
-        image={image || file}
+        image={fileAwsS3  } 
         category={cat}
         tags={tags}
       />
@@ -251,20 +246,41 @@ PublishComponent.propTypes = {
   title: PropTypes.string,
   cont: PropTypes.string,
   desc: PropTypes.string,
-  image: PropTypes.string,
+  // Update image prop type to accept either string or object
+  image: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.shape({
+      base64String: PropTypes.string,
+      metadata: PropTypes.shape({
+        name: PropTypes.string,
+        type: PropTypes.string,
+        size: PropTypes.number,
+      }),
+    }),
+  ]),
   cat: PropTypes.string,
-  postId: PropTypes.string,
-  tags: PropTypes.array,
-  file: PropTypes.string,
+  postId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]), // Also fixing postId
+  tags: PropTypes.arrayOf(PropTypes.string),
+  // Update file prop type to match image structure
+  file: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.shape({
+      base64String: PropTypes.string,
+      metadata: PropTypes.shape({
+        name: PropTypes.string,
+        type: PropTypes.string,
+        size: PropTypes.number,
+      }),
+    }),
+  ]),
+  fileAwsS3: PropTypes.string,
   handlePublishAndDeleteDraft: PropTypes.func,
   handleFileChange: PropTypes.func,
   handleDeleteDraftPost: PropTypes.func,
   handleCancel: PropTypes.func,
   setCat: PropTypes.func,
-  metadataPost: PropTypes.string
-
+  metadataPost: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
 };
-
 
 export default PublishComponent;
 
@@ -324,7 +340,7 @@ const Preview = styled.div`
         background: #0cdf73;
       }
       & + .switch:before {
-        content: "";
+        content: '';
         position: absolute;
         width: 20px;
         height: 20px;

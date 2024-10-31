@@ -13,13 +13,12 @@ const handleCrossPostToMedium = async (
 ) => {
   const mediumProxiEndPoint = `${import.meta.env.VITE_API_URI}/medium-proxy`;
 
-  const markdownContent = `# ${description}\n\n${
-    import.meta.env.VITE_API_UPLOAD
-  }/uploads/${image?.metadata?.name}\n\n${content}`;
+  const markdownContent = `# ${title}\n\n![${title}](${image})${description}\n\n${content}`;
 
   const articleData = {
     title: title,
     content: markdownContent,
+    canonicalUrl: image,
     tags: [category, tags.toString()],
     publishStatus: draftMedium ? 'draft' : 'public',
     mediumToken,
@@ -42,8 +41,8 @@ const handleCrossPostToMedium = async (
       progress: undefined,
     });
   } catch (error) {
-    console.error('Error posting article to Dev.to:', error);
-    toast.error('Error posting article to Dev.to');
+    console.error('Error posting article to Medium:', error);
+    toast.error('Error posting article to Medium');
   }
 };
 

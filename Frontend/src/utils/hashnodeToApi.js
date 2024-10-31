@@ -5,6 +5,7 @@ const handleCrossPostToHashnode = async (
   title,
   content,
   description,
+  image,
   tags,
   hashnodeToken,
   hashnodePublicationId,
@@ -24,7 +25,7 @@ const handleCrossPostToHashnode = async (
     contentMarkdown: markdownContent,
     coverImageOptions: {
       coverImageURL:
-        'https://caracoltv.brightspotcdn.com/dims4/default/13a675b/2147483647/strip/true/crop/1000x666+0+0/resize/1000x666!/format/webp/quality/90/?url=http%3A%2F%2Fcaracol-brightspot.s3.us-west-2.amazonaws.com%2Fcb%2F07%2Fd8719fa241a89a444d4a24e91d0d%2Fluis-diaz-liverpool-premier-league-west-ham.jpg',
+        image,
     },
     tags:
       Array.isArray(tags) &&

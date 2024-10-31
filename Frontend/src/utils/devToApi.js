@@ -13,15 +13,13 @@ const handleCrossPostToDevTo = async (
 ) => {
   const devToProxyEndPoint = `${import.meta.env.VITE_API_URI}/devto-proxy`;
 
-  const markdownContent = `# ${description}\n\n${content}`;
+  const markdownContent = `${description}\n\n${content}`;
 
   const articleData = {
     title: title,
     body_markdown: markdownContent,
-    published: draftDevto ? true : false,
-    main_image: `${import.meta.env.VITE_API_UPLOAD}/uploads/${
-      image?.metadata?.name
-    }`,
+    published: draftDevto ? false : true,
+    main_image: image,
     tags: [category, tags],
     devToken,
   };

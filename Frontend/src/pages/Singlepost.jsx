@@ -191,9 +191,9 @@ const Singlepost = () => {
           {userImage && (
             <img
               className="userImg"
-              src={`${import.meta.env.VITE_API_UPLOAD}/uploads/${
+              src={
                 post.userImage
-              }`}
+              }
               alt={userImage}
             />
           )}

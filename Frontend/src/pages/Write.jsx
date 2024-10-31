@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef , useCallback} from 'react';
 import 'react-quill/dist/quill.snow.css';
 import '@mdxeditor/editor/style.css';
 import { codeMirrorPlugin } from '@mdxeditor/editor';
@@ -65,7 +65,7 @@ const Write = () => {
   const [metadataPost, setMetadataPost] = useState();
   const [initialMarkdown, setInitialMarkdown] = useState('');
   const [post, setPost] = useState('');
-
+  const [fileAwsS3, setFileAwsS3] = useState('');
   const [image, setImage] = useState('');
   console.log(metadataPost);
   console.log(file.metadata?.name);
@@ -121,7 +121,9 @@ const Write = () => {
     }
   }, [draftId]);
 
-  const saveDraftAndPostAutomatically = async () => {
+  
+
+  const saveDraftAndPostAutomatically = useCallback( async () => {
     if ((title && desc && cont && cat && tags && file) || image) {
       try {
         let endpoint;
@@ -165,7 +167,7 @@ const Write = () => {
             title,
             description: desc,
             content: cont,
-            image: !postId ? imageUrl : metadataUrl,
+            image: !postId ? imageUrl : metadataUrl || fileAwsS3,
             date: moment(Date.now()).format('YYYY-MM-DD HH:mm:ss'),
             category: cat,
             tags,
@@ -197,21 +199,25 @@ const Write = () => {
         toast.error('Error saving draft, Please upload the image again');
       }
     }
-  };
+  });
 
   useEffect(() => {
-    const debounceSaveDraft = debounced.debounced(
-      saveDraftAndPostAutomatically,
-      2000
-    );
-
-    // Listen for changes in title, desc, cont, cat, and file
-    debounceSaveDraft();
-
-    return () => {
-      debounced.cancel();
-    };
-  }, [title, desc, cont, image, cat, tags, postId, draftId,]);
+    // First check if all required fields are present
+    const areAllFieldsComplete = title && desc && cont && cat && tags && (file || image);
+    
+    if (areAllFieldsComplete) {
+      const debounceSaveDraft = debounced.debounced(
+        saveDraftAndPostAutomatically,
+        2000
+      );
+      
+      debounceSaveDraft();
+  
+      return () => {
+        debounced.cancel();
+      };
+    }
+  }, [title, desc, cont, cat, tags, file, image, saveDraftAndPostAutomatically])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -235,6 +241,8 @@ const Write = () => {
         setPost(response.data);
         console.log('Fetched data:', data);
 
+        
+
         if (data.post) {
           // Handle single post or draft
           const postData = data.post;
@@ -247,6 +255,8 @@ const Write = () => {
           setMetadataPost(
             postData?.metadata ? JSON.parse(postData.metadata) : ''
           );
+          setFileAwsS3(postData?.image);
+          console.log(postData?.image)
         } else if (data.posts && data.posts.length > 0) {
           // Handle multiple drafts (though we're only using the first one)
           const draftData = data.posts[0];
@@ -350,10 +360,11 @@ const Write = () => {
           formData.set('file', fileObject);
 
           const res = await axios.post(
-            `${import.meta.env.VITE_API_UPLOAD}/upload`,
+            `${import.meta.env.VITE_API_URI}/upload`,
             formData
           );
           const filename = res.data.url;
+        
           console.log(filename);
 
           fileUrl = `${filename}`;
@@ -401,6 +412,8 @@ const Write = () => {
         progress: undefined,
         theme: 'dark',
       });
+
+      navigate('/');
     } catch (err) {
       console.error(err);
       toast.error('Error uploading image or publishing post');
@@ -534,6 +547,7 @@ const Write = () => {
             cat={cat}
             tags={tags}
             file={file}
+            fileAwsS3={fileAwsS3}
             image={image}
             postId={postId}
             draftId={draftId}

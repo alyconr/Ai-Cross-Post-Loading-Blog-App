@@ -1,11 +1,9 @@
-import styled from "styled-components";
-import { BsPostcardHeartFill } from "react-icons/bs";
-import { useState, useEffect } from "react";
-import axios from "axios";
-import { Link } from "react-router-dom";
-import PropTypes from "prop-types";
-
-
+import styled from 'styled-components';
+import { BsPostcardHeartFill } from 'react-icons/bs';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 const MenuLeft = ({ category }) => {
   const [posts, setPosts] = useState([]);
@@ -14,7 +12,7 @@ const MenuLeft = ({ category }) => {
     const fetchPosts = async () => {
       try {
         const res = await axios(
-          `http://localhost:9000/api/v1/posts/?category=${category}`
+          `${import.meta.env.VITE_API_URI}/posts/?category=${category}`
         );
         const reverse = res.data.posts.reverse();
 
@@ -28,7 +26,7 @@ const MenuLeft = ({ category }) => {
   }, [category]);
 
   const getText = (html) => {
-    const doc = new DOMParser().parseFromString(html, "text/html");
+    const doc = new DOMParser().parseFromString(html, 'text/html');
     return doc.body.textContent;
   };
 
@@ -37,26 +35,22 @@ const MenuLeft = ({ category }) => {
       <h1>
         Posts you may like
         <BsPostcardHeartFill
-          color={"#6A072D"}
+          color={'#6A072D'}
           size={40}
-          style={{ marginLeft: "1rem" }}
+          style={{ marginLeft: '1rem' }}
         />
       </h1>
 
       {Array.isArray(posts) &&
         posts.map((post) => (
           <div className="post" key={post.id}>
-            <img
-              className="postImg"
-              src={post.image}
-              alt="post"
-            />
+            <img className="postImg" src={post.image} alt="post" />
             <div className="postInfo">
               <h2 className="postTitle">{post.title}</h2>
               <p>{getText(post.description)}</p>
               <Link
                 to={`/singlepost/${post.id}/title=${encodeURIComponent(
-                  post.title.replace(/ /g, "-")
+                  post.title.replace(/ /g, '-')
                 )}`}
               >
                 <button>Read More</button>
@@ -68,9 +62,8 @@ const MenuLeft = ({ category }) => {
   );
 };
 
-
 MenuLeft.propTypes = {
-  category: PropTypes.string.isRequired,
+  category: PropTypes.string,
 };
 
 export default MenuLeft;

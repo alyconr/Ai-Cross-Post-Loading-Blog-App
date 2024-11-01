@@ -6,7 +6,6 @@ const postHashnodeApi = async (req, res) => {
     const {
       publicationId,
       title,
-      subtitle,
       contentMarkdown,
       coverImageOptions,
       tags,
@@ -19,7 +18,6 @@ const postHashnodeApi = async (req, res) => {
     console.log("Received article data:", {
       publicationId,
       title,
-      subtitle,
       contentMarkdown,
       coverImageOptions,
       tags,
@@ -49,7 +47,6 @@ const postHashnodeApi = async (req, res) => {
       input: {
         publicationId,
         title,
-        subtitle,
         contentMarkdown,
         coverImageOptions,
         tags,

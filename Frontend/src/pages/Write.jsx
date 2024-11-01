@@ -425,6 +425,61 @@ const Write = () => {
     await handleDeleteDraftPost();
   };
 
+  const imageUploadHandler = async (image) => {
+    try {
+      // Convert image to base64 if it's a File object
+      const processImage = async (file) => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      };
+
+      let imageData;
+      if (image instanceof File) {
+        const formData = new FormData();
+        formData.append('file', image);
+
+        // Upload to your server
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_URI}/upload`,
+          formData,
+          {
+            withCredentials: true,
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
+
+        // Get the URL from the response
+        imageData = response.data.url;
+
+        // Show success message
+        toast.success('Image uploaded successfully', {
+          position: 'bottom-right',
+          autoClose: 2500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'dark',
+        });
+      }
+
+      // Return the URL for the editor to use
+      return imageData;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast.error('Error uploading image. Please try again.');
+      throw error;
+    }
+  };
+
+  
   return (
     <Container>
       <PreviewPublish onClick={handleToggle}>
@@ -469,7 +524,19 @@ const Write = () => {
                 codeBlockPlugin({
                   defaultCodeBlockLanguage: 'javascript',
                 }),
-                imagePlugin(),
+                imagePlugin({
+                  imageUploadHandler,
+                  imageAutocompleteSuggestions: [], // Optional: Add suggestions if needed
+                  defaultAttributes: {
+                    // Optional: Set default attributes for uploaded images
+                    className: 'uploaded-image',
+                    loading: 'lazy',
+                  },
+                  imagePreviewHandler: (url) => {
+                    // Optional: Preview handler for images
+                    return url;
+                  },
+                }),
                 tablePlugin(),
                 thematicBreakPlugin(),
                 quotePlugin(),

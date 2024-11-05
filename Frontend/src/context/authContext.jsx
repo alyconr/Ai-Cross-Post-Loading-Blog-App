@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import PropTypes from 'prop-types';
 export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
@@ -10,7 +11,7 @@ export const AuthContextProvider = ({ children }) => {
 
   const login = async (inputs) => {
     const res = await axios.post(
-      "http://localhost:9000/api/v1/auth/login",
+      `${import.meta.env.VITE_API_URI}/auth/login`,
       inputs,
       {
         withCredentials: true,
@@ -27,7 +28,7 @@ export const AuthContextProvider = ({ children }) => {
   const logout = async () => {
     try {
       await axios.post(
-        "http://localhost:9000/api/v1/auth/logout",
+        `${import.meta.env.VITE_API_URI}/auth/logout`,
         {},
         {
           withCredentials: true,
@@ -46,12 +47,15 @@ export const AuthContextProvider = ({ children }) => {
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
-        progress: undefined,
         theme: "dark",
       });
     } catch (error) {
       console.log(error);
     }
+  };
+
+  AuthContextProvider.propTypes = {
+    children: PropTypes.node.isRequired,
   };
 
   useEffect(() => {

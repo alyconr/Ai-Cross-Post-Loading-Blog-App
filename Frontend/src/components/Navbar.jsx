@@ -202,7 +202,7 @@ const Navbar = () => {
                   <ProfileContainer>
                     {currentUser?.user.image ? (
                       <img
-                        src={`http://localhost:9000/uploads/${currentUser.user.image}`}
+                        src={currentUser.user.image}
                         alt={currentUser.user.username}
                       />
                     ) : (
@@ -350,7 +350,7 @@ const Navbar = () => {
                       className="bg-transparent border-0"
                     >
                       <img
-                        src={`../upload/${currentUser.user.image}`}
+                        src={currentUser.user.image}
                         alt={currentUser.user.username}
                       />
                     </Button>

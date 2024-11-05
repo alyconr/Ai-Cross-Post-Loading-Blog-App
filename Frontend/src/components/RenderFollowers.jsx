@@ -13,7 +13,7 @@ const RenderFollowers = ({ followers }) => (
           <FollowerItem >
             {follower.userImage ? (
               <UserImage
-                src={`../upload/${follower.userImage}`}
+                src={follower.userImage}
                 alt={follower.fullname}
               />
             ) : (

@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { useEffect, useState, useRef , useCallback} from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import 'react-quill/dist/quill.snow.css';
 import '@mdxeditor/editor/style.css';
 import { codeMirrorPlugin } from '@mdxeditor/editor';
@@ -52,7 +52,7 @@ const Write = () => {
   const navigate = useNavigate();
   const draftParamId = new URLSearchParams(location.search).get('draftId');
 
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState(location?.state?.title || '');
   const [desc, setDesc] = useState(location?.state?.description || '');
   const [cont, setCont] = useState(location?.state?.content || '');
   const [file, setFile] = useState('');
@@ -64,7 +64,7 @@ const Write = () => {
   const [postId] = useState(location?.state?.pid || '');
   const [metadataPost, setMetadataPost] = useState();
   const [initialMarkdown, setInitialMarkdown] = useState('');
-  const [post, setPost] = useState('');
+  const [setPost] = useState('');
   const [fileAwsS3, setFileAwsS3] = useState('');
   const [image, setImage] = useState('');
   console.log(metadataPost);
@@ -74,6 +74,91 @@ const Write = () => {
 
   const editorRef = useRef(null);
 
+  const [imageState, setImageState] = useState({
+    fileData: null,
+    awsUrl: '',
+    metadata: null,
+  });
+
+  const saveDraftAndPostAutomatically = useCallback(async () => {
+    if (
+      title &&
+      desc &&
+      cont &&
+      cat &&
+      tags &&
+      (imageState.fileData || imageState.awsUrl)
+    ) {
+      try {
+        let endpoint;
+        let method;
+
+        if (postId) {
+          endpoint = `${import.meta.env.VITE_API_URI}/posts/${
+            location.state.pid
+          }`;
+          method = 'put';
+        } else if (draftId) {
+          endpoint = `${import.meta.env.VITE_API_URI}/draftposts/${draftId}`;
+          method = 'put';
+        } else {
+          endpoint = `${import.meta.env.VITE_API_URI}/draftposts`;
+          method = 'post';
+        }
+
+        const imageUrl =
+          imageState.awsUrl || imageState.fileData?.metadata?.name;
+
+        const response = await axios({
+          method: method,
+          url: endpoint,
+          data: {
+            title,
+            description: desc,
+            content: cont,
+            image: imageUrl,
+            date: moment(Date.now()).format('YYYY-MM-DD HH:mm:ss'),
+            category: cat,
+            tags,
+            metadata: imageState.metadata || imageState.fileData?.metadata,
+          },
+          withCredentials: true,
+        });
+
+        if (!postId && !draftId) {
+          const newDraftId = response.data.post;
+          setDraftId(newDraftId);
+        }
+
+        toast.info(
+          postId ? 'Post updated successfully' : 'Draft saved successfully',
+          {
+            position: 'bottom-center',
+            autoClose: 2500,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: 'dark',
+          }
+        );
+      } catch (err) {
+        console.error('Error saving draft:', err);
+        toast.error('Error saving draft. Please try again.');
+      }
+    }
+  }, [
+    title,
+    desc,
+    cont,
+    cat,
+    tags,
+    imageState,
+    postId,
+    draftId,
+    location?.state?.pid,
+  ]);
   const handleEditorChange = (content) => {
     setCont(content);
     if (!initialMarkdown) {
@@ -94,6 +179,12 @@ const Write = () => {
           selectedFile
         );
         const fileData = { base64String, metadata };
+
+        setImageState({
+          fileData,
+          awsUrl: '',
+          metadata,
+        });
 
         if (postId) {
           setImage(fileData);
@@ -121,103 +212,33 @@ const Write = () => {
     }
   }, [draftId]);
 
-  
-
-  const saveDraftAndPostAutomatically = useCallback( async () => {
-    if ((title && desc && cont && cat && tags && file) || image) {
-      try {
-        let endpoint;
-        let method;
-        let metadataUrl;
-
-        if (postId) {
-          endpoint = `${import.meta.env.VITE_API_URI}/posts/${
-            location.state.pid
-          }`;
-          method = 'put';
-        } else if (draftId) {
-          endpoint = `${import.meta.env.VITE_API_URI}/draftposts/${draftId}`;
-          method = 'put';
-        } else {
-          endpoint = `${import.meta.env.VITE_API_URI}/draftposts`;
-          method = 'post';
-        }
-
-        const imageUrl = file?.metadata?.name || image?.metadata?.name;
-
-        const metadata =
-          JSON.parse(localStorage.getItem('uploadedImage')) ||
-          JSON.parse(localStorage.getItem('uploadedFile'));
-        console.log(metadata);
-
-        if (!metadata) {
-          metadataUrl = setPost(post.post.image);
-        } else {
-          metadataUrl = `${import.meta.env.VITE_API_UPLOAD}/uploads/${
-            metadata?.metadata?.name
-          }`;
-        }
-
-        console.log(metadataUrl);
-
-        const response = await axios({
-          method: method,
-          url: endpoint,
-          data: {
-            title,
-            description: desc,
-            content: cont,
-            image: !postId ? imageUrl : metadataUrl || fileAwsS3,
-            date: moment(Date.now()).format('YYYY-MM-DD HH:mm:ss'),
-            category: cat,
-            tags,
-            metadata: metadata?.metadata,
-          },
-          withCredentials: true,
-        });
-
-        if (!postId && !draftId) {
-          const newDraftId = response.data.post;
-          setDraftId(newDraftId);
-        }
-
-        toast.info(
-          postId ? 'Post updated successfully' : 'Draft saved successfully',
-          {
-            position: 'bottom-center',
-            autoClose: 2500,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: 'dark',
-          }
-        );
-      } catch (err) {
-        console.error('Error saving draft: Please upload the image again', err);
-        toast.error('Error saving draft, Please upload the image again');
-      }
-    }
-  });
-
   useEffect(() => {
     // First check if all required fields are present
-    const areAllFieldsComplete = title && desc && cont && cat && tags && (file || image);
-    
+    const areAllFieldsComplete =
+      title && desc && cont && cat && tags && (file || image);
+
     if (areAllFieldsComplete) {
       const debounceSaveDraft = debounced.debounced(
         saveDraftAndPostAutomatically,
         2000
       );
-      
+
       debounceSaveDraft();
-  
+
       return () => {
         debounced.cancel();
       };
     }
-  }, [title, desc, cont, cat, tags, file, image, saveDraftAndPostAutomatically])
+  }, [
+    title,
+    desc,
+    cont,
+    cat,
+    tags,
+    file,
+    image,
+    saveDraftAndPostAutomatically,
+  ]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -239,42 +260,75 @@ const Write = () => {
 
         const data = response.data;
         setPost(response.data);
-        console.log('Fetched data:', data);
-
-        
 
         if (data.post) {
-          // Handle single post or draft
           const postData = data.post;
           setTitle(postData?.title || '');
           setDesc(postData?.description || '');
           setCont(postData?.content || '');
           setCat(postData?.category || '');
           setTags(Array.isArray(postData?.tags) ? postData.tags : []);
-          setImage(postData?.metadata ? JSON.parse(postData.metadata) : '');
+
+          // New image state handling
+          setImageState({
+            fileData: postData?.metadata ? JSON.parse(postData.metadata) : null,
+            awsUrl: postData?.image || '',
+            metadata: postData?.metadata ? JSON.parse(postData.metadata) : null,
+          });
+
           setMetadataPost(
             postData?.metadata ? JSON.parse(postData.metadata) : ''
           );
           setFileAwsS3(postData?.image);
-          console.log(postData?.image)
         } else if (data.posts && data.posts.length > 0) {
-          // Handle multiple drafts (though we're only using the first one)
           const draftData = data.posts[0];
           setTitle(draftData?.title || '');
           setDesc(draftData?.description || '');
           setCont(draftData?.content || '');
           setCat(draftData?.category || '');
           setTags(Array.isArray(draftData?.tags) ? draftData.tags : []);
+
+          // New draft image state handling
+          setImageState({
+            fileData: draftData?.metadata
+              ? JSON.parse(draftData.metadata)
+              : null,
+            awsUrl: draftData?.image || '',
+            metadata: draftData?.metadata
+              ? JSON.parse(draftData.metadata)
+              : null,
+          });
+
           setImage(draftData?.metadata ? JSON.parse(draftData.metadata) : '');
+          setFileAwsS3(draftData?.image);
+        }
+
+        // Restore image from localStorage if available
+        const savedFile = localStorage.getItem('uploadedFile');
+        const savedImage = localStorage.getItem('uploadedImage');
+
+        if (savedFile && draftId) {
+          const parsedFile = JSON.parse(savedFile);
+          setImageState((prev) => ({
+            ...prev,
+            fileData: parsedFile,
+            metadata: parsedFile.metadata,
+          }));
+        } else if (savedImage) {
+          const parsedImage = JSON.parse(savedImage);
+          setImageState((prev) => ({
+            ...prev,
+            fileData: parsedImage,
+            metadata: parsedImage.metadata,
+          }));
         }
       } catch (err) {
         console.log(err);
       }
     };
-    // Only fetch draft data when the component mounts
 
     fetchData();
-  }, [draftId, postId]);
+  }, [draftId, postId, setPost]);
 
   const handleDeleteDraftPost = async () => {
     if (postId) {
@@ -303,7 +357,6 @@ const Write = () => {
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
-          progress: undefined,
           theme: 'dark',
         });
       } catch (err) {
@@ -333,7 +386,6 @@ const Write = () => {
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
-          progress: undefined,
           theme: 'dark',
         });
 
@@ -364,7 +416,7 @@ const Write = () => {
             formData
           );
           const filename = res.data.url;
-        
+
           console.log(filename);
 
           fileUrl = `${filename}`;
@@ -409,7 +461,6 @@ const Write = () => {
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
-        progress: undefined,
         theme: 'dark',
       });
 
@@ -427,17 +478,6 @@ const Write = () => {
 
   const imageUploadHandler = async (image) => {
     try {
-      // Convert image to base64 if it's a File object
-      const processImage = async (file) => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
-      };
-
-      let imageData;
       if (image instanceof File) {
         const formData = new FormData();
         formData.append('file', image);
@@ -454,9 +494,6 @@ const Write = () => {
           }
         );
 
-        // Get the URL from the response
-        imageData = response.data.url;
-
         // Show success message
         toast.success('Image uploaded successfully', {
           position: 'bottom-right',
@@ -465,13 +502,13 @@ const Write = () => {
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
-          progress: undefined,
           theme: 'dark',
         });
-      }
 
-      // Return the URL for the editor to use
-      return imageData;
+        // Return the URL from the response
+        return response.data.url;
+      }
+      return null;
     } catch (error) {
       console.error('Error uploading image:', error);
       toast.error('Error uploading image. Please try again.');
@@ -479,7 +516,6 @@ const Write = () => {
     }
   };
 
-  
   return (
     <Container>
       <PreviewPublish onClick={handleToggle}>
@@ -526,15 +562,9 @@ const Write = () => {
                 }),
                 imagePlugin({
                   imageUploadHandler,
-                  imageAutocompleteSuggestions: [], // Optional: Add suggestions if needed
                   defaultAttributes: {
-                    // Optional: Set default attributes for uploaded images
                     className: 'uploaded-image',
                     loading: 'lazy',
-                  },
-                  imagePreviewHandler: (url) => {
-                    // Optional: Preview handler for images
-                    return url;
                   },
                 }),
                 tablePlugin(),
@@ -616,6 +646,7 @@ const Write = () => {
             file={file}
             fileAwsS3={fileAwsS3}
             image={image}
+            imageState={imageState}
             postId={postId}
             draftId={draftId}
             handleFileChange={handleFileChange}

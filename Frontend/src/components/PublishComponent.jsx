@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import CustomModal from '../components/Modal';
 import PropTypes from 'prop-types';
 
+
 const PublishComponent = ({
   title,
   desc,
@@ -19,6 +20,8 @@ const PublishComponent = ({
   handlePublishAndDeleteDraft,
   setCat,
   metadataPost,
+  imageState
+  
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [metadataObject, setMetadataObject] = useState('');
@@ -28,6 +31,20 @@ const PublishComponent = ({
   console.log(fileAwsS3);
   console.log(image);
   console.log(file);
+
+  const getImageDisplay = () => {
+    if (imageState.awsUrl) {
+      return `Image: ${imageState.awsUrl}`;
+    } else if (imageState.fileData?.metadata?.name) {
+      return `Image: ${imageState.fileData.metadata.name}`;
+    }
+    return 'No image selected';
+  };
+
+  const canPublish = () => {
+    return imageState.awsUrl || imageState.fileData?.metadata?.name;
+  };
+
   useEffect(() => {
     if (metadataPost) {
       if (typeof metadataPost === 'string') {
@@ -82,12 +99,10 @@ const PublishComponent = ({
           </button>
         )}
         <h5>
-          {image || file || fileAwsS3
-            ? `Image: ${fileAwsS3}`
-            : 'No image selected'}
+          <h5>{getImageDisplay()}</h5>
         </h5>
         <hr />
-        {file?.metadata || image?.metadata?.name || metadataObject?.name || fileAwsS3? (
+        {canPublish() ? (
           <div className="actions d-flex justify-content-between gap-3">
             <button className="btn" onClick={handleShowModal}>
               Publish
@@ -234,7 +249,7 @@ const PublishComponent = ({
         title={title}
         cont={cont}
         desc={desc}
-        image={fileAwsS3  } 
+        image={fileAwsS3}
         category={cat}
         tags={tags}
       />
@@ -274,6 +289,19 @@ PublishComponent.propTypes = {
     }),
   ]),
   fileAwsS3: PropTypes.string,
+  imageState: PropTypes.shape({
+    fileData: PropTypes.shape({
+      base64String: PropTypes.string,
+      metadata: PropTypes.shape({
+        name: PropTypes.string,
+        type: PropTypes.string,
+        size: PropTypes.number,
+      }),
+    }),
+    awsUrl: PropTypes.string,
+    metadata: PropTypes.object,
+  }),
+  setImageState: PropTypes.func,
   handlePublishAndDeleteDraft: PropTypes.func,
   handleFileChange: PropTypes.func,
   handleDeleteDraftPost: PropTypes.func,

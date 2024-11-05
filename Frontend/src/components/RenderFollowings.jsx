@@ -13,7 +13,7 @@ const RenderFollowings = ({ following }) => (
             <FollowerItem key={followings.id}>
               {followings.userImage ? (
                 <UserImage
-                  src={`../upload/${followings.userImage}`}
+                  src={followings.userImage}
                   alt={followings.fullname}
                 />
               ) : (

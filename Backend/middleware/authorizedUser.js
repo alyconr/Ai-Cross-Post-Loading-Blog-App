@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 
 const authorizedUser = (req, res, next) => {
   const token = req.cookies.token;
+ 
 
   if (!token) {
     // check if token exists
@@ -33,6 +34,7 @@ const authorizedUser = (req, res, next) => {
 
 const authorized = (req, res, next) => {
   const token = req.cookies.token;
+  
   if (!token) {
     return res
       .status(StatusCodes.UNAUTHORIZED)
@@ -49,6 +51,8 @@ const authorized = (req, res, next) => {
 
   const { userId: urlUserId } = req.params;
 
+  console.log(urlUserId, decoded.id);
+
   if (parseInt(urlUserId) !== decoded.id) {
     return res
       .status(StatusCodes.UNAUTHORIZED)
@@ -58,4 +62,26 @@ const authorized = (req, res, next) => {
   next();
 };
 
-module.exports = { authorizedUser, authorized }; //authorizedUser ; // authorizedUser;
+
+const apiAuthorized = (req, res, next) => {
+  const token = req.cookies.token;
+
+  if (!token) {
+    return res
+      .status(StatusCodes.UNAUTHORIZED)
+      .json({ error: "Unauthorized no token" });
+  }
+
+  let decoded;
+
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Unauthorized" });
+  }
+
+  
+
+  next();
+};
+module.exports = { authorizedUser, authorized, apiAuthorized }; //authorizedUser ; // authorizedUser;

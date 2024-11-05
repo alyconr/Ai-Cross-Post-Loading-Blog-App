@@ -402,7 +402,7 @@ const Profile = () => {
                         <Image>
                           <img
                             className="userImg-follower"
-                            src={`../upload/${follow.userImage}`}
+                            src={follow.userImage}
                             alt={user.fullname}
                           />
                         </Image>
@@ -446,7 +446,7 @@ const Profile = () => {
                         <Image>
                           <img
                             className="userImg-follower"
-                            src={`../upload/${follower.userImage}`}
+                            src={user.userImage}
                             alt={user.fullname}
                           />
                         </Image>
@@ -471,7 +471,7 @@ const Profile = () => {
               {user.userImage && (
                 <img
                   className="userImg"
-                  src={`../upload/${user.userImage}`}
+                  src={user.userImage}
                   alt={user.image}
                 />
               )}

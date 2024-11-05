@@ -202,6 +202,7 @@ const Singlepost = () => {
               {' '}
               <span>{post.fullname}</span>
             </PostLink>
+            
 
             <p>Posted {moment(post.date).fromNow()}</p>
           </div>

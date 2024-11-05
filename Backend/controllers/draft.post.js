@@ -137,6 +137,26 @@ const getSingleDraftPost = async (req, res) => {
   });
 };
 
+
+const deleteDraftPostById = async (req, res) => {
+  const values = [req.params.id];
+  const sql = "DELETE FROM posts_draft WHERE draft_id = ?";
+
+  pool.query(sql, values, (queryError, results) => {
+    if (queryError) {
+      console.error("Database query error:", queryError);
+      res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: "Database query error" });
+    } else {
+      res
+        .status(StatusCodes.OK)
+        .json({ message: "Draft Post deleted successfully" });
+    }
+  });
+
+}
+
 const deleteDraftPost = async (req, res) => {
   const token = req.cookies.token;
 
@@ -178,4 +198,5 @@ module.exports = {
   updateDraftPost,
   getSingleDraftPost,
   deleteDraftPost,
+  deleteDraftPostById
 }; // export getAllDraftPosts

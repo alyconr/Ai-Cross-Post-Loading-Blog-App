@@ -51,7 +51,7 @@ const authorized = (req, res, next) => {
 
   const { userId: urlUserId } = req.params;
 
-  console.log(urlUserId, decoded.id);
+  
 
   if (parseInt(urlUserId) !== decoded.id) {
     return res

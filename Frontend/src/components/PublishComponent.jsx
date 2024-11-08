@@ -3,16 +3,13 @@ import { useEffect, useState } from 'react';
 import CustomModal from '../components/Modal';
 import PropTypes from 'prop-types';
 
-
 const PublishComponent = ({
   title,
   desc,
   cont,
   cat,
   tags,
-  file,
   fileAwsS3,
-  image,
   postId,
   handleFileChange,
   handleDeleteDraftPost,
@@ -20,29 +17,20 @@ const PublishComponent = ({
   handlePublishAndDeleteDraft,
   setCat,
   metadataPost,
-  imageState
-  
+  imageState,
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [metadataObject, setMetadataObject] = useState('');
 
-  console.log('Original metadataPost:', metadataPost);
-
-  console.log(fileAwsS3);
-  console.log(image);
-  console.log(file);
-
   const getImageDisplay = () => {
-    if (imageState.awsUrl) {
-      return `Image: ${imageState.awsUrl}`;
-    } else if (imageState.fileData?.metadata?.name) {
-      return `Image: ${imageState.fileData.metadata.name}`;
+    if (imageState.fileData?.metadata?.name) {
+      return `Selected Image: ${imageState.fileData.metadata.name}`;
     }
-    return 'No image selected';
+    return postId ? 'Please upload a new image' : 'No image selected';
   };
 
   const canPublish = () => {
-    return imageState.awsUrl || imageState.fileData?.metadata?.name;
+    return imageState.fileData?.metadata?.name;
   };
 
   useEffect(() => {
@@ -50,14 +38,12 @@ const PublishComponent = ({
       if (typeof metadataPost === 'string') {
         try {
           setMetadataObject(JSON.parse(metadataPost));
-          console.log('The metadataPost is already an object:', metadataObject);
         } catch (error) {
           console.error('Failed to parse metadataPost string:', error);
           // Handle the error appropriately
         }
       } else if (typeof metadataPost === 'object' && metadataPost !== null) {
         setMetadataObject(metadataPost);
-        console.log('The metadataPost is already an object:', metadataObject);
       } else {
         console.log('metadataPost is neither a string nor an object');
       }
@@ -99,13 +85,13 @@ const PublishComponent = ({
           </button>
         )}
         <h5>
-          <h5>{getImageDisplay()}</h5>
+          <ImageDisplay>{getImageDisplay()}</ImageDisplay>
         </h5>
         <hr />
         {canPublish() ? (
           <div className="actions d-flex justify-content-between gap-3">
             <button className="btn" onClick={handleShowModal}>
-              Publish
+              {postId ? 'Update Post' : 'Publish'}
             </button>
           </div>
         ) : (
@@ -311,6 +297,13 @@ PublishComponent.propTypes = {
 };
 
 export default PublishComponent;
+
+const ImageDisplay = styled.div`
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0.5rem 0;
+  color: #fff;
+`;
 
 const Preview = styled.div`
   flex: 2;

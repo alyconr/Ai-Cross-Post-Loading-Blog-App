@@ -370,7 +370,7 @@ const Navbar = () => {
                     <ProfileContainer>
                       {currentUser?.user.image && (
                         <img
-                          src={`../upload/${currentUser.user.image}`}
+                          src={currentUser.user.image}
                           alt={currentUser.user.username}
                         />
                       )}

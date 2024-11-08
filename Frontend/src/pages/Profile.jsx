@@ -177,7 +177,7 @@ const Profile = () => {
         );
 
         setFollowers(res.data);
-        console.log(res.data);
+    
         const values = res.data;
 
         const filter = values.filter(
@@ -205,7 +205,7 @@ const Profile = () => {
         );
 
         setFollowing(res.data);
-        console.log(res.data);
+       
 
         const values = res.data;
 
@@ -234,7 +234,7 @@ const Profile = () => {
         );
 
         setBookmarks(res.data);
-        console.log(res.data);
+        
       } catch (error) {
         console.log(error);
       }

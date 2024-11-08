@@ -64,21 +64,23 @@ const Write = () => {
   const [postId] = useState(location?.state?.pid || '');
   const [metadataPost, setMetadataPost] = useState();
   const [initialMarkdown, setInitialMarkdown] = useState('');
-  const [setPost] = useState('');
+  const [post, setPost] = useState('');
   const [fileAwsS3, setFileAwsS3] = useState('');
   const [image, setImage] = useState('');
-  console.log(metadataPost);
-  console.log(file.metadata?.name);
-  console.log(image);
+  
   const [showPublishComponent, setShowPublishComponent] = useState(true);
-
+  const [editorKey, setEditorKey] = useState(0);
   const editorRef = useRef(null);
+  const [saveStatus, setSaveStatus] = useState('');
 
   const [imageState, setImageState] = useState({
     fileData: null,
-    awsUrl: '',
     metadata: null,
   });
+
+  const savingTimeoutRef = useRef(null);
+  const lastContentRef = useRef('');
+  const contentTimeoutRef = useRef(null);
 
   const saveDraftAndPostAutomatically = useCallback(async () => {
     if (
@@ -129,20 +131,6 @@ const Write = () => {
           const newDraftId = response.data.post;
           setDraftId(newDraftId);
         }
-
-        toast.info(
-          postId ? 'Post updated successfully' : 'Draft saved successfully',
-          {
-            position: 'bottom-center',
-            autoClose: 2500,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: 'dark',
-          }
-        );
       } catch (err) {
         console.error('Error saving draft:', err);
         toast.error('Error saving draft. Please try again.');
@@ -159,13 +147,51 @@ const Write = () => {
     draftId,
     location?.state?.pid,
   ]);
-  const handleEditorChange = (content) => {
-    setCont(content);
-    if (!initialMarkdown) {
-      setInitialMarkdown(content);
-    }
-    saveDraftAndPostAutomatically();
-  };
+
+  const handleEditorChange = useCallback(
+    (content) => {
+      setCont(content);
+      if (!initialMarkdown) {
+        setInitialMarkdown(content);
+      }
+
+      // Show "Saving..." immediately when changes occur
+      setSaveStatus('Saving...');
+
+      // Clear any existing timeout
+      if (contentTimeoutRef.current) {
+        clearTimeout(contentTimeoutRef.current);
+      }
+      if (savingTimeoutRef.current) {
+        clearTimeout(savingTimeoutRef.current);
+      }
+
+      // Only schedule a new save if content has changed significantly
+      if (content !== lastContentRef.current) {
+        lastContentRef.current = content;
+
+        contentTimeoutRef.current = setTimeout(async () => {
+          try {
+            await saveDraftAndPostAutomatically();
+            setSaveStatus('Saved');
+
+            // Clear the "Saved" status after 1 second
+            savingTimeoutRef.current = setTimeout(() => {
+              setSaveStatus('');
+            }, 1000);
+          } catch (error) {
+            setSaveStatus('Error saving');
+
+            // Clear the error status after 2 seconds
+            savingTimeoutRef.current = setTimeout(() => {
+              setSaveStatus('');
+            }, 2000);
+          }
+        }, 2000);
+      }
+    },
+    [initialMarkdown, saveDraftAndPostAutomatically]
+  );
 
   const handleToggle = (event) => {
     event.preventDefault();
@@ -213,21 +239,15 @@ const Write = () => {
   }, [draftId]);
 
   useEffect(() => {
-    // First check if all required fields are present
     const areAllFieldsComplete =
       title && desc && cont && cat && tags && (file || image);
 
     if (areAllFieldsComplete) {
-      const debounceSaveDraft = debounced.debounced(
-        saveDraftAndPostAutomatically,
-        2000
-      );
+      const debouncedSave = debounced.debounced(() => {
+        saveDraftAndPostAutomatically();
+      }, 2000);
 
-      debounceSaveDraft();
-
-      return () => {
-        debounced.cancel();
-      };
+      debouncedSave();
     }
   }, [
     title,
@@ -260,47 +280,44 @@ const Write = () => {
 
         const data = response.data;
         setPost(response.data);
+        console.log(data);
 
         if (data.post) {
           const postData = data.post;
           setTitle(postData?.title || '');
           setDesc(postData?.description || '');
           setCont(postData?.content || '');
+          const content = postData?.content || '';
+          setInitialMarkdown(content); // Set initial markdown
+          setEditorKey((prev) => prev + 1);
           setCat(postData?.category || '');
           setTags(Array.isArray(postData?.tags) ? postData.tags : []);
 
           // New image state handling
           setImageState({
-            fileData: postData?.metadata ? JSON.parse(postData.metadata) : null,
-            awsUrl: postData?.image || '',
-            metadata: postData?.metadata ? JSON.parse(postData.metadata) : null,
+            fileData: null,
+            metadata: null,
           });
 
-          setMetadataPost(
-            postData?.metadata ? JSON.parse(postData.metadata) : ''
-          );
-          setFileAwsS3(postData?.image);
+          setMetadataPost(null);
         } else if (data.posts && data.posts.length > 0) {
           const draftData = data.posts[0];
           setTitle(draftData?.title || '');
           setDesc(draftData?.description || '');
+          const content = draftData?.content || '';
           setCont(draftData?.content || '');
+          setInitialMarkdown(content); // Set initial markdown
+          setEditorKey((prev) => prev + 1);
           setCat(draftData?.category || '');
           setTags(Array.isArray(draftData?.tags) ? draftData.tags : []);
 
           // New draft image state handling
           setImageState({
-            fileData: draftData?.metadata
-              ? JSON.parse(draftData.metadata)
-              : null,
-            awsUrl: draftData?.image || '',
-            metadata: draftData?.metadata
-              ? JSON.parse(draftData.metadata)
-              : null,
+            fileData: null,
+            metadata: null,
           });
 
           setImage(draftData?.metadata ? JSON.parse(draftData.metadata) : '');
-          setFileAwsS3(draftData?.image);
         }
 
         // Restore image from localStorage if available
@@ -330,38 +347,53 @@ const Write = () => {
     fetchData();
   }, [draftId, postId, setPost]);
 
-  const handleDeleteDraftPost = async () => {
-    if (postId) {
-      try {
-        // Delete the draftId from localStorage
-        localStorage.removeItem('draftId');
-        localStorage.removeItem('uploadedFile');
-        localStorage.removeItem('uploadedImage');
-        // Set the state to null or an appropriate value
-
-        await axios.delete(`${import.meta.env.VITE_API_URI}/draftposts`, {
-          withCredentials: true,
-        });
-        setTitle('');
-        setDesc('');
-        setCont('');
-        setDesc(' ');
-        setFile('');
-        setImage('');
-        setDraftId('');
-        navigate('/');
-        toast.info('Draft deleted successfully', {
-          position: 'bottom-right',
-          autoClose: 2500,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          theme: 'dark',
-        });
-      } catch (err) {
-        console.log(err);
+  useEffect(() => {
+    return () => {
+      if (contentTimeoutRef.current) {
+        clearTimeout(contentTimeoutRef.current);
       }
+      if (savingTimeoutRef.current) {
+        clearTimeout(savingTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleDeleteDraftPost = async () => {
+    try {
+      if (draftId) {
+        await axios.delete(
+          `${import.meta.env.VITE_API_URI}/draftposts/${draftId}`,
+          {
+            withCredentials: true,
+          }
+        );
+      }
+
+      // Delete the draftId from localStorage
+      localStorage.removeItem('draftId');
+      localStorage.removeItem('uploadedFile');
+      localStorage.removeItem('uploadedImage');
+      // Set the state to null or an appropriate value
+
+      setTitle('');
+      setDesc('');
+      setCont('');
+      setDesc(' ');
+      setFile('');
+      setImage('');
+      setDraftId('');
+      //navigate('/');
+      toast.info('Draft deleted successfully', {
+        position: 'bottom-right',
+        autoClose: 2500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: 'dark',
+      });
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -375,57 +407,54 @@ const Write = () => {
       return;
     }
 
+    if (!file?.base64String && !image?.base64String) {
+      toast.error('Please upload an image');
+      return;
+    }
+
     try {
+      toast.info('Uploading image...', {
+        position: 'bottom-right',
+        autoClose: 2500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: 'dark',
+      });
+
       let fileUrl = '';
+      let fileObject;
 
-      if (file || image) {
-        toast.info('Uploading image...', {
-          position: 'bottom-right',
-          autoClose: 2500,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          theme: 'dark',
-        });
-
-        let fileObject;
-
-        if (file && file.base64String) {
-          fileObject = base64ToFile(
-            file.base64String,
-            file.metadata?.name || 'image.jpg',
-            file.metadata?.type || 'image/jpeg'
-          );
-        } else if (image && image.base64String) {
-          fileObject = base64ToFile(
-            image.base64String,
-            image.metadata?.name || 'image.jpg',
-            image.metadata?.type || 'image/jpeg'
-          );
-        } else if (image instanceof File) {
-          fileObject = image;
-        }
-
-        if (fileObject) {
-          const formData = new FormData();
-          formData.set('file', fileObject);
-
-          const res = await axios.post(
-            `${import.meta.env.VITE_API_URI}/upload`,
-            formData
-          );
-          const filename = res.data.url;
-
-          console.log(filename);
-
-          fileUrl = `${filename}`;
-        }
+      if (file?.base64String) {
+        fileObject = base64ToFile(
+          file.base64String,
+          file.metadata?.name || 'image.jpg',
+          file.metadata?.type || 'image/jpeg'
+        );
+      } else if (image?.base64String) {
+        fileObject = base64ToFile(
+          image.base64String,
+          image.metadata?.name || 'image.jpg',
+          image.metadata?.type || 'image/jpeg'
+        );
       }
 
-      const metadata = localStorage.getItem('uploadedImage')
-        ? JSON.parse(localStorage.getItem('uploadedImage'))
-        : null;
+      if (!fileObject) {
+        toast.error('Error processing image');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.set('file', fileObject);
+
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URI}/upload`,
+        formData
+      );
+      fileUrl = res.data.url;
+
+      const metadata = file?.metadata || image?.metadata || null;
 
       const postData = {
         title,
@@ -454,23 +483,15 @@ const Write = () => {
         });
       }
 
-      toast.success('Post published successfully', {
-        position: 'bottom-right',
-        autoClose: 2500,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: 'dark',
-      });
-
+      toast.success('Post published successfully');
+      localStorage.removeItem('uploadedImage');
+      localStorage.removeItem('uploadedFile');
       navigate('/');
     } catch (err) {
-      console.error(err);
-      toast.error('Error uploading image or publishing post');
+      console.error('Error publishing post:', err);
+      toast.error('Error publishing post');
     }
   };
-
   const handlePublishAndDeleteDraft = async () => {
     await handlePublish();
     await handleDeleteDraftPost();
@@ -545,94 +566,98 @@ const Write = () => {
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
             />
+            <EditorContainer>
+              <SaveIndicator $status={saveStatus}>{saveStatus}</SaveIndicator>
 
-            <MDXEditor
-              ref={editorRef}
-              markdown={cont}
-              onChange={handleEditorChange}
-              plugins={[
-                headingsPlugin(),
-                linkPlugin(),
-                markdownShortcutPlugin(),
-                listsPlugin(),
-                thematicBreakPlugin(),
-                linkDialogPlugin(),
-                codeBlockPlugin({
-                  defaultCodeBlockLanguage: 'javascript',
-                }),
-                imagePlugin({
-                  imageUploadHandler,
-                  defaultAttributes: {
-                    className: 'uploaded-image',
-                    loading: 'lazy',
-                  },
-                }),
-                tablePlugin(),
-                thematicBreakPlugin(),
-                quotePlugin(),
-                diffSourcePlugin({
-                  diffMarkdown: initialMarkdown,
-                  viewMode: 'rich-text',
-                }),
-                codeBlockPlugin({
-                  defaultCodeBlockLanguage: 'js',
-                  defaultCodeBlockTheme: 'dark',
-                  codeBlockLanguages: {
-                    javascript: 'JavaScript',
-                    python: 'Python',
-                    php: 'PHP',
-                    css: 'CSS',
-                    shell: 'Shell',
-                    bash: 'Bash',
-                    html: 'HTML',
-                    json: 'JSON',
-                    nginx: 'Nginx',
-                    dockerfile: 'Dockerfile',
-                    yaml: 'Yaml',
-                    csharp: 'C#',
-                    makefile: 'Makefile',
-                  },
-                }),
-                codeMirrorPlugin({
-                  codeBlockLanguages: {
-                    javascript: 'javascript',
-                    python: 'python',
-                    php: 'php',
-                    css: 'css',
-                    html: 'html',
-                    json: 'json',
-                    shell: 'shell',
-                    bash: 'bash',
-                    nginx: 'nginx',
-                    Dockerfile: 'Dockerfile',
-                    yaml: 'yaml',
-                    csharp: 'csharp',
-                    makefile: 'makefile',
-                  },
-                }),
-                toolbarPlugin({
-                  toolbarContents: () => (
-                    <>
-                      {' '}
-                      <DiffSourceToggleWrapper>
-                        <UndoRedo />
-                        <BlockTypeSelect />
-                        <BoldItalicUnderlineToggles />
-                        <InsertTable />
-                        <InsertImage />
-                        <InsertThematicBreak />
-                        <InsertCodeBlock />
-                        <CodeToggle />
-                        <ListsToggle />
-                        <CreateLink />
-                        <Separator />
-                      </DiffSourceToggleWrapper>
-                    </>
-                  ),
-                }),
-              ]}
-              contentEditableClassName="mdx-editor"
-            />
+              <MDXEditor
+                key={editorKey}
+                ref={editorRef}
+                markdown={cont}
+                onChange={handleEditorChange}
+                plugins={[
+                  headingsPlugin(),
+                  linkPlugin(),
+                  markdownShortcutPlugin(),
+                  listsPlugin(),
+                  thematicBreakPlugin(),
+                  linkDialogPlugin(),
+                  codeBlockPlugin({
+                    defaultCodeBlockLanguage: 'javascript',
+                  }),
+                  imagePlugin({
+                    imageUploadHandler,
+                    defaultAttributes: {
+                      className: 'uploaded-image',
+                      loading: 'lazy',
+                    },
+                  }),
+                  tablePlugin(),
+                  thematicBreakPlugin(),
+                  quotePlugin(),
+                  diffSourcePlugin({
+                    diffMarkdown: initialMarkdown,
+                    viewMode: 'rich-text',
+                  }),
+                  codeBlockPlugin({
+                    defaultCodeBlockLanguage: 'js',
+                    defaultCodeBlockTheme: 'dark',
+                    codeBlockLanguages: {
+                      javascript: 'JavaScript',
+                      python: 'Python',
+                      php: 'PHP',
+                      css: 'CSS',
+                      shell: 'Shell',
+                      bash: 'Bash',
+                      html: 'HTML',
+                      json: 'JSON',
+                      nginx: 'Nginx',
+                      dockerfile: 'Dockerfile',
+                      yaml: 'Yaml',
+                      csharp: 'C#',
+                      makefile: 'Makefile',
+                    },
+                  }),
+                  codeMirrorPlugin({
+                    codeBlockLanguages: {
+                      javascript: 'javascript',
+                      python: 'python',
+                      php: 'php',
+                      css: 'css',
+                      html: 'html',
+                      json: 'json',
+                      shell: 'shell',
+                      bash: 'bash',
+                      nginx: 'nginx',
+                      Dockerfile: 'Dockerfile',
+                      yaml: 'yaml',
+                      csharp: 'csharp',
+                      makefile: 'makefile',
+                    },
+                  }),
+                  toolbarPlugin({
+                    toolbarContents: () => (
+                      <>
+                        {' '}
+                        <DiffSourceToggleWrapper>
+                          <UndoRedo />
+                          <BlockTypeSelect />
+                          <BoldItalicUnderlineToggles />
+                          <InsertTable />
+                          <InsertImage />
+                          <InsertThematicBreak />
+                          <InsertCodeBlock />
+                          <CodeToggle />
+                          <ListsToggle />
+                          <CreateLink />
+                          <Separator />
+                        </DiffSourceToggleWrapper>
+                      </>
+                    ),
+                  }),
+                ]}
+                contentEditableClassName="mdx-editor"
+              />
+            </EditorContainer>
           </StickyEditor>
         </EditorWrapper>
 
@@ -672,6 +697,58 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   height: 100vh;
+  position: relative;
+`;
+
+const EditorContainer = styled.div`
+  position: relative;
+  width: 100%;
+`;
+
+const SaveIndicator = styled.div`
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 1000;
+  transition: all 0.3s ease;
+  opacity: ${({ $status }) => ($status ? 1 : 0)};
+  pointer-events: none; // Prevent it from intercepting clicks
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); // Add subtle shadow
+  background-color: ${({ $status }) => {
+    switch ($status) {
+      case 'Saving...':
+        return '#ffd700';
+      case 'Saved':
+        return '#4CAF50';
+      case 'Error saving':
+        return '#f44336';
+      default:
+        return 'transparent';
+    }
+  }};
+  color: ${({ $status }) => {
+    switch ($status) {
+      case 'Saving...':
+        return '#000';
+      case 'Saved':
+        return '#fff';
+      case 'Error saving':
+        return '#fff';
+      default:
+        return 'transparent';
+    }
+  }};
+
+  /* Optional: Add animation */
+  transform: ${({ $status }) =>
+    $status
+      ? 'translateX(-50%) translateY(0)'
+      : 'translateX(-50%) translateY(20px)'};
 `;
 
 const PreviewPublish = styled.div`

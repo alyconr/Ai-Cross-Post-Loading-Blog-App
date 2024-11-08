@@ -22,8 +22,10 @@ const ForgotPassword = () => {
 
   const validateInputs = () => {
     let isValid = true;
+    
 
-    if (!inputs.email.trim()) {
+    if (!inputs.email.trim()) { // Check if email is empty
+      setErrors((prev) => ({ ...prev, email: 'Email is required' }));
       isValid = false;
     }
 

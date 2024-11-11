@@ -15,6 +15,7 @@ const handleCrossPostToDevTo = async (
 
   const markdownContent = `${description}\n\n${content}`;
 
+
   const articleData = {
     title: title,
     body_markdown: markdownContent,

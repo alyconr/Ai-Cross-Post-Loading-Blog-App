@@ -9,7 +9,7 @@ const PublishComponent = ({
   cont,
   cat,
   tags,
-  fileAwsS3,
+  image,  
   postId,
   handleFileChange,
   handleDeleteDraftPost,
@@ -18,9 +18,11 @@ const PublishComponent = ({
   setCat,
   metadataPost,
   imageState,
+  
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [metadataObject, setMetadataObject] = useState('');
+
 
   const getImageDisplay = () => {
     if (imageState.fileData?.metadata?.name) {
@@ -30,7 +32,7 @@ const PublishComponent = ({
   };
 
   const canPublish = () => {
-    return imageState.fileData?.metadata?.name;
+    return imageState.fileData?.metadata?.name || imageState.awsUrl;
   };
 
   useEffect(() => {
@@ -235,7 +237,7 @@ const PublishComponent = ({
         title={title}
         cont={cont}
         desc={desc}
-        image={fileAwsS3}
+        image={image} // Use either source of the URL
         category={cat}
         tags={tags}
       />
@@ -274,7 +276,7 @@ PublishComponent.propTypes = {
       }),
     }),
   ]),
-  fileAwsS3: PropTypes.string,
+  awsUrlS3: PropTypes.string,
   imageState: PropTypes.shape({
     fileData: PropTypes.shape({
       base64String: PropTypes.string,

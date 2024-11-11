@@ -15,7 +15,6 @@ const handleCrossPostToDevTo = async (
 
   const markdownContent = `${description}\n\n${content}`;
 
-
   const articleData = {
     title: title,
     body_markdown: markdownContent,
@@ -24,7 +23,6 @@ const handleCrossPostToDevTo = async (
     tags: [category, tags],
     devToken,
   };
-  console.log(articleData);
 
   try {
     await axios.post(devToProxyEndPoint, articleData, {

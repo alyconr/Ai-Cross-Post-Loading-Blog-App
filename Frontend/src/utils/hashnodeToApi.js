@@ -15,18 +15,14 @@ const handleCrossPostToHashnode = async (
     import.meta.env.VITE_API_URI
   }/hashnode-proxy`;
 
-
- 
   const markdownContent = `${description}\n\n${content}`;
 
-  console.log(hashnodeToken);
   const articleData = {
     publicationId: hashnodePublicationId,
     title: title,
     contentMarkdown: markdownContent,
     coverImageOptions: {
-      coverImageURL:
-        image,
+      coverImageURL: image,
     },
     tags:
       Array.isArray(tags) &&
@@ -37,7 +33,7 @@ const handleCrossPostToHashnode = async (
     hashnodeApiKey: hashnodeToken,
     draft: draftHashnode ? true : false,
   };
-  console.log('Article data:', articleData);
+
   try {
     await axios.post(hashnodeProxyEndPoint, articleData, {
       headers: {

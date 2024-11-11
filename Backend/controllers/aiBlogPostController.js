@@ -91,7 +91,7 @@ const generateBlogPost = async (req, res) => {
     const model = new ChatOpenAI({
       openAIApiKey: openAiApiKey,
       temperature: 0.5,
-      modelName: "gpt-4-turbo",
+      modelName: "gpt-4o",
     });
 
     const context = relevantDocs.map((doc) => doc.pageContent).join("\n\n");
@@ -172,7 +172,7 @@ const generateBlogPost = async (req, res) => {
       ## Conclusion
       (Summary and call-to-action)
       
-      ## Meta Description Options
+      ## Meta Description References
       (3-5 options)
       
       CRITICAL REMINDERS:

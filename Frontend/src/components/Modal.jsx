@@ -1,13 +1,13 @@
-import Button from "react-bootstrap/Button";
-import Modal from "react-bootstrap/Modal";
-import { useState } from "react";
-import ModalBodyDevTo from "./ModalBodyDevto";
-import handleCrossPostToDevTo from "../utils/devToApi";
-import handleCrossPostToMedium from "../utils/mediumToApi";
-import handleCrossPostToHashnode from "../utils/hashnodeToApi";
-import ModalBodyMedium from "./ModalBodyMedium";
-import ModalBodyHashnode from "./ModalBodyHashnode";
-import PropTypes from "prop-types";
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import { useState } from 'react';
+import ModalBodyDevTo from './ModalBodyDevto';
+import handleCrossPostToDevTo from '../utils/devToApi';
+import handleCrossPostToMedium from '../utils/mediumToApi';
+import handleCrossPostToHashnode from '../utils/hashnodeToApi';
+import ModalBodyMedium from './ModalBodyMedium';
+import ModalBodyHashnode from './ModalBodyHashnode';
+import PropTypes from 'prop-types';
 
 const CustomModal = ({
   handlePublishAndDeleteDraft,
@@ -29,17 +29,15 @@ const CustomModal = ({
   const [draftDevto, setDraftDevto] = useState(false);
   const [draftMedium, setDraftMedium] = useState(false);
   const [draftHashnode, setDraftHashnode] = useState(false);
-  const [devToken, setDevToken] = useState("");
-  const [mediumToken, setMediumToken] = useState("");
-  const [hashnodeToken, setHashnodeToken] = useState("");
-  const [hashnodePublicationId, setHashnodePublicationId] = useState("");
-
+  const [devToken, setDevToken] = useState('');
+  const [mediumToken, setMediumToken] = useState('');
+  const [hashnodeToken, setHashnodeToken] = useState('');
+  const [hashnodePublicationId, setHashnodePublicationId] = useState('');
 
 
 
   const handleClose = () => setShowModal(false);
   const handlePostDevTo = async () => {
-    
     await handleCrossPostToDevTo(
       title,
       cont,
@@ -52,7 +50,6 @@ const CustomModal = ({
     );
   };
   const handlePostMediumTo = async () => {
-    
     await handleCrossPostToMedium(
       title,
       cont,
@@ -64,14 +61,14 @@ const CustomModal = ({
       draftMedium
     );
   };
-
   const handlePostHashnodeTo = async () => {
-    
+    // Handle the image format before passing to the API
+
     await handleCrossPostToHashnode(
       title,
       cont,
       desc,
-      image,
+      image, // Pass the processed image URL
       tags,
       hashnodeToken,
       hashnodePublicationId,
@@ -170,9 +167,9 @@ CustomModal.propTypes = {
       metadata: PropTypes.shape({
         name: PropTypes.string,
         type: PropTypes.string,
-        size: PropTypes.number
-      })
-    })
+        size: PropTypes.number,
+      }),
+    }),
   ]),
   desc: PropTypes.string,
   category: PropTypes.string,

@@ -65,9 +65,9 @@ const Write = () => {
   const [metadataPost, setMetadataPost] = useState();
   const [initialMarkdown, setInitialMarkdown] = useState('');
   const [post, setPost] = useState('');
-  const [fileAwsS3, setFileAwsS3] = useState('');
+
   const [image, setImage] = useState('');
-  
+  const [awsUrlS3, setAwsUrlS3] = useState('');
   const [showPublishComponent, setShowPublishComponent] = useState(true);
   const [editorKey, setEditorKey] = useState(0);
   const editorRef = useRef(null);
@@ -76,6 +76,7 @@ const Write = () => {
   const [imageState, setImageState] = useState({
     fileData: null,
     metadata: null,
+    awsUrl: null,
   });
 
   const savingTimeoutRef = useRef(null);
@@ -298,6 +299,7 @@ const Write = () => {
             fileData: null,
             metadata: null,
           });
+          setAwsUrlS3(postData?.image);
 
           setMetadataPost(null);
         } else if (data.posts && data.posts.length > 0) {
@@ -669,8 +671,7 @@ const Write = () => {
             cat={cat}
             tags={tags}
             file={file}
-            fileAwsS3={fileAwsS3}
-            image={image}
+            image={awsUrlS3}
             imageState={imageState}
             postId={postId}
             draftId={draftId}

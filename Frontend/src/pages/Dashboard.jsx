@@ -129,7 +129,7 @@ const Dashboard = () => {
     if (currentUser?.user.id) {
       fetchData();
     }
-  }, [currentUser?.user.id, currentUser?.user?.username]);
+  }, [currentUser?.user.id, currentUser?.user?.username, apiKeys]);
 
   const handleClickFollowers = async () => {
     setShowFollowers(true);

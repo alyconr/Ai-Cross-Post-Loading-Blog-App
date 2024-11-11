@@ -23,7 +23,7 @@ const Bookmarks = () => {
           `${import.meta.env.VITE_API_URI}/bookmarks/${currentUserId} `
         );
         setBookmarks(res.data);
-        console.log(res.data);
+        
       } catch (err) {
         console.log(err);
       }

@@ -1,5 +1,5 @@
-const { StatusCodes } = require("http-status-codes");
-const pool = require("../db/connect");
+const { StatusCodes } = require('http-status-codes');
+const pool = require('../db/connect');
 
 const postHashnodeApi = async (req, res) => {
   try {
@@ -13,17 +13,7 @@ const postHashnodeApi = async (req, res) => {
       draft,
     } = req.body;
 
-    const hashnodeEndpoint = "https://gql.hashnode.com";
-
-    console.log("Received article data:", {
-      publicationId,
-      title,
-      contentMarkdown,
-      coverImageOptions,
-      tags,
-      hashnodeApiKey,
-      draft,
-    });
+    const hashnodeEndpoint = 'https://gql.hashnode.com';
 
     const postMutation = `
         mutation ($input: PublishPostInput!) {
@@ -54,10 +44,10 @@ const postHashnodeApi = async (req, res) => {
     };
 
     const response = await fetch(hashnodeEndpoint, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
         Authorization: hashnodeApiKey,
       },
       body: JSON.stringify({
@@ -72,14 +62,14 @@ const postHashnodeApi = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      error: "An internal server error occurred. Please try again later.",
+      error: 'An internal server error occurred. Please try again later.',
     });
   }
 };
 
 const getHashnodePosts = async (req, res) => {
   try {
-    const hashnodeEndpoint = "https://gql.hashnode.com";
+    const hashnodeEndpoint = 'https://gql.hashnode.com';
 
     const hashNodeToken = await getHashnodeTokenFromDb(req.params.userId);
 
@@ -93,10 +83,10 @@ const getHashnodePosts = async (req, res) => {
     `;
 
     const userResponse = await fetch(hashnodeEndpoint, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
         Authorization: hashNodeToken,
       },
       body: JSON.stringify({
@@ -137,10 +127,10 @@ const getHashnodePosts = async (req, res) => {
     };
 
     const postResponse = await fetch(hashnodeEndpoint, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
       },
       body: JSON.stringify({
         query: query,
@@ -154,20 +144,20 @@ const getHashnodePosts = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      error: "An internal server error occurred. Please try again later.",
+      error: 'An internal server error occurred. Please try again later.',
     });
   }
 };
 
 const getHashnodeTokenFromDb = async (userId) => {
   return new Promise((resolve, reject) => {
-    const sql = "SELECT `HashNodeToken`  FROM users WHERE `id` = ?";
+    const sql = 'SELECT `HashNodeToken`  FROM users WHERE `id` = ?';
 
     const values = [userId];
 
     pool.query(sql, values, (queryError, results) => {
       if (queryError) {
-        console.error("Database query error:", queryError);
+        console.error('Database query error:', queryError);
         reject(queryError);
       } else {
         resolve(results[0].HashNodeToken);

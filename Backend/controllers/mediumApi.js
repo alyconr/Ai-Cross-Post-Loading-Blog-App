@@ -20,14 +20,6 @@ const postMediumApi = async (req, res) => {
 
     const postMediumEndpoint = `https://api.medium.com/v1/users/${userId}/posts`;
 
-    console.log('Received article data:', {
-      title,
-      content,
-      tags,
-      publishStatus,
-      mediumToken,
-    });
-
     const article = {
       title,
       contentFormat: 'markdown',

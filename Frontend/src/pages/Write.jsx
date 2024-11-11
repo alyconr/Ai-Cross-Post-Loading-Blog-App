@@ -281,7 +281,7 @@ const Write = () => {
 
         const data = response.data;
         setPost(response.data);
-        console.log(data);
+      
 
         if (data.post) {
           const postData = data.post;

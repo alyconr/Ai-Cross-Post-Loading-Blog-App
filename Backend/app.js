@@ -15,7 +15,7 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(bodyParser.json({ limit: "50" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
-app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
+app.use(cors({ credentials: true, origin: process.env.VITE_URI_HOST }));
 app.use(cookieParser());
 
 app.use("/uploads", express.static("uploads"));

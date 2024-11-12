@@ -43,185 +43,223 @@ const Dashboard = () => {
   const { currentUser } = useContext(AuthContext);
 
   useEffect(() => {
+    const fetchApiKeys = async () => {
+      try {
+        const axiosConfig = { withCredentials: true };
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URI}/user/apikeys/${currentUser?.user.id}`,
+          axiosConfig
+        );
+        setApiKeys(response.data);
+      } catch (error) {
+        console.error('Error fetching API keys:', error);
+      }
+    };
+
+    if (currentUser?.user.id) {
+      fetchApiKeys();
+    }
+  }, [currentUser?.user.id]); // Only depend on user ID
+
+  // Main data fetch
+  useEffect(() => {
     const fetchData = async () => {
       try {
-        const axiosConfig = {
-          withCredentials: true,
-        };
+        const axiosConfig = { withCredentials: true };
+        
+        // Fetch basic data
         const [
-          apiKeysRes,
           followersRes,
           followingRes,
           bookmarksRes,          
           localPostsRes,
           drafts,
         ] = await Promise.all([
-          axios.get(
-            `${import.meta.env.VITE_API_URI}/user/apikeys/${
-              currentUser?.user.id
-            }`,
-            axiosConfig
-          ),
-
-          axios.get(
-            `${import.meta.env.VITE_API_URI}/followers/${currentUser?.user.id}`
-          ),
-          axios.get(
-            `${import.meta.env.VITE_API_URI}/followings/${currentUser?.user.id}`
-          ),
-          axios.get(
-            `${import.meta.env.VITE_API_URI}/bookmarks/${currentUser?.user.id}`
-          ),
-
-          axios.get(
-            `${import.meta.env.VITE_API_URI}/user/posts/${
-              currentUser?.user.username
-            }`
-          ),
+          axios.get(`${import.meta.env.VITE_API_URI}/followers/${currentUser?.user.id}`),
+          axios.get(`${import.meta.env.VITE_API_URI}/followings/${currentUser?.user.id}`),
+          axios.get(`${import.meta.env.VITE_API_URI}/bookmarks/${currentUser?.user.id}`),
+          axios.get(`${import.meta.env.VITE_API_URI}/user/posts/${currentUser?.user.username}`),
           axios.get(`${import.meta.env.VITE_API_URI}/draftposts`),
         ]);
 
-        setApiKeys(apiKeysRes.data);
         setFollowers(followersRes.data);
         setFollowing(followingRes.data);
         setBookmarks(bookmarksRes.data);
         setLocalPosts(localPostsRes.data.posts);
         setDrafts(drafts.data.posts);
 
-        // Only fetch from blog platforms if API keys exist
-        if (apiKeys.data && apiKeys.data.length > 0) {
-          const [mediumRes, devtoRes, hashNodeRes] = await Promise.all([
-            apiKeys.data[0].MediumToken
-              ? axios.get(
-                  `${import.meta.env.VITE_API_URI}/medium-proxy/${
-                    currentUser?.user.id
-                  }`,
-                  axiosConfig
-                )
-              : Promise.resolve({ data: [] }),
-            apiKeys.data[0].DevToToken
-              ? axios.get(
-                  `${import.meta.env.VITE_API_URI}/devto-proxy/${
-                    currentUser?.user.id
-                  }`,
-                  axiosConfig
-                )
-              : Promise.resolve({ data: [] }),
-            apiKeys.data[0].HashNodeToken
-              ? axios.get(
-                  `${import.meta.env.VITE_API_URI}/hashnode-proxy/${
-                    currentUser?.user.id
-                  }`,
-                  axiosConfig
-                )
-              : Promise.resolve({ data: [] }),
-          ]);
+        // Only fetch platform data if we have API keys
+        if (apiKeys && apiKeys.length > 0) {
+          const platformRequests = [];
+          const platformSetters = [];
 
-          setMediumPosts(mediumRes.data);
-          setDevtoPosts(devtoRes.data);
-          setHashNodePosts(hashNodeRes.data);
+          if (apiKeys[0].MediumToken) {
+            platformRequests.push(axios.get(
+              `${import.meta.env.VITE_API_URI}/medium-proxy/${currentUser?.user.id}`,
+              axiosConfig
+            ));
+            platformSetters.push(setMediumPosts);
+          }
+
+          if (apiKeys[0].DevToToken) {
+            platformRequests.push(axios.get(
+              `${import.meta.env.VITE_API_URI}/devto-proxy/${currentUser?.user.id}`,
+              axiosConfig
+            ));
+            platformSetters.push(setDevtoPosts);
+          }
+
+          if (apiKeys[0].HashNodeToken) {
+            platformRequests.push(axios.get(
+              `${import.meta.env.VITE_API_URI}/hashnode-proxy/${currentUser?.user.id}`,
+              axiosConfig
+            ));
+            platformSetters.push(setHashNodePosts);
+          }
+
+          if (platformRequests.length > 0) {
+            const responses = await Promise.all(platformRequests);
+            responses.forEach((res, index) => {
+              platformSetters[index](Array.isArray(res.data) ? res.data : [res.data]);
+            });
+          }
         }
       } catch (error) {
-        console.error(error);
+        console.error('Error fetching dashboard data:', error);
       }
     };
 
     if (currentUser?.user.id) {
       fetchData();
     }
-  }, [currentUser?.user.id, currentUser?.user?.username, apiKeys]);
+  }, [currentUser?.user.id, currentUser?.user.username, apiKeys]);
 
-  const handleClickFollowers = async () => {
+  const handleClickFollowers = () => {
     setShowFollowers(true);
-
-    try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URI}/followers/${currentUser?.user.id}`
-      );
-
-      setFollowers(res.data);
-    } catch (error) {
-      console.error(error);
+    // Only fetch if we don't have followers data
+    if (!followers.length) {
+      const fetchFollowers = async () => {
+        try {
+          const res = await axios.get(
+            `${import.meta.env.VITE_API_URI}/followers/${currentUser?.user.id}`
+          );
+          setFollowers(res.data);
+        } catch (error) {
+          console.error('Error fetching followers:', error);
+        }
+      };
+      fetchFollowers();
     }
   };
+  
 
-  const handleClickFollowings = async () => {
+  const handleClickFollowings = () => {
     setShowFollowings(true);
-    try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URI}/followings/${currentUser?.user.id}`
-      );
-
-      setFollowing(res.data);
-    } catch (error) {
-      console.error(error);
+    if (!following.length) {
+      // fetch only if needed
+      const fetchFollowings = async () => {
+        try {
+          const res = await axios.get(
+            `${import.meta.env.VITE_API_URI}/followings/${currentUser?.user.id}`
+          );
+          setFollowing(res.data);
+        } catch (error) {
+          console.error('Error fetching followings:', error);
+        }
+      };
+      fetchFollowings();
     }
   };
 
-  const handleClickBookmarks = async () => {
+  const handleClickBookmarks = () => {
     setShowBookmarks(true);
-    try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URI}/bookmarks/${currentUser?.user.id}`
-      );
-
-      setBookmarks(res.data);
-    } catch (error) {
-      console.error(error);
+    if (!bookmarks.length) {
+      // fetch only if needed
+      const fetchBookmarks = async () => {
+        try {
+          const res = await axios.get(
+            `${import.meta.env.VITE_API_URI}/bookmarks/${currentUser?.user.id}`
+          );
+          setBookmarks(res.data);
+        } catch (error) {
+          console.error('Error fetching bookmarks:', error);
+        }
+      };
+      fetchBookmarks();
     }
-  };
-
+  }
   const handleClickMediumPosts = async () => {
     setShowMediumPosts(true);
-    try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URI}/medium-proxy/${currentUser?.user.id}`
-      );
-
-      setMediumPosts(Array.isArray(res.data) ? res.data : [res.data]);
-    } catch (error) {
-      console.error(error);
+    if (!mediumPosts.length) {
+      // fetch only if needed
+      const fetchMediumPosts = async () => {
+        try {
+          const res = await axios.get(
+            `${import.meta.env.VITE_API_URI}/medium-proxy/${currentUser?.user.id}`
+          );
+          setMediumPosts(Array.isArray(res.data) ? res.data : [res.data]);
+        } catch (error) {
+          console.error('Error fetching medium posts:', error);
+        }
+      };
+      fetchMediumPosts();
     }
   };
 
   const handleClickDevtoPosts = async () => {
     setShowDevtoPosts(true);
-    try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URI}/devto-proxy/${currentUser?.user.id}`
-      );
-
-      setDevtoPosts(Array.isArray(res.data) ? res.data : [res.data]);
-    } catch (error) {
-      console.error(error);
+    
+    if (!devtoPosts.length) {
+      // fetch only if needed
+      const fetchDevtoPosts = async () => {
+        try {
+          const res = await axios.get(
+            `${import.meta.env.VITE_API_URI}/devto-proxy/${currentUser?.user.id}`
+          );
+          setDevtoPosts(Array.isArray(res.data) ? res.data : [res.data]);
+        } catch (error) {
+          console.error('Error fetching devto posts:', error);
+        }
+      };
+      fetchDevtoPosts();
     }
   };
 
   const handleClickHashNodePosts = async () => {
     setShowHashNodePosts(true);
-    try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URI}/hashnode-proxy/${currentUser?.user.id}`
-      );
-
-      setHashNodePosts(Array.isArray(res.data) ? res.data : [res.data]);
-    } catch (error) {
-      console.error(error);
-    }
+    
+    if (!hashNodePosts.length) {
+      // fetch only if needed
+      const fetchHashNodePosts = async () => {
+        try {
+          const res = await axios.get(
+            `${import.meta.env.VITE_API_URI}/hashnode-proxy/${currentUser?.user.id}`
+          );
+          setHashNodePosts(Array.isArray(res.data) ? res.data : [res.data]);
+        } catch (error) { 
+          console.error('Error fetching hashnode posts:', error);
+        }
+      };
+      fetchHashNodePosts();
+  }
   };
 
   const handleClickLocalPosts = async () => {
     setShowLocalPosts(true);
-    try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URI}/user/posts/${
-          currentUser?.user?.username
-        }`
-      );
-
-      setLocalPosts(res.data.posts);
-    } catch (error) {
-      console.error(error);
+   
+    if (!localPosts.length) {
+      // fetch only if needed
+      const fetchLocalPosts = async () => {
+        try {
+          const res = await axios.get(
+            `${import.meta.env.VITE_API_URI}/user/posts/${currentUser?.user.username}`
+          );
+          setLocalPosts(res.data.posts);
+        } catch (error) {
+          console.error('Error fetching local posts:', error);
+        }
+      };
+      fetchLocalPosts();
     }
   };
 
@@ -353,6 +391,7 @@ const Dashboard = () => {
     </DashboardContainer>
   );
 };
+
 
 export default Dashboard;
 const DashboardContainer = styled.div`

@@ -48,14 +48,15 @@ const Layout = () => {
 
 const PrivateRoute = ({ element }) => {
   const { currentUser } = useContext(AuthContext);
-
   return currentUser ? element : <Navigate to="/login" />;
 };
+
 PrivateRoute.propTypes = {
   element: PropTypes.element.isRequired,
 };
 
-const Router = createBrowserRouter([
+// Define routes configuration
+const routes = [
   {
     path: '/',
     element: <Layout />,
@@ -102,7 +103,6 @@ const Router = createBrowserRouter([
     path: '/register',
     element: <Register />,
   },
-
   {
     path: '/forgot-password',
     element: <ForgotPassword />,
@@ -111,16 +111,32 @@ const Router = createBrowserRouter([
     path: '/reset-password',
     element: <ResetPassword />,
   },
-]);
+];
 
-function App() {
+// Create router with all future flags
+const router = createBrowserRouter(routes, {
+  future: {
+    
+    v7_relativeSplatPath: true,
+    v7_fetcherPersist: true,
+    v7_normalizeFormMethod: true,
+    v7_partialHydration: true,
+    v7_skipActionErrorRevalidation: true
+  }
+});
+
+// Root component that contains both AuthContextProvider and RouterProvider
+const Root = () => {
   return (
-    <>
-      <Container>
-        <RouterProvider router={Router} />
-      </Container>
-    </>
+    <Container>
+      <RouterProvider router={router} future={{ v7_startTransition: true }} />
+    </Container>
   );
+};
+
+// Main App component
+function App() {
+  return <Root />;
 }
 
 const Container = styled.div`

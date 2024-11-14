@@ -1,0 +1,53 @@
+services:
+  frontend:
+    container_name: frontend_blog
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URI: ${VITE_API_URI}
+    env_file:
+      - ./.env
+    environment:      
+      VITE_API_URI: ${VITE_API_URI}      
+      NODE_ENV: development
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - blog_network
+    
+
+  backend:
+    container_name: backend_blog
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    env_file:
+      - ./.env
+    environment:
+      MYSQL_URI: ${MYSQL_URI}
+      CA_PATH: ${CA_PATH}
+      JWT_SECRET: ${JWT_SECRET}
+      NODE_ENV: production
+      EMAIL: ${EMAIL}
+      PASSWORD: ${PASSWORD}
+      VITE_URI_HOST: ${VITE_URI_HOST}
+      QDRANT_URL: ${QDRANT_URL}
+      QDRANT_API_KEY: ${QDRANT_API_KEY}
+      GOOGLE_SEARCH_ENGINE_ID: ${GOOGLE_SEARCH_ENGINE_ID}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
+      AWS_BUCKET_NAME: ${AWS_BUCKET_NAME}
+    ports:
+      - "9000:9000"
+    networks:
+      - blog_network
+    
+
+networks:
+  blog_network:
+    driver: bridge

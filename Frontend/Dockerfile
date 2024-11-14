@@ -1,8 +1,9 @@
-FROM node:20.18.0-alpine3.17
+FROM node:20-alpine
 WORKDIR /usr/src/app
 COPY package*.json ./
-ADD package.json /usr/src/app/package.json
-RUN npm install
+RUN npm install --legacy-peer-deps --no-audit
 COPY . .
-CMD ["npm", "run", "docker"]
+EXPOSE 5173
+ENV HOST=0.0.0.0
+CMD ["npm", "run", "dev"]
 

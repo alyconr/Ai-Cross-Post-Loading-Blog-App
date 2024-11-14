@@ -65,7 +65,7 @@ const authorized = (req, res, next) => {
 
 const apiAuthorized = (req, res, next) => {
   const token = req.cookies.token;
-
+ 
   if (!token) {
     return res
       .status(StatusCodes.UNAUTHORIZED)

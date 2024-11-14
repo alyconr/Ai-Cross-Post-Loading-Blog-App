@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { authorizedUser, authorized } = require("../middleware/authorizedUser");
+const { authorizedUser, authorized, apiAuthorized} = require("../middleware/authorizedUser");
 
 const {
   getCurrentUser,
@@ -48,5 +48,5 @@ router
   .get(authorized, getOpenAiApiKey)
   .put(authorized, updateOpenAiApiKey);
 
-router.route("/apikeys/:userId").get(authorized, getApiKeys);
+router.route("/apikeys/:userId").get(apiAuthorized, getApiKeys);
 module.exports = router;

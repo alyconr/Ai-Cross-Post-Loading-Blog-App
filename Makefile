@@ -1,3 +1,6 @@
+DOCKER_COMPOSE_LOCAL = docker compose -f docker-compose.local.yml
+
+
 # Execute the Backend
 .PHONY: dev-backend
 dev-backend:
@@ -18,4 +21,9 @@ install-backend:
 install-frontend:
 	cd Frontend && npm install
 
+# Docker
+
+.PHONY: docker-dev-up
+docker-dev-up:
+	${DOCKER_COMPOSE_LOCAL} up --build -d 
 	

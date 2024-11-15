@@ -8,9 +8,9 @@ const createPool = (url, caPath) => {
   const connectionConfig = {
     ...mysql.createConnection(url).config,
     ssl: {
-      ca: fs.readFileSync(caPath),
+      rejectUnauthorized: false // Disables SSL certificate validation,
     },
-    timezone: "Z"
+   
 
   };
 

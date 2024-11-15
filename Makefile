@@ -1,4 +1,5 @@
 DOCKER_COMPOSE_LOCAL = docker compose -f docker-compose.local.yml
+DOCKER_COMPOSE_PRODUCTION = docker compose -f docker-compose.prod.yml
 
 
 # Execute the Backend
@@ -21,9 +22,31 @@ install-backend:
 install-frontend:
 	cd Frontend && npm install
 
-# Docker
+# Docker development
 
 .PHONY: docker-dev-up
 docker-dev-up:
 	${DOCKER_COMPOSE_LOCAL} up --build -d 
-	
+
+
+.PHONY: docker-dev-down
+docker-dev-down:
+	${DOCKER_COMPOSE_LOCAL} down
+
+# Docker production
+
+.PHONY: docker-prod-up
+docker-prod-up:
+	${DOCKER_COMPOSE_PRODUCTION} up --build -d
+
+.PHONY: docker-prod-down
+docker-prod-down:
+	${DOCKER_COMPOSE_PRODUCTION} down
+
+
+# Certificates
+
+.PHONY: generate-certificates
+generate-certificates:
+	cd nginx && ./generate-certificates.sh
+

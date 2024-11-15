@@ -12,17 +12,18 @@ export default ({ mode }) => {
     server: {
       proxy: {
         '/api/v1': {
-          target: env.VITE_API_URI ,  
+          target: mode === 'production' 
+            ? 'http://backend:9000'  // Docker service name
+            : env.VITE_API_URI,
           changeOrigin: true,
           secure: false,
-          rewrite: (path) => path.replace(/^\/api\/v1/, '')
         }
       },
       watch: {
         usePolling: true,
       },
-      port: 5173,
-      host: '0.0.0.0',  // explicitly set host
+      
+      host: true,  // explicitly set host
       cors: true        // enable CORS
     },
     resolve: {

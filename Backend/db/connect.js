@@ -19,7 +19,7 @@ const createPool = (url, caPath) => {
 
   const pool = mysql.createPool(connectionConfig);
 
-  // Handle disconnections
+  // Handle connection errors and   reconnect if necessary
   pool.on("connection", (connection) => {
     console.log("Connected to MySQL");
 

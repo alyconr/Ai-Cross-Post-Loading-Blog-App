@@ -10,14 +10,14 @@ const Register = () => {
     fullname: '',
     username: '',
     email: '',
-    password: '',
+    password: ''
   });
 
   const [errors, setErrors] = useState({
     fullname: '',
     username: '',
     email: '',
-    password: '',
+    password: ''
   });
   const [showErrorModal, setShowErrorModal] = useState(false);
   const handleChange = (e) => {
@@ -61,10 +61,7 @@ const Register = () => {
 
     if (validateInputs()) {
       try {
-        await axios.post(
-          `${import.meta.env.VITE_API_URI}/auth/register`,
-          inputs
-        );
+        await axios.post(`${import.meta.env.VITE_API_URI}/auth/register`, inputs);
         window.location.href = '/Login';
       } catch (err) {
         console.log(err);
@@ -78,7 +75,7 @@ const Register = () => {
             fullname: '',
             username: '',
             email: '',
-            password: '',
+            password: ''
           });
 
           if (errorResponse.error === 'Email already exists') {
@@ -88,7 +85,7 @@ const Register = () => {
           if (errorResponse.error === 'Username already exists') {
             setErrors((prev) => ({
               ...prev,
-              username: 'Username already exists',
+              username: 'Username already exists'
             }));
           }
 
@@ -99,7 +96,7 @@ const Register = () => {
             setErrors((prev) => ({
               ...prev,
               password:
-                'Password must be at least 8 characters long and contain at least one number and one special character',
+                'Password must be at least 8 characters long and contain at least one number and one special character'
             }));
 
             setShowErrorModal(true);
@@ -202,12 +199,23 @@ const Container = styled.div`
   height: 80vh;
   width: 35vw;
   margin: 50px auto;
-  background: linear-gradient(
-    90deg,
-    rgba(2, 0, 36, 1) 0%,
-    rgba(9, 9, 121, 1) 35%,
-    rgba(0, 212, 255, 1) 100%
+  background-image: linear-gradient(
+    45deg,
+    hsl(160deg 12% 5%) 0%,
+    hsl(170deg 100% 4%) 8%,
+    hsl(176deg 100% 5%) 17%,
+    hsl(187deg 100% 6%) 25%,
+    hsl(197deg 100% 9%) 33%,
+    hsl(205deg 100% 12%) 42%,
+    hsl(211deg 100% 15%) 50%,
+    hsl(215deg 100% 18%) 58%,
+    hsl(217deg 100% 21%) 67%,
+    hsl(220deg 100% 24%) 75%,
+    hsl(223deg 100% 26%) 83%,
+    hsl(227deg 100% 27%) 92%,
+    hsl(246deg 90% 28%) 100%
   );
+
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 

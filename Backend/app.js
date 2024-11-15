@@ -15,7 +15,30 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(bodyParser.json({ limit: "50" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
-app.use(cors({ credentials: true, origin: process.env.VITE_URI_HOST }));
+const allowedOrigins = [
+  process.env.VITE_URI_HOST,      // Development URL (e.g., http://localhost:5173)
+  process.env.VITE_PROD_URI,             // Production URL when served through nginx
+  process.env.VITE_PROD_HTTP,             // Production URL when served through nginx
+  process.env.VITE_PROD_HTTPS,             // Production URL when served through nginx
+  // Add any other production domains you need
+];
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('Blocked origin:', origin);
+      callback(null, true); // Temporarily allow all origins while debugging
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
 app.use(cookieParser());
 
 app.use("/uploads", express.static("uploads"));

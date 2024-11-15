@@ -2,135 +2,157 @@
 CREATE DATABASE IF NOT EXISTS ai_blog_posts;
 USE ai_blog_posts;
 
--- Drop tables if they exist (in reverse order of dependencies)
-DROP TABLE IF EXISTS followers;
-DROP TABLE IF EXISTS bookmarks;
-DROP TABLE IF EXISTS claps_commentOnComments;
-DROP TABLE IF EXISTS claps_comments;
-DROP TABLE IF EXISTS claps;
-DROP TABLE IF EXISTS comment_onComments;
-DROP TABLE IF EXISTS comments;
-DROP TABLE IF EXISTS posts_draft;
-DROP TABLE IF EXISTS posts;
-DROP TABLE IF EXISTS users;
+-- Set character set
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
 
--- Create Users table (parent table)
+-- Create Users table
 CREATE TABLE users (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
+    id INT NOT NULL AUTO_INCREMENT,
+    fullname VARCHAR(45) NOT NULL,
+    username VARCHAR(45) NOT NULL,
+    email VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+    bio TEXT,
+    image VARCHAR(255),
+    company VARCHAR(45),
+    location VARCHAR(45),
+    social1 VARCHAR(45),
+    social2 VARCHAR(45),
+    reset_token VARCHAR(255),
+    reset_token_expires_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    DevToToken VARCHAR(255),
+    MediumToken VARCHAR(255),
+    HashNodeToken VARCHAR(255),
+    HashnodePublicationId VARCHAR(255),
+    OpenAiApiKey VARCHAR(255),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Create Posts table
 CREATE TABLE posts (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id INT NOT NULL AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
-    content TEXT,
+    description MEDIUMTEXT NOT NULL,
+    Content LONGTEXT NOT NULL,
+    image VARCHAR(255),
+    date DATETIME,
     uid INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT uid FOREIGN KEY (uid) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
-);
+    Category VARCHAR(45),
+    Tags MEDIUMTEXT,
+    Metadata LONGTEXT,
+    PRIMARY KEY (id),
+    KEY uid_idx (uid),
+    CONSTRAINT uid FOREIGN KEY (uid) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Create Posts_draft table
 CREATE TABLE posts_draft (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    draft_id INT NOT NULL AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
-    content TEXT,
-    uid INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT posts_draft_uid FOREIGN KEY (uid) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
-);
+    description MEDIUMTEXT NOT NULL,
+    content LONGTEXT NOT NULL,
+    image VARCHAR(255),
+    date DATETIME,
+    userId INT NOT NULL,
+    category VARCHAR(45),
+    tags MEDIUMTEXT,
+    PRIMARY KEY (draft_id),
+    KEY draft_postId_idx (userId)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Create Comments table
 CREATE TABLE comments (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    content TEXT NOT NULL,
-    postID INT NOT NULL,
+    id INT NOT NULL AUTO_INCREMENT,
     userID INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT postID FOREIGN KEY (postID) REFERENCES posts(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT userID FOREIGN KEY (userID) REFERENCES users(id) ON DELETE NO ACTION ON UPDATE NO ACTION
-);
+    fullname VARCHAR(45),
+    postID INT,
+    comment MEDIUMTEXT NOT NULL,
+    date DATETIME,
+    PRIMARY KEY (id),
+    KEY user_id_idx (userID),
+    KEY post_id_idx (postID),
+    CONSTRAINT postID FOREIGN KEY (postID) REFERENCES posts (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT userID FOREIGN KEY (userID) REFERENCES users (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Create Comment_onComments table
 CREATE TABLE comment_onComments (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    content TEXT NOT NULL,
+    id INT NOT NULL AUTO_INCREMENT,
     onComment_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT onCommnet_id FOREIGN KEY (onComment_id) REFERENCES comments(id) ON DELETE CASCADE ON UPDATE CASCADE
-);
+    postId INT,
+    fullname VARCHAR(45),
+    comment MEDIUMTEXT NOT NULL,
+    date DATETIME,
+    PRIMARY KEY (id),
+    KEY onComment_id_idx (onComment_id),
+    CONSTRAINT onCommnet_id FOREIGN KEY (onComment_id) REFERENCES comments (id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Create Claps table
 CREATE TABLE claps (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    post_id INT NOT NULL,
+    id INT NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT post_id FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    UNIQUE KEY unique_clap (post_id, user_id)
-);
+    post_id INT,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    applause_count INT NOT NULL,
+    PRIMARY KEY (id),
+    KEY uid_idx (user_id),
+    KEY post_id_idx (post_id),
+    CONSTRAINT post_id FOREIGN KEY (post_id) REFERENCES posts (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT user_id FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Create Claps_comments table
 CREATE TABLE claps_comments (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    comment_id INT NOT NULL,
+    id INT NOT NULL AUTO_INCREMENT,
     userComment_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT comment_id FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT userComment_id FOREIGN KEY (userComment_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    UNIQUE KEY unique_comment_clap (comment_id, userComment_id)
-);
+    comment_id INT NOT NULL,
+    applauseComment_count INT NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY userComment_id_idx (userComment_id),
+    KEY comment_id_idx (comment_id),
+    CONSTRAINT comment_id FOREIGN KEY (comment_id) REFERENCES comments (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT userComment_id FOREIGN KEY (userComment_id) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Create Claps_commentOnComments table
 CREATE TABLE claps_commentOnComments (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    commentOnCommentId INT NOT NULL,
+    id INT NOT NULL AUTO_INCREMENT,
     userCommentId INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT CommentsOnCommentsId FOREIGN KEY (commentOnCommentId) REFERENCES comment_onComments(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT userCommentId FOREIGN KEY (userCommentId) REFERENCES users(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-    UNIQUE KEY unique_comment_reply_clap (commentOnCommentId, userCommentId)
-);
+    commentOnCommentId INT NOT NULL,
+    applauseCommentOnComment INT NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY CommentsOnCommentsId_idx (commentOnCommentId),
+    KEY userCommentId_idx (userCommentId),
+    CONSTRAINT CommentsOnCommentsId FOREIGN KEY (commentOnCommentId) REFERENCES comment_onComments (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT userCommentId FOREIGN KEY (userCommentId) REFERENCES users (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Create Bookmarks table
 CREATE TABLE bookmarks (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id INT NOT NULL AUTO_INCREMENT,
     usersId INT NOT NULL,
     postsId INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT usersId FOREIGN KEY (usersId) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT postsId FOREIGN KEY (postsId) REFERENCES posts(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    UNIQUE KEY unique_bookmark (usersId, postsId)
-);
+    PRIMARY KEY (id),
+    KEY user_id_idx (usersId),
+    KEY posts_id_idx (postsId),
+    CONSTRAINT postsId FOREIGN KEY (postsId) REFERENCES posts (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT usersId FOREIGN KEY (usersId) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Create Followers table
 CREATE TABLE followers (
-    id INT PRIMARY KEY AUTO_INCREMENT,
     follower_id INT NOT NULL,
     following_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT follower_id FOREIGN KEY (follower_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT following_id FOREIGN KEY (following_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    UNIQUE KEY unique_follow (follower_id, following_id)
-);
+    followers_count INT,
+    follow_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (follower_id, following_id),
+    KEY following_id_idx (following_id),
+    CONSTRAINT follower_id FOREIGN KEY (follower_id) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT following_id FOREIGN KEY (following_id) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Add indexes for better performance
-CREATE INDEX idx_posts_uid ON posts(uid);
-CREATE INDEX idx_posts_draft_uid ON posts_draft(uid);
-CREATE INDEX idx_comments_postID ON comments(postID);
-CREATE INDEX idx_comments_userID ON comments(userID);
-CREATE INDEX idx_comment_replies ON comment_onComments(onComment_id);
-CREATE INDEX idx_claps_post ON claps(post_id);
-CREATE INDEX idx_claps_user ON claps(user_id);
-CREATE INDEX idx_bookmarks_user ON bookmarks(usersId);
-CREATE INDEX idx_bookmarks_post ON bookmarks(postsId);
-CREATE INDEX idx_followers ON followers(follower_id, following_id);
+SET FOREIGN_KEY_CHECKS = 1;

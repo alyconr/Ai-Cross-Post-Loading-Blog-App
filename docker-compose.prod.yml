@@ -1,0 +1,56 @@
+services:
+
+  nginx:
+    container_name: nginx_blog
+    restart: always
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    env_file:
+      - ./.env
+    environment:
+      NGINX_PORT: ${NGINX_PORT}
+      NGINX_HTTPS_PORT: ${NGINX_HTTPS_PORT}
+      FORCE_HTTPS: ${FORCE_HTTPS}
+      BACKEND_API: backend:9000
+      VITE_API_URI: ${VITE_API_URI}
+    depends_on:
+      - backend
+    ports:
+      - "${NGINX_PORT}:${NGINX_PORT}"
+      - "${NGINX_HTTPS_PORT}:${NGINX_HTTPS_PORT}"
+    networks:
+      - blog_network
+
+  backend:
+    container_name: backend_blog
+    restart: always
+    build:
+      context: .
+      dockerfile: ./Backend/prod.Dockerfile
+    env_file:
+      - ./.env
+    environment:
+      VITE_PROD_URI: ${VITE_PROD_URI}
+      MYSQL_URI: ${MYSQL_URI}
+      CA_PATH: ${CA_PATH}
+      JWT_SECRET: ${JWT_SECRET}
+      NODE_ENV: production
+      EMAIL: ${EMAIL}
+      PASSWORD: ${PASSWORD}
+      QDRANT_URL: ${QDRANT_URL}
+      QDRANT_API_KEY: ${QDRANT_API_KEY}
+      GOOGLE_SEARCH_ENGINE_ID: ${GOOGLE_SEARCH_ENGINE_ID}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
+      AWS_BUCKET_NAME: ${AWS_BUCKET_NAME}
+    ports:
+      - "9000:9000"
+    networks:
+      - blog_network
+
+networks:
+  blog_network:
+    driver: bridge

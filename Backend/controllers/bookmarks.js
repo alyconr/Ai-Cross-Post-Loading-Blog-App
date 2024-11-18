@@ -69,12 +69,22 @@ const getAllBookmarks = async (req, res) => {
     } else {
       res.status(StatusCodes.OK).json(results);
     }
-  });
+  }); 
 };
 
 const deleteBookmark = async (req, res) => {
+
+
+  const { usersId, postsId } = req.body;
+
+  if(!usersId || !postsId) {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ error: "Missing required fields" });
+  }
+
   const sql = "DELETE FROM bookmarks WHERE usersId = ? AND postsId = ?";
-  const values = [req.body.usersId, req.body.postsId];
+  const values = [usersId, postsId];
 
   pool.query(sql, values, (queryError, results) => {
     if (queryError) {

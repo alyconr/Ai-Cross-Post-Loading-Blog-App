@@ -32,7 +32,7 @@ services:
       - ./.env
     environment:
       VITE_PROD_URI: ${VITE_PROD_URI}
-      MYSQL_URI: ${MYSQL_URI}
+      MYSQL_URI: mysql://root:${MYSQL_ROOT_PASSWORD}@mysql:3306/${MYSQL_DATABASE}
       CA_PATH: ${CA_PATH}
       JWT_SECRET: ${JWT_SECRET}
       NODE_ENV: production
@@ -46,11 +46,36 @@ services:
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_REGION: ${AWS_REGION}
       AWS_BUCKET_NAME: ${AWS_BUCKET_NAME}
+    depends_on:
+      mysql:
+        condition: service_healthy
     ports:
       - "9000:9000"
     networks:
       - blog_network
 
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_blog
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD:  ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "3306:3306"
+    volumes: 
+      - mysql_data:/var/lib/mysql
+      - ./Scripts/create_database.sql:/docker-entrypoint-initdb.d/create_database.sql:ro
+    networks:
+      - blog_network
+
+volumes:
+  mysql_data:
 networks:
   blog_network:
     driver: bridge

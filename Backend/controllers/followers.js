@@ -100,10 +100,11 @@ const unfollowUser = async (req, res) => {
     return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Unauthorized" });
   }
 
+  const { followingId} = req.params;
   const sql =
     "DELETE FROM followers WHERE follower_id = ? AND following_id = ?";
 
-  const values = [decoded.id, req.body.following_id]; // decoded.id is the user id
+  const values = [decoded.id, followingId]; // decoded.id is the user id
 
   pool.query(sql, values, (queryError, results) => {
     if (queryError) {

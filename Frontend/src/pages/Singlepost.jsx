@@ -159,7 +159,7 @@ const Singlepost = () => {
   const deleteBookmark = async () => {
     try {
       await axios.delete(
-        `${import.meta.env.VITE_API_URI}/bookmarks/${currentUser?.user?.id}`,
+        `${import.meta.env.VITE_API_URI}/bookmarks/delete`,
         {
           data: {
             usersId: currentUser?.user?.id,

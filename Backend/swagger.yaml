@@ -1,0 +1,1357 @@
+openapi: 3.0.0
+info:
+  title: Blog API
+  description: Complete API for managing blog posts, users, comments, interactions, and third-party integrations
+  version: 1.0.0
+servers:
+  - url: http://localhost:9000/api/v1
+    description: Development server
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    
+security:
+  - bearerAuth: []
+
+paths:
+ 
+  # Authentication
+  /auth/login:
+    post:
+      summary: User login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+
+  /auth/register:
+    post:
+      summary: User registration
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullname:
+                  type: string
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '201':
+          description: Registration successful
+
+  /auth/requestPasswordReset:
+    post:
+      summary: Request password reset
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+      responses:
+        '200':
+          description: Password reset link sent successfully
+
+  /auth/resetPassword:
+    post:
+      summary: Reset password
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                token:
+                  type: string
+      responses:
+        '200':
+          description: Password reset successful
+  # User Management
+  /user:
+    get:
+      summary: Get all users
+      responses:
+        '200':
+          description: List of users retrieved successfully
+        '500':
+          description: Internal server error
+
+  /user/{username}:
+    get:
+      summary: Get current user
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User details retrieved successfully
+        '500':
+          description: Internal server error
+
+    put:
+      summary: Update user
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullname:
+                  type: string
+                password:
+                  type: string
+                bio:
+                  type: string
+                userImage:
+                  type: string
+                  nullable: true
+                company:
+                  type: string
+                location:
+                  type: string
+                social1:
+                  type: string
+                social2:
+                  type: string
+      responses:
+        '200':
+          description: User updated successfully
+        '500':
+          description: Internal server error
+
+    delete:
+      summary: Delete account
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Account deleted successfully
+        '500':
+          description: Internal server error
+
+  /user/posts/{username}:
+    get:
+      summary: Get user posts
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User's posts retrieved successfully
+        '500':
+          description: Internal server error
+
+  /user/devToken/{userId}:
+    get:
+      summary: Get Dev.to token
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Dev.to token retrieved successfully
+        '500':
+          description: Internal server error
+
+    put:
+      summary: Update Dev.to token
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                devToToken:
+                  type: string
+      responses:
+        '200':
+          description: Dev.to token updated successfully
+        '500':
+          description: Internal server error
+
+  /user/mediumToken/{userId}:
+    get:
+      summary: Get Medium token
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Medium token retrieved successfully
+        '500':
+          description: Internal server error
+
+    put:
+      summary: Update Medium token
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mediumToken:
+                  type: string
+      responses:
+        '200':
+          description: Medium token updated successfully
+        '500':
+          description: Internal server error
+
+  /user/hashnodeToken/{userId}:
+    get:
+      summary: Get Hashnode token
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Hashnode token retrieved successfully
+        '500':
+          description: Internal server error
+
+    put:
+      summary: Update Hashnode token
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                hashnodeToken:
+                  type: string
+      responses:
+        '200':
+          description: Hashnode token updated successfully
+        '500':
+          description: Internal server error
+
+  /user/openAiApiKey/{userId}:
+    get:
+      summary: Get OpenAI API key
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OpenAI API key retrieved successfully
+        '500':
+          description: Internal server error
+
+    put:
+      summary: Update OpenAI API key
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                openAiApiKey:
+                  type: string
+      responses:
+        '200':
+          description: OpenAI API key updated successfully
+        '500':
+          description: Internal server error
+
+  # Posts
+  /posts:
+    get:
+      summary: Get all posts
+      responses:
+        '200':
+          description: List of posts retrieved successfully
+        '500':
+          description: Internal server error
+
+    post:
+      summary: Create post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                content:
+                  type: string
+                category:
+                  type: string
+                tags:
+                  type: string
+      responses:
+        '201':
+          description: Post created successfully
+        '500':
+          description: Internal server error
+
+  /posts/{id}:
+    get:
+      summary: Get single post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Post retrieved successfully
+        '500':
+          description: Internal server error
+
+    put:
+      summary: Update post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                content:
+                  type: string
+      responses:
+        '200':
+          description: Post updated successfully
+        '500':
+          description: Internal server error
+
+    delete:
+      summary: Delete post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Post deleted successfully
+        '500':
+          description: Internal server error
+
+  # Draft Posts
+  /draftposts:
+    get:
+      summary: Get all draft posts
+      responses:
+        '200':
+          description: Draft posts retrieved successfully
+
+    post:
+      summary: Create draft post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                content:
+                  type: string
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '201':
+          description: Draft post created successfully
+
+    delete:
+      summary: Delete all draft posts
+      responses:
+        '200':
+          description: All draft posts deleted successfully
+
+  /draftposts/{id}:
+    get:
+      summary: Get single draft post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Draft post retrieved successfully
+
+    put:
+      summary: Update draft post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                content:
+                  type: string
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Draft post updated successfully
+
+    delete:
+      summary: Delete single draft post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Draft post deleted successfully
+
+  # Comments
+  /comments/{postId}:
+    get:
+      summary: Get comments for a post
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Comments retrieved successfully
+
+    post:
+      summary: Create comment
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                postID:
+                  type: integer
+                comment:
+                  type: string
+                date:
+                  type: string
+                  format: date-time
+      responses:
+        '201':
+          description: Comment created successfully
+
+  /comments/postId/{commentId}:
+    put:
+      summary: Edit comment
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: string
+      responses:
+        '200':
+          description: Comment updated successfully
+
+    delete:
+      summary: Delete comment
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Comment deleted successfully
+
+  # Comments on Comments
+  /commentsoncomment/{commentId}:
+    get:
+      summary: Get comments on a comment
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Comments on comment retrieved successfully
+
+    post:
+      summary: Create comment on comment
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                onComment_id:
+                  type: integer
+                postId:
+                  type: integer
+                comment:
+                  type: string
+                date:
+                  type: string
+                  format: date-time
+      responses:
+        '201':
+          description: Comment on comment created successfully
+
+    put:
+      summary: Update comment on comment
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: string
+      responses:
+        '200':
+          description: Comment on comment updated successfully
+
+    delete:
+      summary: Delete comment on comment
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Comment on comment deleted successfully
+
+  # Claps
+  /claps:
+    post:
+      summary: Create claps for post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                post_id:
+                  type: integer
+                applause_count:
+                  type: integer
+      responses:
+        '201':
+          description: Claps created successfully
+
+  /claps/{postId}:
+    get:
+      summary: Get total claps for post
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Total claps retrieved successfully
+
+  /claps/users/{userId}:
+    get:
+      summary: Get user's claps
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User's claps retrieved successfully
+
+  # Claps on Comments
+  /clapsoncomments/{commentId}:
+    post:
+      summary: Create claps on comment
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment_id:
+                  type: integer
+                applauseComment_count:
+                  type: integer
+      responses:
+        '201':
+          description: Claps on comment created successfully
+
+    get:
+      summary: Get total claps on comment
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Total claps on comment retrieved successfully
+
+  /clapsoncomments/users/{commentId}:
+    get:
+      summary: Get user claps on comment
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User claps on comment retrieved successfully
+
+  # Claps on Comments on Comments
+  /clapsoncommentsoncomment/{commentId}:
+    post:
+      summary: Create claps on comment on comment
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                commentOnCommentId:
+                  type: integer
+                applauseCommentOnComment:
+                  type: integer
+      responses:
+        '201':
+          description: Claps on comment on comment created successfully
+
+    get:
+      summary: Get total claps on comment on comment
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Total claps on comment on comment retrieved successfully
+
+  /clapsoncommentsoncomment/users/{commentId}:
+    get:
+      summary: Get user claps on comment on comment
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User claps on comment on comment retrieved successfully
+
+  
+
+  # Bookmarks
+  /bookmarks:
+    post:
+      summary: Create bookmark
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                usersId:
+                  type: integer
+                postsId:
+                  type: integer
+              required:
+                - usersId
+                - postsId
+      responses:
+        '201':
+          description: Bookmark created successfully
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+
+  /bookmarks/{id}:
+    get:
+      summary: Get user's bookmarks
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Bookmarks retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    title:
+                      type: string
+                    description:
+                      type: string
+                    image:
+                      type: string
+                    author_username:
+                      type: string
+                    author_fullname:
+                      type: string
+                    uid:
+                      type: integer
+                    current_usersId:
+                      type: integer
+        '500':
+          description: Internal server error
+
+  /bookmarks/delete:
+    delete:
+      summary: Delete bookmark
+      parameters:
+        - name: usersId
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: ID of the user who created the bookmark
+        - name: postsId
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: ID of the bookmarked post
+      responses:
+        '200':
+          description: Bookmark deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Bookmark deleted successfully'
+        '400':
+          description: Missing required parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Missing required parameters: usersId and postsId are required'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Unauthorized'
+        '404':
+          description: Bookmark not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Bookmark not found or already deleted'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Database query error'
+  # Followers
+  /followers/{userId}:
+    post:
+      summary: Create follower
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                following_id:
+                  type: integer
+                followers_count:
+                  type: integer
+      responses:
+        '201':
+          description: Follower created successfully
+        
+        '500':
+          description: Internal server error
+
+    get:
+      summary: Get total followers
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Total followers retrieved successfully
+        '500':
+          description: Internal server error
+
+  /followers/users/{userId}:
+    get:
+      summary: Get user followers
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User followers retrieved successfully
+        '500':
+          description: Internal server error
+
+  /followers/unfollow/{id}/{followingId}:
+    delete:
+      summary: Unfollow user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the user performing the unfollow action
+        - name: followingId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the user to unfollow
+      responses:
+        '200':
+          description: Unfollowed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Unfollowed successfully"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized no token"
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Follow relationship not found or already deleted"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Database query error"
+
+  # Followings
+  /followings/{userId}:
+    get:
+      summary: Get user followings
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User followings retrieved successfully
+        '500':
+          description: Internal server error
+
+  # Third-party API Integrations
+  /devto-proxy:
+    post:
+      summary: Post to Dev.to
+      security:
+        - devToAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                body_markdown:
+                  type: string
+                published:
+                  type: boolean
+                main_image:
+                  type: string
+                tags:
+                  type: string
+                devToken:
+                  type: string
+      responses:
+        '201':
+          description: Posted to Dev.to successfully
+        '500':
+          description: Internal server error
+
+  /devto-proxy/{userId}:
+    get:
+      summary: Get Dev.to posts
+      security:
+        - devToAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Dev.to posts retrieved successfully
+        '500':
+          description: Internal server error
+  
+  /user/devToken/{userId}:
+    get:
+      summary: Get Dev.to token
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Dev.to token retrieved successfully
+        '500':
+          description: Internal server error
+  /user/devToken/{userId}:
+    put:
+      summary: Update Dev.to token
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                devToken:
+                  type: string
+      responses:
+        '200':
+          description: Dev.to token updated successfully
+        '500':
+          description: Internal server error
+          
+
+  /medium-proxy:
+    post:
+      summary: Post to Medium     
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+                tags:
+                  type: array
+                  items:
+                    type: string
+                publishStatus:
+                  type: string
+                mediumToken:
+                  type: string
+      responses:
+        '201':
+          description: Posted to Medium successfully
+        '500':
+          description: Internal server error
+
+  /medium-proxy/{userId}:
+    get:
+      summary: Get Medium posts      
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Medium posts retrieved successfully
+        '500':
+          description: Internal server error
+  /user/mediumToken/{userId}:
+    get:
+      summary: Get Medium token
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Medium token retrieved successfully
+        '500':
+          description: Internal server error
+  /user/mediumToken/{userId}:
+    put:
+      summary: Update Medium token
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mediumToken:
+                  type: string
+      responses:
+        '200':
+          description: Medium token updated successfully
+        '500':
+          description: Internal server error
+
+
+  /hashnode-proxy:
+    post:
+      summary: Post to Hashnode
+      security:
+        - hashnodeAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                publicationId:
+                  type: string
+                title:
+                  type: string
+                subtitle:
+                  type: string
+                contentMarkdown:
+                  type: string
+                coverImageOptions:
+                  type: object
+                  properties:
+                    coverImageURL:
+                      type: string
+                tags:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      slug:
+                        type: string
+                hashnodeApiKey:
+                  type: string
+                draft:
+                  type: boolean
+      responses:
+        '201':
+          description: Posted to Hashnode successfully
+        '500':
+          description: Internal server error
+
+  /hashnode-proxy/{userId}:
+    get:
+      summary: Get Hashnode posts
+      security:
+        - hashnodeAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Hashnode posts retrieved successfully
+        '500':
+          description: Internal server error
+
+  /user/hashnodeApiKey/{userId}:
+    get:
+      summary: Get Hashnode API key
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Hashnode API key retrieved successfully
+        '500':
+          description: Internal server error
+
+    put:
+      summary: Update Hashnode API key
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                hashnodeApiKey:
+                  type: string
+      responses:
+        '200':
+          description: Hashnode API key updated successfully
+        '500':
+          description: Internal server error

@@ -248,11 +248,9 @@ const Profile = () => {
       await axios.delete(
         `${import.meta.env.VITE_API_URI}/followers/unfollow/${
           currentUser?.user.id
-        }`,
+        }/${user.id}`,
         {
-          data: {
-            following_id: user.id,
-          },
+          
           withCredentials: true,
           credentials: 'include',
         }

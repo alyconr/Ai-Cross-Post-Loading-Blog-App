@@ -14,6 +14,6 @@ const {
 router.route("/:id").post(createFollower);
 router.route("/:id").get(getTotalFollowers);
 router.route("/users/:id").get(getUserFollowers);
-router.route("/unfollow/:id").delete(unfollowUser);
+router.route("/unfollow/:id/:followingId").delete(unfollowUser);
 
 module.exports = router

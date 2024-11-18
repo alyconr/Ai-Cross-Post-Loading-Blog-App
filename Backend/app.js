@@ -9,8 +9,13 @@ const fs = require("fs");
 const app = express();
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const bodyParser = require("body-parser");
+const swaggerUI = require('swagger-ui-express');
+const YAML = require('yamljs');
+const swaggerDocument = YAML.load('./swagger.yaml');
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
 app.use(bodyParser.json({ limit: "50" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
@@ -19,7 +24,8 @@ const allowedOrigins = [
   process.env.VITE_URI_HOST,      // Development URL (e.g., http://localhost:5173)
   process.env.VITE_PROD_URI,             // Production URL when served through nginx
   process.env.VITE_PROD_HTTP,             // Production URL when served through nginx
-  process.env.VITE_PROD_HTTPS,             // Production URL when served through nginx
+  process.env.VITE_PROD_HTTPS, 
+  process.env.VITE_APP_SWAGGER,            // Production URL when served through nginx
   // Add any other production domains you need
 ];
 app.use(cors({

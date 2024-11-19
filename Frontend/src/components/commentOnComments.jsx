@@ -21,7 +21,7 @@ const CommentOnComments = ({
   setNewCommentOnComment,
 }) => {
   const [commentList, setCommentList] = useState([]);
-  const [setCont] = useState([]);
+  const [cont, setCont] = useState([]);
   const [postCommentTrigger, setPostCommentTrigger] = useState(false);
   const [editCommentId, setEditCommentId] = useState(null); // Track the comment being edited
   const location = useLocation();

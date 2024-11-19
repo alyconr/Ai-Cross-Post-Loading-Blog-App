@@ -26,7 +26,7 @@ const Comments = ({ post, setPost }) => {
   const [commentList, setCommentList] = useState([]);
   const [postCommentTrigger, setPostCommentTrigger] = useState(false);
   const [editCommentId, setEditCommentId] = useState(null); // Track the comment being edited
-  const [setCont] = useState([]);
+  const [cont, setCont] = useState([]);
   const location = useLocation();
   const urlId = location.pathname.split('/')[2];
   const { currentUser } = useContext(AuthContext);
@@ -66,7 +66,7 @@ const Comments = ({ post, setPost }) => {
     }
     try {
       const response = await axios.post(
-        `http://localhost:9000/api/v1/comments/${urlId}`,
+        `${import.meta.env.VITE_API_URI}/comments/${urlId}`,
         {
           postID: urlId,
           comment: newComment,
@@ -98,7 +98,7 @@ const Comments = ({ post, setPost }) => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:9000/api/v1/comments/postId/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URI}/comments/postId/${id}`, {
         withCredentials: true,
         credentials: 'include',
       });
@@ -123,7 +123,7 @@ const Comments = ({ post, setPost }) => {
   const handleUpdate = async () => {
     try {
       await axios.put(
-        `http://localhost:9000/api/v1/comments/postId/${editCommentId}`,
+        `${import.meta.env.VITE_API_URI}/comments/postId/${editCommentId}`,
         {
           comment: newComment,
         },

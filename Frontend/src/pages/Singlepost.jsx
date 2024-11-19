@@ -306,7 +306,7 @@ const Singlepost = () => {
                   {currentUser.user.image ? (
                     <img
                       className="user-Img"
-                      src={`../upload/${currentUser.user.image}`}
+                      src={currentUser.user.image}
                       alt={currentUser.user.image}
                     />
                   ) : (
@@ -327,7 +327,7 @@ const Singlepost = () => {
                 </h3>
               )}
               <Comments post={post} setPost={setPost} />
-              test
+              
             </ContainerComments>
           </Offcanvas.Body>
         </Offcanvas>

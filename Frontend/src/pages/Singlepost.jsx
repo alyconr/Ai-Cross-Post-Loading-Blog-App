@@ -67,7 +67,7 @@ const Singlepost = () => {
           `${import.meta.env.VITE_API_URI}/posts/${postId}`
         );
         setPost(res.data.post);
-        console.log(res.data.post);
+        
 
         const userRes = await axios.get(
           `${import.meta.env.VITE_API_URI}/user/${res.data.post.username}`,

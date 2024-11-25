@@ -91,7 +91,7 @@ const generateBlogPost = async (req, res) => {
     const model = new ChatOpenAI({
       openAIApiKey: openAiApiKey,
       temperature: 0.5,
-      modelName: "gpt-4o",
+      modelName: "gpt-4-turbo-preview",
     });
 
     const context = relevantDocs.map((doc) => doc.pageContent).join("\n\n");

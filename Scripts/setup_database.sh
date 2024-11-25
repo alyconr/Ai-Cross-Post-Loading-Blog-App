@@ -17,6 +17,8 @@ if [ ! -f "$SQL_FILE" ]; then
     exit 1
 fi
 
+
+
 # Run the SQL script
 echo "Creating database and tables..."
 mysql -u "$DB_USER" -p << EOF

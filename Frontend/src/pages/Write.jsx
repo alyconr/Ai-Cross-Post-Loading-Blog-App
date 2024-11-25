@@ -28,7 +28,7 @@ import {
   thematicBreakPlugin,
   quotePlugin,
   diffSourcePlugin,
-  DiffSourceToggleWrapper,
+  DiffSourceToggleWrapper
 } from '@mdxeditor/editor';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -37,13 +37,11 @@ import { toast } from 'react-toastify';
 import { debounced } from '../utils/debounce';
 import TagsInput from '../components/tags';
 import PublishComponent from '../components/PublishComponent';
+import CopilotPanel from '../components/AICopilotComponent';
 
 import { IoCloseCircleOutline } from 'react-icons/io5';
 import { MdPostAdd } from 'react-icons/md';
-import {
-  fileToBase64WithMetadata,
-  base64ToFile,
-} from '../utils/uploadImagesUtils';
+import { fileToBase64WithMetadata, base64ToFile } from '../utils/uploadImagesUtils';
 import ArtificialIntelligenceComponent from '../components/ArtificialIntelligence';
 
 const Write = () => {
@@ -57,49 +55,47 @@ const Write = () => {
   const [cont, setCont] = useState(location?.state?.content || '');
   const [file, setFile] = useState('');
   const [cat, setCat] = useState(location?.state?.category || '');
-  const [tags, setTags] = useState(
-    Array.isArray(location?.state?.tags) ? location.state.tags : []
-  );
+  const [tags, setTags] = useState(Array.isArray(location?.state?.tags) ? location.state.tags : []);
   const [draftId, setDraftId] = useState(draftParamId);
   const [postId] = useState(location?.state?.pid || '');
   const [metadataPost, setMetadataPost] = useState();
   const [initialMarkdown, setInitialMarkdown] = useState('');
   const [post, setPost] = useState('');
 
+  
   const [image, setImage] = useState('');
   const [awsUrlS3, setAwsUrlS3] = useState('');
   const [showPublishComponent, setShowPublishComponent] = useState(true);
   const [editorKey, setEditorKey] = useState(0);
   const editorRef = useRef(null);
+  const editorContainerRef = useRef(null);
   const [saveStatus, setSaveStatus] = useState('');
 
   const [imageState, setImageState] = useState({
     fileData: null,
     metadata: null,
-    awsUrl: null,
+    awsUrl: null
+  });
+  const [editorContent, setEditorContent] = useState('');
+  const [suggestionState, setSuggestionState] = useState({
+    currentParagraph: '',
+    newCharCount: 0,
+    isEnabled: true,
+    lastTriggerTime: 0
   });
 
   const savingTimeoutRef = useRef(null);
-  const lastContentRef = useRef('');
+
   const contentTimeoutRef = useRef(null);
 
   const saveDraftAndPostAutomatically = useCallback(async () => {
-    if (
-      title &&
-      desc &&
-      cont &&
-      cat &&
-      tags &&
-      (imageState.fileData || imageState.awsUrl)
-    ) {
+    if (title && desc && cont && cat && tags && (imageState.fileData || imageState.awsUrl)) {
       try {
         let endpoint;
         let method;
 
         if (postId) {
-          endpoint = `${import.meta.env.VITE_API_URI}/posts/${
-            location.state.pid
-          }`;
+          endpoint = `${import.meta.env.VITE_API_URI}/posts/${location.state.pid}`;
           method = 'put';
         } else if (draftId) {
           endpoint = `${import.meta.env.VITE_API_URI}/draftposts/${draftId}`;
@@ -109,8 +105,7 @@ const Write = () => {
           method = 'post';
         }
 
-        const imageUrl =
-          imageState.awsUrl || imageState.fileData?.metadata?.name;
+        const imageUrl = imageState.awsUrl || imageState.fileData?.metadata?.name;
 
         const response = await axios({
           method: method,
@@ -123,9 +118,9 @@ const Write = () => {
             date: moment(Date.now()).format('YYYY-MM-DD HH:mm:ss'),
             category: cat,
             tags,
-            metadata: imageState.metadata || imageState.fileData?.metadata,
+            metadata: imageState.metadata || imageState.fileData?.metadata
           },
-          withCredentials: true,
+          withCredentials: true
         });
 
         if (!postId && !draftId) {
@@ -137,80 +132,103 @@ const Write = () => {
         toast.error('Error saving draft. Please try again.');
       }
     }
-  }, [
-    title,
-    desc,
-    cont,
-    cat,
-    tags,
-    imageState,
-    postId,
-    draftId,
-    location?.state?.pid,
-  ]);
+  }, [title, desc, cont, cat, tags, imageState, postId, draftId, location?.state?.pid]);
 
-  const handleEditorChange = useCallback(
-    (content) => {
-      setCont(content);
-      if (!initialMarkdown) {
-        setInitialMarkdown(content);
+
+
+  const handleEditorChange = useCallback((content) => {
+    setCont(content);
+    setEditorContent(content);
+    
+    // Get paragraphs and current paragraph
+    const paragraphs = content.split(/\n\n+/);
+    const currentParagraph = paragraphs[paragraphs.length - 1]?.trim() || '';
+    
+    if (suggestionState.isEnabled) {
+      setSuggestionState(prev => {
+        const charDiff = currentParagraph.length - (prev.currentParagraph?.length || 0);
+        const newCount = Math.max(0, prev.newCharCount + (charDiff > 0 ? charDiff : 0));
+        
+        return {
+          ...prev,
+          currentParagraph,
+          newCharCount: newCount,
+          showSuggestions: newCount >= 50
+        };
+      });
+    }
+
+    // Autosave logic
+    setSaveStatus('Saving...');
+    if (contentTimeoutRef.current) clearTimeout(contentTimeoutRef.current);
+    if (savingTimeoutRef.current) clearTimeout(savingTimeoutRef.current);
+
+    contentTimeoutRef.current = setTimeout(async () => {
+      try {
+        await saveDraftAndPostAutomatically();
+        setSaveStatus('Saved');
+        savingTimeoutRef.current = setTimeout(() => setSaveStatus(''), 1000);
+      } catch (error) {
+        setSaveStatus('Error saving');
+        savingTimeoutRef.current = setTimeout(() => setSaveStatus(''), 1000);
       }
+    }, 1000);
+  }, [suggestionState.isEnabled, saveDraftAndPostAutomatically]);
 
-      // Show "Saving..." immediately when changes occur
-      setSaveStatus('Saving...');
+  const handleSuggestionSelect = useCallback((suggestion) => {
+    // Get the current content
+    const currentContent = editorContent;
+    
+    // Split into paragraphs
+    const paragraphs = currentContent.split(/\n\n+/);
+    
+    // Create new content with the suggestion
+    const newContent = [
+      ...paragraphs.slice(0, -1),
+      paragraphs[paragraphs.length - 1]?.trim() || '',
+      suggestion,
+      '' // Add empty line for next paragraph
+    ].filter(Boolean).join('\n\n');
 
-      // Clear any existing timeout
-      if (contentTimeoutRef.current) {
-        clearTimeout(contentTimeoutRef.current);
-      }
-      if (savingTimeoutRef.current) {
-        clearTimeout(savingTimeoutRef.current);
-      }
+    // Update the editor content
+    setCont(newContent);
+    setEditorContent(newContent);
+    
+    // Force editor refresh
+    setEditorKey(prev => prev + 1);
+    
+    // Reset suggestion state
+    setSuggestionState({
+      currentParagraph: '',
+      newCharCount: 0,
+      isEnabled: false,
+      lastTriggerTime: Date.now()
+    });
 
-      // Only schedule a new save if content has changed significantly
-      if (content !== lastContentRef.current) {
-        lastContentRef.current = content;
-
-        contentTimeoutRef.current = setTimeout(async () => {
-          try {
-            await saveDraftAndPostAutomatically();
-            setSaveStatus('Saved');
-
-            // Clear the "Saved" status after 1 second
-            savingTimeoutRef.current = setTimeout(() => {
-              setSaveStatus('');
-            }, 1000);
-          } catch (error) {
-            setSaveStatus('Error saving');
-
-            // Clear the error status after 2 seconds
-            savingTimeoutRef.current = setTimeout(() => {
-              setSaveStatus('');
-            }, 2000);
-          }
-        }, 2000);
-      }
-    },
-    [initialMarkdown, saveDraftAndPostAutomatically]
-  );
-
-  const handleToggle = (event) => {
+    // Re-enable suggestions after delay
+    setTimeout(() => {
+      setSuggestionState(prev => ({
+        ...prev,
+        isEnabled: true
+      }));
+    }, 2000);
+  }, [editorContent]);
+    const handleToggle = (event) => {
     event.preventDefault();
     setShowPublishComponent(!showPublishComponent);
   };
+
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       try {
-        const { base64String, metadata } = await fileToBase64WithMetadata(
-          selectedFile
-        );
+        const { base64String, metadata } = await fileToBase64WithMetadata(selectedFile);
         const fileData = { base64String, metadata };
 
         setImageState({
           fileData,
           awsUrl: '',
-          metadata,
+          metadata
         });
 
         if (postId) {
@@ -240,8 +258,7 @@ const Write = () => {
   }, [draftId]);
 
   useEffect(() => {
-    const areAllFieldsComplete =
-      title && desc && cont && cat && tags && (file || image);
+    const areAllFieldsComplete = title && desc && cont && cat && tags && (file || image);
 
     if (areAllFieldsComplete) {
       const debouncedSave = debounced.debounced(() => {
@@ -250,16 +267,7 @@ const Write = () => {
 
       debouncedSave();
     }
-  }, [
-    title,
-    desc,
-    cont,
-    cat,
-    tags,
-    file,
-    image,
-    saveDraftAndPostAutomatically,
-  ]);
+  }, [title, desc, cont, cat, tags, file, image, saveDraftAndPostAutomatically]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -276,12 +284,11 @@ const Write = () => {
         const response = await axios({
           method: 'get',
           url: endpoint,
-          withCredentials: true,
+          withCredentials: true
         });
 
         const data = response.data;
         setPost(response.data);
-      
 
         if (data.post) {
           const postData = data.post;
@@ -297,7 +304,7 @@ const Write = () => {
           // New image state handling
           setImageState({
             fileData: null,
-            metadata: null,
+            metadata: null
           });
           setAwsUrlS3(postData?.image);
 
@@ -316,7 +323,7 @@ const Write = () => {
           // New draft image state handling
           setImageState({
             fileData: null,
-            metadata: null,
+            metadata: null
           });
 
           setImage(draftData?.metadata ? JSON.parse(draftData.metadata) : '');
@@ -331,14 +338,14 @@ const Write = () => {
           setImageState((prev) => ({
             ...prev,
             fileData: parsedFile,
-            metadata: parsedFile.metadata,
+            metadata: parsedFile.metadata
           }));
         } else if (savedImage) {
           const parsedImage = JSON.parse(savedImage);
           setImageState((prev) => ({
             ...prev,
             fileData: parsedImage,
-            metadata: parsedImage.metadata,
+            metadata: parsedImage.metadata
           }));
         }
       } catch (err) {
@@ -363,12 +370,9 @@ const Write = () => {
   const handleDeleteDraftPost = async () => {
     try {
       if (draftId) {
-        await axios.delete(
-          `${import.meta.env.VITE_API_URI}/draftposts/${draftId}`,
-          {
-            withCredentials: true,
-          }
-        );
+        await axios.delete(`${import.meta.env.VITE_API_URI}/draftposts/${draftId}`, {
+          withCredentials: true
+        });
       }
 
       // Delete the draftId from localStorage
@@ -392,7 +396,7 @@ const Write = () => {
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
-        theme: 'dark',
+        theme: 'dark'
       });
     } catch (err) {
       console.log(err);
@@ -422,7 +426,7 @@ const Write = () => {
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
-        theme: 'dark',
+        theme: 'dark'
       });
 
       let fileUrl = '';
@@ -450,10 +454,7 @@ const Write = () => {
       const formData = new FormData();
       formData.set('file', fileObject);
 
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URI}/upload`,
-        formData
-      );
+      const res = await axios.post(`${import.meta.env.VITE_API_URI}/upload`, formData);
       fileUrl = res.data.url;
 
       const metadata = file?.metadata || image?.metadata || null;
@@ -466,7 +467,7 @@ const Write = () => {
         date: moment(Date.now()).format('YYYY-MM-DD HH:mm:ss'),
         category: cat,
         tags,
-        metadata,
+        metadata
       };
 
       if (location.state?.pid) {
@@ -474,14 +475,14 @@ const Write = () => {
           method: 'put',
           url: `${import.meta.env.VITE_API_URI}/posts/${location.state.pid}`,
           data: postData,
-          withCredentials: true,
+          withCredentials: true
         });
       } else {
         await axios({
           method: 'post',
           url: `${import.meta.env.VITE_API_URI}/posts`,
           data: postData,
-          withCredentials: true,
+          withCredentials: true
         });
       }
 
@@ -506,16 +507,12 @@ const Write = () => {
         formData.append('file', image);
 
         // Upload to your server
-        const response = await axios.post(
-          `${import.meta.env.VITE_API_URI}/upload`,
-          formData,
-          {
-            withCredentials: true,
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
+        const response = await axios.post(`${import.meta.env.VITE_API_URI}/upload`, formData, {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'multipart/form-data'
           }
-        );
+        });
 
         // Show success message
         toast.success('Image uploaded successfully', {
@@ -525,7 +522,7 @@ const Write = () => {
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
-          theme: 'dark',
+          theme: 'dark'
         });
 
         // Return the URL from the response
@@ -542,11 +539,7 @@ const Write = () => {
   return (
     <Container>
       <PreviewPublish onClick={handleToggle}>
-        {showPublishComponent ? (
-          <MdPostAdd size={50} />
-        ) : (
-          <IoCloseCircleOutline size={50} />
-        )}
+        {showPublishComponent ? <MdPostAdd size={50} /> : <IoCloseCircleOutline size={50} />}
       </PreviewPublish>
 
       <Wrapper>
@@ -568,7 +561,7 @@ const Write = () => {
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
             />
-            <EditorContainer>
+            <EditorContainer ref={editorContainerRef}>
               <SaveIndicator $status={saveStatus}>{saveStatus}</SaveIndicator>
 
               <MDXEditor
@@ -584,21 +577,21 @@ const Write = () => {
                   thematicBreakPlugin(),
                   linkDialogPlugin(),
                   codeBlockPlugin({
-                    defaultCodeBlockLanguage: 'javascript',
+                    defaultCodeBlockLanguage: 'javascript'
                   }),
                   imagePlugin({
                     imageUploadHandler,
                     defaultAttributes: {
                       className: 'uploaded-image',
-                      loading: 'lazy',
-                    },
+                      loading: 'lazy'
+                    }
                   }),
                   tablePlugin(),
                   thematicBreakPlugin(),
                   quotePlugin(),
                   diffSourcePlugin({
                     diffMarkdown: initialMarkdown,
-                    viewMode: 'rich-text',
+                    viewMode: 'rich-text'
                   }),
                   codeBlockPlugin({
                     defaultCodeBlockLanguage: 'js',
@@ -616,8 +609,8 @@ const Write = () => {
                       dockerfile: 'Dockerfile',
                       yaml: 'Yaml',
                       csharp: 'C#',
-                      makefile: 'Makefile',
-                    },
+                      makefile: 'Makefile'
+                    }
                   }),
                   codeMirrorPlugin({
                     codeBlockLanguages: {
@@ -633,8 +626,8 @@ const Write = () => {
                       Dockerfile: 'Dockerfile',
                       yaml: 'yaml',
                       csharp: 'csharp',
-                      makefile: 'makefile',
-                    },
+                      makefile: 'makefile'
+                    }
                   }),
                   toolbarPlugin({
                     toolbarContents: () => (
@@ -654,11 +647,19 @@ const Write = () => {
                           <Separator />
                         </DiffSourceToggleWrapper>
                       </>
-                    ),
-                  }),
+                    )
+                  })
                 ]}
                 contentEditableClassName="mdx-editor"
               />
+
+              {suggestionState.showSuggestions && suggestionState.isEnabled  && (
+                <CopilotPanel
+                  currentText={suggestionState.currentParagraph}
+                  onSuggestionSelect={handleSuggestionSelect}
+                  editorRef={editorContainerRef}
+                />
+              )}
             </EditorContainer>
           </StickyEditor>
         </EditorWrapper>
@@ -704,6 +705,7 @@ const Container = styled.div`
 const EditorContainer = styled.div`
   position: relative;
   width: 100%;
+  min-height: 300px;
 `;
 
 const SaveIndicator = styled.div`
@@ -747,9 +749,7 @@ const SaveIndicator = styled.div`
 
   /* Optional: Add animation */
   transform: ${({ $status }) =>
-    $status
-      ? 'translateX(-50%) translateY(0)'
-      : 'translateX(-50%) translateY(20px)'};
+    $status ? 'translateX(-50%) translateY(0)' : 'translateX(-50%) translateY(20px)'};
 `;
 
 const PreviewPublish = styled.div`
@@ -828,8 +828,7 @@ const PublishWrapper = styled.div`
   flex: 2;
   transition: all 0.3s ease-in-out;
   opacity: ${({ $showPublishComponent }) => ($showPublishComponent ? 1 : 0)};
-  max-width: ${({ $showPublishComponent }) =>
-    $showPublishComponent ? '100%' : 0};
+  max-width: ${({ $showPublishComponent }) => ($showPublishComponent ? '100%' : 0)};
   overflow: hidden;
   overflow-y: auto;
   height: 100%;

@@ -140,6 +140,7 @@ const linkedinPost = require("./routes/linkedinPost");
 const authLinkedinPost = require("./routes/authLinkedinPost");
 const authLinkedinCallback = require("./routes/authLinkedinCallback");
 const aiBlogPostGenerator = require("./routes/aiBlogPostRoutes");
+const aiCopilotComponent = require("./routes/aiCopilotCOmponent");
 const { connectors } = require("googleapis/build/src/apis/connectors");
 
 app.use("/api/v1/auth", authRouter);
@@ -161,6 +162,7 @@ app.use("/api/v1/linkedin-proxy", linkedinPost);
 app.use("/auth/linkedin", authLinkedinPost);
 app.use("/auth/linkedin/callback", authLinkedinCallback);
 app.use("/api/v1/generateBlogPost", aiBlogPostGenerator);
+app.use("/api/v1/aiCopilotComponent", aiCopilotComponent);
 
 app.get("/", (req, res) => {
   res.send("Hello World, IT WORKS");

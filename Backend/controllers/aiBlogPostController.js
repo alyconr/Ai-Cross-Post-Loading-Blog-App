@@ -172,7 +172,7 @@ const generateBlogPost = async (req, res) => {
       ## Conclusion
       (Summary and call-to-action)
       
-      ## Meta Description References
+      ## Description References
       (3-5 options)
       
       CRITICAL REMINDERS:

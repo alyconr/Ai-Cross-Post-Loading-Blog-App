@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 
-const CopilotPanel = ({ currentText, onSuggestionSelect, editorRef }) => {
+const CopilotPanel = ({ currentText, onSuggestionSelect, apiKey }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const copilotRef = useRef(null);
@@ -16,7 +16,8 @@ const CopilotPanel = ({ currentText, onSuggestionSelect, editorRef }) => {
       if (
         currentText && 
         currentText.length >= 50 && 
-        currentText !== lastProcessedTextRef.current 
+        currentText !== lastProcessedTextRef.current,
+        apiKey
       ) {
         setIsLoading(true);
         lastProcessedTextRef.current = currentText;
@@ -32,8 +33,12 @@ const CopilotPanel = ({ currentText, onSuggestionSelect, editorRef }) => {
             }
           );
 
-          if (response.data && response.data.suggestions) {
-            setSuggestions(response.data.suggestions);
+          if (response.data?.suggestions) {
+            // Clean up suggestions to remove any numbering
+            const cleanedSuggestions = response.data.suggestions.map(suggestion => 
+              suggestion.replace(/^\d+[.)]\s*/, '').trim()
+            );
+            setSuggestions(cleanedSuggestions);
           }
         } catch (error) {
           console.error('Error fetching suggestions:', error);
@@ -46,7 +51,7 @@ const CopilotPanel = ({ currentText, onSuggestionSelect, editorRef }) => {
 
     const debounceTimer = setTimeout(fetchSuggestions, 1000);
     return () => clearTimeout(debounceTimer);
-  }, [currentText]);
+  }, [currentText, apiKey]);
 
  // Reset suggestions when currentText is empty
  useEffect(() => {
@@ -82,12 +87,13 @@ const CopilotPanel = ({ currentText, onSuggestionSelect, editorRef }) => {
                 key={index}
                 onClick={() => {
                   console.log('Selecting suggestion:', suggestion); // Debug log
-                  onSuggestionSelect(suggestion);
+                  const cleanSuggestion = suggestion.replace(/^\d+[.)]\s*/, '').trim();
+                  onSuggestionSelect(cleanSuggestion);
                   setSuggestions([]);
                   lastProcessedTextRef.current = ''; // Reset after selection
                 }}
               >
-                {suggestion.substring(0, 150)}...
+                {suggestion.substring(0, 150)}... 
               </SuggestionCard>
             ))
           ) : (
@@ -102,7 +108,8 @@ const CopilotPanel = ({ currentText, onSuggestionSelect, editorRef }) => {
 CopilotPanel.propTypes = {
   currentText: PropTypes.string,
   onSuggestionSelect: PropTypes.func.isRequired,
-  editorRef: PropTypes.object.isRequired
+  editorRef: PropTypes.object.isRequired,
+  apiKey: PropTypes.string.isRequired
 };
 
 export default CopilotPanel;

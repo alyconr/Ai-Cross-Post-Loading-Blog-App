@@ -13,8 +13,9 @@ const postProcessBlogPost = (content, documents) => {
   }
 
   try {
-    // Extract headings
-    const headings = content.match(/^#{1,3} .+$/gm) || [];
+    // Extract headings, excluding those within code blocks
+    const nonCodeBlockContent = content.replace(/```[\s\S]*?```/g, match => match.replace(/^#{1,3} .+$/gm, ''));
+    const headings = nonCodeBlockContent.match(/^#{1,3} .+$/gm) || [];
 
     // Generate table of contents
     let toc = "## Table of Contents\n\n";
@@ -43,11 +44,32 @@ const postProcessBlogPost = (content, documents) => {
         `${"  ".repeat(Math.max(0, level - 1))}* [${text}](#${slug})`
       );
 
-      // Replace original heading with a markdown-style anchor link
-      const headingRegex = new RegExp(`^${heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'm');
-      
-        content = content.replace(headingRegex, `<a id="${slug}"></a>\n\n${heading}`);
-      
+      // Replace original heading with a markdown-style anchor link, 
+      // but only outside of code blocks
+      content = content.replace(
+        new RegExp(`^(${heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})$`, 'm'), 
+        (match, originalHeading) => {
+          // Check if the match is within a code block
+          const lines = content.split('\n');
+          const matchIndex = lines.findIndex(line => line === originalHeading);
+          
+          let isInCodeBlock = false;
+          let openCodeBlocks = 0;
+          
+          for (let i = 0; i < matchIndex; i++) {
+            if (lines[i].startsWith('```')) {
+              openCodeBlocks += lines[i].match(/```/g).length;
+            }
+          }
+          
+          isInCodeBlock = (openCodeBlocks % 2 !== 0);
+          
+          // If not in a code block, add the anchor
+          return isInCodeBlock 
+            ? originalHeading 
+            : `<a id="${slug}"></a>\n\n${originalHeading}`;
+        }
+      );
     });
 
     toc += tocEntries.join("\n");
@@ -88,4 +110,4 @@ const postProcessBlogPost = (content, documents) => {
 
 module.exports = {
   postProcessBlogPost
-}
+};

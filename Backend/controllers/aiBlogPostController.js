@@ -122,6 +122,7 @@ const generateBlogPost = async (req, res) => {
              e. Use markdown formatting throughout
              f. Use clear, descriptive titles for sections and subsections
              g. Do not add any anchor links or HTML tags to the content
+             h. Do not  add HTML comments in the content
       
           3. SEO Optimization:
              - Use the main keyword in the title and naturally throughout the content
@@ -177,7 +178,7 @@ const generateBlogPost = async (req, res) => {
       
       CRITICAL REMINDERS:
       1. You MUST have EXACTLY 5 main sections (##) and 3 subsections (###) per main section.
-      2. Each subsection MUST have EXACTLY 8 paragraphs. Use comments to track: <!-- Paragraph 1 -->, <!-- Paragraph 2 -->, etc.
+      2. Each subsection MUST have EXACTLY 8 paragraphs.
       3. Each subsection MUST include at least one code example.
       4. Explain all code examples thoroughly.
       5. Do not skip or combine any sections or subsections.

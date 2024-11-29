@@ -57,12 +57,11 @@ const Write = () => {
   const [cat, setCat] = useState(location?.state?.category || '');
   const [tags, setTags] = useState(Array.isArray(location?.state?.tags) ? location.state.tags : []);
   const [draftId, setDraftId] = useState(draftParamId);
-  const [postId] = useState(location?.state?.pid || '');
+  const [postId, setPostId] = useState(location?.state?.pid || '');
   const [metadataPost, setMetadataPost] = useState();
   const [initialMarkdown, setInitialMarkdown] = useState('');
   const [post, setPost] = useState('');
 
-  
   const [image, setImage] = useState('');
   const [awsUrlS3, setAwsUrlS3] = useState('');
   const [showPublishComponent, setShowPublishComponent] = useState(true);
@@ -70,7 +69,10 @@ const Write = () => {
   const editorRef = useRef(null);
   const editorContainerRef = useRef(null);
   const [saveStatus, setSaveStatus] = useState('');
-
+  const [copilotConfig, setCopilotConfig] = useState({
+    enabled: false,
+    apiKey: ''
+  });
   const [imageState, setImageState] = useState({
     fileData: null,
     metadata: null,
@@ -83,9 +85,10 @@ const Write = () => {
     isEnabled: true,
     lastTriggerTime: 0
   });
+  const [isCopilotEnabled, setIsCopilotEnabled] = useState(false);
 
   const savingTimeoutRef = useRef(null);
-
+  const editorInstanceRef = useRef(null);
   const contentTimeoutRef = useRef(null);
 
   const saveDraftAndPostAutomatically = useCallback(async () => {
@@ -133,87 +136,128 @@ const Write = () => {
       }
     }
   }, [title, desc, cont, cat, tags, imageState, postId, draftId, location?.state?.pid]);
-
-
-
-  const handleEditorChange = useCallback((content) => {
-    setCont(content);
-    setEditorContent(content);
-    
-    // Get paragraphs and current paragraph
-    const paragraphs = content.split(/\n\n+/);
-    const currentParagraph = paragraphs[paragraphs.length - 1]?.trim() || '';
-    
-    if (suggestionState.isEnabled) {
-      setSuggestionState(prev => {
-        const charDiff = currentParagraph.length - (prev.currentParagraph?.length || 0);
-        const newCount = Math.max(0, prev.newCharCount + (charDiff > 0 ? charDiff : 0));
-        
-        return {
-          ...prev,
-          currentParagraph,
-          newCharCount: newCount,
-          showSuggestions: newCount >= 50
-        };
+  const handleCopilotChange = ({ enabled, apiKey }) => {
+    setCopilotConfig({ enabled, apiKey });
+    // Reset suggestion state when copilot is disabled
+    if (!enabled || !apiKey) {
+      setSuggestionState({
+        currentParagraph: '',
+        newCharCount: 0,
+        isEnabled: false,
+        lastTriggerTime: 0,
+        trackingNewParagraph: false
       });
-    }
-
-    // Autosave logic
-    setSaveStatus('Saving...');
-    if (contentTimeoutRef.current) clearTimeout(contentTimeoutRef.current);
-    if (savingTimeoutRef.current) clearTimeout(savingTimeoutRef.current);
-
-    contentTimeoutRef.current = setTimeout(async () => {
-      try {
-        await saveDraftAndPostAutomatically();
-        setSaveStatus('Saved');
-        savingTimeoutRef.current = setTimeout(() => setSaveStatus(''), 1000);
-      } catch (error) {
-        setSaveStatus('Error saving');
-        savingTimeoutRef.current = setTimeout(() => setSaveStatus(''), 1000);
-      }
-    }, 1000);
-  }, [suggestionState.isEnabled, saveDraftAndPostAutomatically]);
-
-  const handleSuggestionSelect = useCallback((suggestion) => {
-    // Get the current content
-    const currentContent = editorContent;
-    
-    // Split into paragraphs
-    const paragraphs = currentContent.split(/\n\n+/);
-    
-    // Create new content with the suggestion
-    const newContent = [
-      ...paragraphs.slice(0, -1),
-      paragraphs[paragraphs.length - 1]?.trim() || '',
-      suggestion,
-      '' // Add empty line for next paragraph
-    ].filter(Boolean).join('\n\n');
-
-    // Update the editor content
-    setCont(newContent);
-    setEditorContent(newContent);
-    
-    // Force editor refresh
-    setEditorKey(prev => prev + 1);
-    
-    // Reset suggestion state
-    setSuggestionState({
-      currentParagraph: '',
-      newCharCount: 0,
-      isEnabled: false,
-      lastTriggerTime: Date.now()
-    });
-
-    // Re-enable suggestions after delay
-    setTimeout(() => {
-      setSuggestionState(prev => ({
+    } else {
+      setSuggestionState((prev) => ({
         ...prev,
         isEnabled: true
       }));
-    }, 2000);
-  }, [editorContent]);
-    const handleToggle = (event) => {
+    }
+  };
+
+  const handleEditorChange = useCallback(
+    (content) => {
+      setCont(content);
+      setEditorContent(content);
+
+      // Only process suggestions if copilot is enabled
+      if (copilotConfig.enabled && copilotConfig.apiKey) {
+        const paragraphs = content.split(/\n\n+/);
+        const currentParagraph = paragraphs[paragraphs.length - 1]?.trim() || '';
+
+        if (suggestionState.isEnabled) {
+          setSuggestionState((prev) => {
+            if (prev.trackingNewParagraph) {
+              return {
+                ...prev,
+                currentParagraph,
+                newCharCount: currentParagraph.length,
+                showSuggestions: currentParagraph.length >= 50,
+                trackingNewParagraph: currentParagraph.length > 0
+              };
+            }
+
+            const charDiff = currentParagraph.length - (prev.currentParagraph?.length || 0);
+            const newCount = Math.max(0, prev.newCharCount + (charDiff > 0 ? charDiff : 0));
+
+            return {
+              ...prev,
+              currentParagraph,
+              newCharCount: newCount,
+              showSuggestions: newCount >= 50
+            };
+          });
+        }
+      }
+
+      // Autosave logic
+      setSaveStatus('Saving...');
+      if (contentTimeoutRef.current) clearTimeout(contentTimeoutRef.current);
+      if (savingTimeoutRef.current) clearTimeout(savingTimeoutRef.current);
+
+      contentTimeoutRef.current = setTimeout(async () => {
+        try {
+          await saveDraftAndPostAutomatically();
+          setSaveStatus('Saved');
+          savingTimeoutRef.current = setTimeout(() => setSaveStatus(''), 1000);
+        } catch (error) {
+          setSaveStatus('Error saving');
+          savingTimeoutRef.current = setTimeout(() => setSaveStatus(''), 1000);
+        }
+      }, 1000);
+    },
+    [
+      copilotConfig.enabled,
+      copilotConfig.apiKey,
+      suggestionState.isEnabled,
+      saveDraftAndPostAutomatically
+    ]
+  );
+
+  const handleSuggestionSelect = useCallback(
+    (suggestion) => {
+      // Get the current content
+      const currentContent = editorContent;
+
+      // Split into paragraphs
+      const paragraphs = currentContent.split(/\n\n+/);
+
+      // Create new content with the suggestion
+      const newContent = [
+        ...paragraphs.slice(0, -1),
+        paragraphs[paragraphs.length - 1]?.trim() || '',
+        suggestion,
+        '' // Add empty line for next paragraph
+      ]
+        .filter(Boolean)
+        .join('');
+
+      // Update the editor content
+      setCont(newContent);
+      setEditorContent(newContent);
+
+      // Force editor refresh
+      setEditorKey((prev) => prev + 1);
+
+      // Reset suggestion state
+      setSuggestionState({
+        currentParagraph: '',
+        newCharCount: 0,
+        isEnabled: false,
+        lastTriggerTime: Date.now()
+      });
+
+      // Re-enable suggestions after delay
+      setTimeout(() => {
+        setSuggestionState((prev) => ({
+          ...prev,
+          isEnabled: true
+        }));
+      }, 2000);
+    },
+    [editorContent]
+  );
+  const handleToggle = (event) => {
     event.preventDefault();
     setShowPublishComponent(!showPublishComponent);
   };
@@ -545,7 +589,7 @@ const Write = () => {
       <Wrapper>
         <EditorWrapper>
           <StickyEditor>
-            <ArtificialIntelligenceComponent />
+            <ArtificialIntelligenceComponent onCopilotChange={handleCopilotChange} />
             <input
               className="h1"
               type="text"
@@ -566,7 +610,10 @@ const Write = () => {
 
               <MDXEditor
                 key={editorKey}
-                ref={editorRef}
+                ref={(editor) => {
+                  editorRef.current = editor;
+                  editorInstanceRef.current = editor;
+                }}
                 markdown={cont}
                 onChange={handleEditorChange}
                 plugins={[
@@ -602,11 +649,12 @@ const Write = () => {
                       php: 'PHP',
                       css: 'CSS',
                       shell: 'Shell',
-                      bash: 'Bash',
+                      bash: 'bash',
                       html: 'HTML',
                       json: 'JSON',
                       nginx: 'Nginx',
-                      dockerfile: 'Dockerfile',
+                      Dockerfile: 'Dockerfile',
+                      dockerfile: 'dockerfile',
                       yaml: 'Yaml',
                       csharp: 'C#',
                       makefile: 'Makefile'
@@ -624,6 +672,7 @@ const Write = () => {
                       bash: 'bash',
                       nginx: 'nginx',
                       Dockerfile: 'Dockerfile',
+                      dockerfile: 'dockerfile',
                       yaml: 'yaml',
                       csharp: 'csharp',
                       makefile: 'makefile'
@@ -653,13 +702,17 @@ const Write = () => {
                 contentEditableClassName="mdx-editor"
               />
 
-              {suggestionState.showSuggestions && suggestionState.isEnabled  && (
-                <CopilotPanel
-                  currentText={suggestionState.currentParagraph}
-                  onSuggestionSelect={handleSuggestionSelect}
-                  editorRef={editorContainerRef}
-                />
-              )}
+              {copilotConfig.enabled &&
+                copilotConfig.apiKey &&
+                suggestionState.showSuggestions &&
+                suggestionState.isEnabled && (
+                  <CopilotPanel
+                    currentText={suggestionState.currentParagraph}
+                    onSuggestionSelect={handleSuggestionSelect}
+                    editorRef={editorContainerRef}
+                    apiKey={copilotConfig.apiKey}
+                  />
+                )}
             </EditorContainer>
           </StickyEditor>
         </EditorWrapper>

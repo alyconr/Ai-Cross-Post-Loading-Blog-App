@@ -5,10 +5,10 @@ const { HumanMessage } = require("@langchain/core/messages");
 
 const generateSuggestions = async (req, res) => {
     try {
-        const { text } = req.body;
+        const { text, openAiApiKey } = req.body;
         
         const chat = new ChatOpenAI({
-            openAIApiKey: process.env.OPENAI_API_KEY,
+            openAiApiKey,
             temperature: 0.7,
             modelName: "gpt-4-turbo-preview", // Corrected model name
         });

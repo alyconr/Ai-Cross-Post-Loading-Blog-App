@@ -26,7 +26,7 @@ const CopilotPanel = ({ currentText, onSuggestionSelect, apiKey }) => {
         try {
           const response = await axios.post(
             `${import.meta.env.VITE_API_URI}/aiCopilotComponent/suggestions`,
-            { text: currentText },
+            { text: currentText , openAiApiKey: apiKey },
             {
               headers: { 'Content-Type': 'application/json' },
               withCredentials: true

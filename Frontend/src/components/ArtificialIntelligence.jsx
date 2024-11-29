@@ -56,7 +56,7 @@ const ArtificialIntelligenceComponent = ({ onCopilotChange }) => {
         }
       }
     };
-
+    
     fetchApiKey();
   }, [currentUser?.user.id, copilot]);
 

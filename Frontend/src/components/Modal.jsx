@@ -77,8 +77,7 @@ const CustomModal = ({
   };
 
   const handlePublishAll = async () => {
-    await handlePublishAndDeleteDraft();
-    await handleClose();
+    
 
     if (publishDevTo === true) {
       await handlePostDevTo();
@@ -91,6 +90,9 @@ const CustomModal = ({
     if (publishHashnodeTo === true) {
       await handlePostHashnodeTo();
     }
+
+    await handlePublishAndDeleteDraft();
+    await handleClose();
   };
 
   return (

@@ -85,8 +85,8 @@ const Write = () => {
     isEnabled: true,
     lastTriggerTime: 0
   });
-  const [isCopilotEnabled, setIsCopilotEnabled] = useState(false);
 
+  
   const savingTimeoutRef = useRef(null);
   const editorInstanceRef = useRef(null);
   const contentTimeoutRef = useRef(null);
@@ -500,6 +500,13 @@ const Write = () => {
 
       const res = await axios.post(`${import.meta.env.VITE_API_URI}/upload`, formData);
       fileUrl = res.data.url;
+
+ 
+
+      setImageState((prev) => ({
+        ...prev,
+        awsUrl: fileUrl
+      }));
 
       const metadata = file?.metadata || image?.metadata || null;
 

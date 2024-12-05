@@ -28,11 +28,17 @@ const PublishComponent = ({
     if (imageState.fileData?.metadata?.name) {
       return `Selected Image: ${imageState.fileData.metadata.name}`;
     }
+    if (imageState.awsUrl) {
+      return `Current Image: ${imageState.awsUrl.split('/').pop()}`;
+    }
+    if (image) {
+      return `Current Image: ${image.split('/').pop()}`;
+    }
     return postId ? 'Please upload a new image' : 'No image selected';
   };
-
+  
   const canPublish = () => {
-    return imageState.fileData?.metadata?.name || imageState.awsUrl;
+    return imageState.fileData?.metadata?.name || imageState.awsUrl || image;
   };
 
   useEffect(() => {
@@ -250,17 +256,7 @@ PublishComponent.propTypes = {
   cont: PropTypes.string,
   desc: PropTypes.string,
   // Update image prop type to accept either string or object
-  image: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.shape({
-      base64String: PropTypes.string,
-      metadata: PropTypes.shape({
-        name: PropTypes.string,
-        type: PropTypes.string,
-        size: PropTypes.number,
-      }),
-    }),
-  ]),
+  image: PropTypes.string,
   cat: PropTypes.string,
   postId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]), // Also fixing postId
   tags: PropTypes.arrayOf(PropTypes.string),

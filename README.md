@@ -4,7 +4,7 @@
 
 <div align="center">
 
-<img src="logo.png" alt="logo" width="140" height="auto" style="border-radius:50%"   />
+<img src="logo.png" alt="logo" width="400" height="250"   />
 <br/>
 <h3><b>AI CROSS POST BLOG APP WITH COPILOT FEATURE</b>
 

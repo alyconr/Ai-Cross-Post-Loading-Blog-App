@@ -22,6 +22,12 @@ install-backend:
 install-frontend:
 	cd Frontend && npm install
 
+# Execute test in the frontend
+
+.PHONY: test-frontend
+test-frontend:
+	cd Frontend && npm  test
+
 # Docker development
 
 .PHONY: docker-dev-up
@@ -42,6 +48,12 @@ docker-prod-up:
 .PHONY: docker-prod-down
 docker-prod-down:
 	${DOCKER_COMPOSE_PRODUCTION} down
+
+# Create database
+
+.PHONY: create-database
+create-database:
+	cd Scripts && ./setup_database.sh
 
 
 # Certificates

@@ -93,6 +93,21 @@ git clone https://github.com/alyconr/Ai-Cross-Post-Loading-Blog-App.git
 
 Install This project using MAKE:
 
+For Linux:
+```sh
+apt-get install make
+```
+
+For Windows:
+```sh
+choco install make
+```
+
+For MacOS:
+```sh
+brew install make
+```
+
 ### Install dependencies
 
 Backend:

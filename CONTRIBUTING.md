@@ -1,85 +1,120 @@
 # Contributin
 
-Contributing explica como configurar los requerimientos del projecto
+Contributing explain how to configure and run the project
 
-## Instalación
+## Instalation 
 
-Antes de desarrollar, es necesario tener instalado:
+Before start the project you need to install the following dependencies
 
 * [NodeJS y NPM](https://nodejs.org/)
-* [MongoDB](https://www.mongodb.com)
+* [mysql](https://www.mysql.com)
   
-## Ejecución
+## Run dependencies
 
-### Configuración de entornos
+### Environment variables
 
-Antes de ejecutar la apliación, es recomendable revisar las variables de entorno para la correcta configuración del proyecto, estas se pueden revisar aquí:
+Before start the project you need to configure the following environment variables
 
 ```.env
-********* ui/.env *********
-REACT_APP_LOCALE=es-ES
-REACT_APP_BASE_URI=
-REACT_APP_API_URI=http://localhost:4000
-SECRET=e89f987sdfs9d879f8798dsf78978
+********* Frontend/.env *********
+VITE_API_URI=http://localhost:9000/api/v1
+VITE_API_UPLOAD=http://localhost:9000
 ```
 
-* `REACT_APP_LOCALE` configura el idioma local del proyecto.
-* `REACT_APP_API_URI` configura la url a la que la API apuntará.
-* `REACT_APP_BASE_URI` configura un path extra para la uri si fuera necesario (si se configura con por ejemplo `/extra` la url final será `http://localhost:4000/extra/...`)
-* `SECRET` configura el secreto del JWT (para verificación, actualmente no tiene uso)
+* `VITE_API_URI` This is the url to the API
+* `VITE_API_UPLOAD` This is the url to the API upload
 
 ```.env
-********* api/.env *********
+********* Backend/.env *********
 #can be 'development' or 'production'
-NODE_ENV=development
+MYSQL_URI=mysql://root:P@tata@localhost:3306/ai_blog_posts
+MYSQL_ROOT_PASSWORD=P@tata
+MYSQL_DATABASE= ai_blog_posts
+CA_PATH=./ca.pem
+JWT_SECRET=secret
+NODE_ENV=production
+EMAIL=deveopsengineer473@gmail.com
+PASSWORD=iygj qars kvha yqzx
+VITE_URI_HOST=http://localhost:5173
+VITE_PROD_URI=http://localhost
+VITE_PROD_URI_HTTP=http://localhost:80
+VITE_PROD_URI_HTTPS=https://localhost:443
+VITE_API_URI=http://localhost:9000/api/v1
+VITE_APP_SWAGGER=http://localhost:9000
 
-#your app port
-PORT=4000
+QDRANT_URL=https://qdrantKEY.cloud.qdrant.io
+QDRANT_API_KEY=dUw-ugJVFnQJL-Fak1I7_Z9umNKAZhjcja_JHxbQ
 
-SECRET=e89f987sdfs9d879f8798dsf78978
+GOOGLE_API_KEY=AIzaVSJRI5ARTCqloQ
+GOOGLE_SEARCH_ENGINE_ID=b1faea9a4725
+
+AWS_ACCESS_KEY_ID=PKKIA552525252322JWDZD5OO
+AWS_SECRET_ACCESS_KEY=ZfxdnaIVpAYQqho854454
+AWS_REGION=us-east-2
+AWS_BUCKET_NAME=uploadsblog
 ```
 
-* `NODE_ENV` configura el entorno para desarrollo o producción
-* `PORT` configura el puerto de la aplicación
-* `SECRET` configura el secreto del JWT para verificación
+* `NODE_ENV` Configure the environment (development or production)
+* `MYSQL_URI` Configure the connection to the database
+* `MYSQL_ROOT_PASSWORD` Configure the password for the root user
+* `MYSQL_DATABASE` Configure the name of the database
+* `CA_PATH` Configure the path to the certificate file
+* `JWT_SECRET` Configure the secret for the JWT
+* `EMAIL` Configure the email for the user
+* `PASSWORD` Configure the password for the user
+* `VITE_URI_HOST` Configure the url to the frontend
+* `VITE_PROD_URI` Configure the url to the backend
+* `VITE_PROD_URI_HTTP` Configure the url to the backend http
+* `VITE_PROD_URI_HTTPS` Configure the url to the backend https
+* `VITE_API_URI` Configure the url to the api
+* `VITE_APP_SWAGGER` Configure the url to the swagger
+* `QDRANT_URL` Configure the url to the qdrant
+* `QDRANT_API_KEY` Configure the api key to the qdrant
+* `GOOGLE_API_KEY` Configure the api key to the google
+* `GOOGLE_SEARCH_ENGINE_ID` Configure the search engine id to the google
+* `AWS_ACCESS_KEY_ID` Configure the access key id to the aws
+* `AWS_SECRET_ACCESS_KEY` Configure the secret access key to the aws
+* `AWS_REGION` Configure the region to the aws
+* `AWS_BUCKET_NAME` Configure the bucket name to the aws
 
-### Instalación dependencias
 
-Instalar las dependencias de ambos proyectos, puedes seguir este script
+### Install dependencies
+
+To install the dependencies, you can use the following commands:
 
 ```bash
-cd api
+cd Backend
 npm install
-cd ../ui
+cd ../Frontend
 npm install
 ```
 
-o simplemente ejecutar `make install-dependencies`
+or just run `make install-dependencies`
 
-### Ejecución Makefile
+###  Makefile Run
 
-Para la ejecución, usamos un **Makefile** con las instrucciones para las dos infraestructuras. Aquí puedes consultar el uso de los [Phony Targets](https://www.gnu.org/software/make/manual/html_node/Phony-Targets.html). Con el fichero Makefile puedes:
+For execution, we use a Makefile with instructions for both infrastructures. Here you can learn about using  [Phony Targets](https://www.gnu.org/software/make/manual/html_node/Phony-Targets.html). With the Makefile you can:
 
-1. Instalar las dependencias con `make install-dependencies`
+1. Install dependencies: `make install-dependencies`
 
-2. Para añadir la información a la bbdd:
-   1. **linux** o **macOS**: Ejecuta `make dev-bbdd-start-populate`
-   2. **Windows**: Inicia primero **mongoDB** y luego ejectua `make dev-populate-data`
-
-3. Para ejecutar la app:
+2. To run the app:
    1. **linux** o **macOS**: ejecuta `make dev-start`
-   2. **Windows**: Inicia primero **mongoDB** y luego ejectua `make dev-api` en una consola y en otra `make dev-ui`
+   2. **Windows**: Run `make dev-backend` and in another terminal `make dev-frontend`
 
-4. La contraseña actual es **patata** que corresponde con el hash de bcrypt `$2b$10$YZ1W1tjiKP3g4j8mGzJAhelx0nlQ4otJIefWXGco8.bk6SOxaunhy`, para cambiar esta contraseña ejecuta `make generate-password -e USERNAME=[CORREO] -e PASS=[CONTRASEÑA]`
 
 ### Scripts BBDD
 
-Para inicializar el proyecto con datos iniciales, utilizamos la importación de estrucutras **json** dentro de **MongoDB**. Para ello usamos el comando `mongoimport --jsonArray` con el que importaremos los json creados. El código usado es el siguiente.
+To create the database, you can use the following commands:
 
 ```bash
-mongoimport --jsonArray --db portfolio_db --collection users --file mockUsername.json
-mongoimport --jsonArray --db portfolio_db --collection profile --file mockProfile.json
-mongoimport --jsonArray --db portfolio_db --collection projects --file mockProjects.json
+make create-database
 ```
 
-Como podéis comprobar, los ficheros `mockProfile.json`, `mockProjects.json`y `mockUsername.json`. Cambiando los datos allí, e importando los nuevos ficheros, tendremos los cambios reflejados en nuestro documento.
+### Certificates
+
+To create the certificates, you can use the following commands:
+
+```bash
+make generate-certificates
+```
+

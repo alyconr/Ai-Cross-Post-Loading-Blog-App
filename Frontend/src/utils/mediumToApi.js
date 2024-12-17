@@ -13,7 +13,7 @@ const handleCrossPostToMedium = async (
 ) => {
   const mediumProxiEndPoint = `${import.meta.env.VITE_API_URI}/medium-proxy`;
 
-  const markdownContent = `${title}\n\n![${title}](${image})${description}\n\n${content}`;
+  const markdownContent = `${description}\n\n${content}`;
 
   const articleData = {
     title: title,

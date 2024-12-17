@@ -71,7 +71,7 @@ AWS_BUCKET_NAME=uploadsblog
 * `QDRANT_URL` Configure the url to the qdrant
 * `QDRANT_API_KEY` Configure the api key to the qdrant
 * `GOOGLE_API_KEY` Configure the api key to the google
-* `GOOGLE_SEARCH_ENGINE_ID` Configure the search engine id to the google
+* `GOOGLE_SEARCH_ENGINE_ID` Configure the search engine id to the google this is to web scrap google search
 * `AWS_ACCESS_KEY_ID` Configure the access key id to the aws
 * `AWS_SECRET_ACCESS_KEY` Configure the secret access key to the aws
 * `AWS_REGION` Configure the region to the aws

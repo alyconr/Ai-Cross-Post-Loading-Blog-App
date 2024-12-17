@@ -223,6 +223,9 @@ Production:
 ```sh
   make docker-prod-up
 ```
+
+To access the frontend, open your browser and navigate to https://localhost
+
 To stop the containers, run the following command:
 
 ```sh
